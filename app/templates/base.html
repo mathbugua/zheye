@@ -1,21 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN" dropEffect="none" class="no-js ">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8" />
 
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-<meta name="renderer" content="webkit" />
-<meta http-equiv="X-ZA-Response-Id" content="001fbe6bda1c3364">
-<meta http-equiv="X-ZA-Experiment" content="default:None,ge7:ge7_3,ge3:ge3_9,ge2:ge2_1,ge4:ge4_1,Enable_Live_FeaturedDetail:newVersion">
-
 <title>首页 - 者也</title>
 
-<meta name="apple-itunes-app" content="app-id=432274380" />
 
-
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
-<meta http-equiv="mobile-agent" content="format=html5;url=https://www.zhihu.com/">
-<meta id="znonce" name="znonce" content="2e3d10f5274a4819bb52a8aba5fae581">
 
 
 
@@ -28,14 +18,9 @@
 <link rel="shortcut icon" href="https://static.zhihu.com/static/favicon.ico" type="image/x-icon">
 
 <link rel="search" type="application/opensearchdescription+xml" href="https://static.zhihu.com/static/search.xml" title="知乎" />
-<link rel="stylesheet" href="{{url_for('static', filename='style/zheye.css')}}">
+<link rel="stylesheet" href="https://static.zhihu.com/static/revved/-/css/z.c138a781.css">
 
 
-
-
-<style>
-.zm-item-answer-author-info a.collapse {margin-top: 0}
-</style>
 
 </head>
 
@@ -205,9 +190,9 @@ style="visibility:hidden" data-count="0">
 <div class="zu-main-content">
 <div class="zu-main-content-inner">
 
+{% block body %}
 
-
-
+{% endblock %}
 
 
 
