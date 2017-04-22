@@ -1,5 +1,5 @@
 # coding=utf-8
-from flask_login import login_user, login_required, logout_user
+from flask_login import login_user, login_required, logout_user, current_user
 from flask import render_template, redirect, url_for, request, flash
 
 from app import db
@@ -7,6 +7,15 @@ from app.auth import auth
 from app.auth.forms import LoginForm, RegistrationForm
 from app.helpers.email import send_email
 from app.models.models import User
+
+
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated:
+        if not current_user.confirmed \
+                and request.endpoint[:5] != 'auth.'\
+                and request.endpoint != 'static':
+            return redirect(url_for('auth.unconfirmed'))
 
 
 @auth.route('/login', methods=['GET', 'POST'])
@@ -18,7 +27,7 @@ def login_register():
         user = User.query.filter_by(email=login_form.email.data).first()
         if user is not None and user.verify_password(login_form.password.data):
             login_user(user, login_form.remember_me.data)
-            return redirect(request.args.get('next') or url_for('main.index'))
+            return redirect(url_for('main.index'))
         flash(u'错误的用户名或密码.')
 
     # 进行注册表单的验证
@@ -44,22 +53,34 @@ def login_register():
 @login_required
 def logout():
     logout_user()
-    flash('You have been logged out.')
     return redirect(url_for('main.index'))
 
 
-# @auth.route('/register', methods=['GET', 'POST'])
-# def register():
-#     form = RegistrationForm()
-#     if form.validate_on_submit():
-#         user = User(email=form.email.data,
-#                     username=form.username.data,
-#                     password=form.password.data)
-#         db.session.add(user)
-#         db.session.commit()
-#         # token = user.generate_confirmation_token()
-#         # send_email(user.email, 'Confirm Your Account',
-#         #            'auth/email/confirm', user=user, token=token)
-#         # flash('A confirmation email has been sent to you by email.')
-#         return redirect(url_for('auth.login'))
-#     return render_template('auth/register.html', form=form)
+@auth.route('/confirm/<token>')
+@login_required
+def confirm(token):
+    if current_user.confirmed:
+        return redirect(url_for('main.index'))
+    if current_user.confirm(token):
+        flash(u'账户验证成功')
+    else:
+        flash(u'验证链接已过期或无效.')
+    return redirect(url_for('main.index'))
+
+
+@auth.route('/unconfirmed')
+def unconfirmed():
+    if current_user.is_anonymous or current_user.confirmed:
+        return redirect(url_for('main.index'))
+    return render_template('auth/unconfirmed.html', user=current_user)
+
+
+@auth.route('/confirm')
+@login_required
+def resend_confirmation():
+    """进行验证邮箱的重新发送"""
+    token = current_user.generate_confirmation_token()
+    send_email(current_user.email, 'Confirm Your Account',
+               'auth/email/confirm', user=current_user, token=token)
+    flash(u'验证邮件已发送到你的邮箱')
+    return redirect(url_for('main.index'))

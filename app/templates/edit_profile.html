@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block head %}
+    {{ super()}}
+<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+{% endblock %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}{{user.username}}{% endblock %}
+{% block page_content %}
+<main role="main" class="App-main">
+    <div id="ProfileHeader" class="ProfileHeader">
+        <div class="Card">
+            <div class="ProfileHeader-userCover">
+                <div class="UserCover">
+                    <img class="UserCover-image" src="{{url_for('static', filename='images/user_images.jpg')}}"
+                         alt="用户封面">
+                </div>
+            </div>
+            <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+            </div>
+        </div>
+    </div>
+    </div>
+</main>
+
+{% endblock %}

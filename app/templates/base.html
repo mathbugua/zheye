@@ -1,217 +1,220 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8" />
+    <meta charset="utf-8"/>
 
-<title>首页 - 者也</title>
+    <title>{% block title %}{% endblock %}</title>
 
-
-
-
-
-<link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-152.87c020b9.png" sizes="152x152">
-<link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-120.496c913b.png" sizes="120x120">
-<link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-76.dcf79352.png" sizes="76x76">
-<link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-60.9911cffb.png" sizes="60x60">
-
-
-<link rel="shortcut icon" href="https://static.zhihu.com/static/favicon.ico" type="image/x-icon">
-
-<link rel="search" type="application/opensearchdescription+xml" href="https://static.zhihu.com/static/search.xml" title="知乎" />
-<link rel="stylesheet" href="{{url_for('static', filename='style/zheye.css')}}">
+    <link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-152.87c020b9.png"
+          sizes="152x152">
+    <link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-120.496c913b.png"
+          sizes="120x120">
+    <link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-76.dcf79352.png"
+          sizes="76x76">
+    <link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-60.9911cffb.png"
+          sizes="60x60">
 
 
+    <link rel="shortcut icon" href="https://static.zhihu.com/static/favicon.ico" type="image/x-icon">
+
+    <link rel="search" type="application/opensearchdescription+xml" href="https://static.zhihu.com/static/search.xml"
+          title="知乎"/>
+    <script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js">
+    </script>
+    <link rel="stylesheet" href="{{url_for('static', filename='style/zheye.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style/mycss.css')}}">
+
+    {% block head %}
+    {% endblock %}
+
+    <script>
+        function mOver(obj) {
+            $(".top-nav-profile ul").addClass("top-nav-dropdowntop-nav-dropdown-other");
+        }
+        function mOut(obj) {
+            $(".top-nav-profile ul").removeClass("top-nav-dropdowntop-nav-dropdown-other");
+        }
+    </script>
 
 </head>
 
 <body class="zhi ">
 
 
-
-
 <div role="navigation" class="zu-top" data-za-module="TopNavBar">
-<div class="zg-wrap modal-shifting clearfix" id="zh-top-inner">
-<a href="/" class="zu-top-link-logo" id="zh-top-link-logo" data-za-c="view_home" data-za-a="visit_home" data-za-l="top_navigation_zhihu_logo">知乎</a>
+    <div class="zg-wrap modal-shifting clearfix" id="zh-top-inner">
+        <a href="/" class="zu-top-link-logo" id="zh-top-link-logo" data-za-c="view_home" data-za-a="visit_home"
+           data-za-l="top_navigation_zhihu_logo">知乎</a>
 
-<div class="top-nav-profile">
-<a href="/people/chen_long" class="zu-top-nav-userinfo ">
-<span class="name">陈龙</span>
-<img class="Avatar" src="https://pic3.zhimg.com/d8725d73b1e2bfa1b2cfe1ccaf2669d6_s.jpg" srcset="https://pic3.zhimg.com/d8725d73b1e2bfa1b2cfe1ccaf2669d6_xs.jpg 2x" alt="陈龙" />
-<span id="zh-top-nav-new-pm" class="zg-noti-number zu-top-nav-pm-count"
-style="visibility:hidden" data-count="0">
+        <div onmouseover="mOver(this)" onmouseout="mOut(this)" class="top-nav-profile">
+            <a href="{{ url_for('main.people', username = user.username) }}" class="zu-top-nav-userinfo ">
+                <span class="name">{{user.username}}</span>
+            </a>
+            <ul id="top-nav-profile-dropdown" class="top-nav-dropdown" aria-labelledby=":0" aria-hidden="true">
+                <li>
+                    <a href="{{ url_for('main.people', username = user.username) }}">
+                        <i class="zg-icon zg-icon-dd-home"></i>我的主页
+                    </a>
+                </li>
 
-</span>
-</a>
-<ul class="top-nav-dropdown" id="top-nav-profile-dropdown">
-<li>
-<a href="/people/chen_long">
-<i class="zg-icon zg-icon-dd-home"></i>我的主页
-</a>
-</li>
-
-<li>
-<a href="/inbox">
-<i class="zg-icon zg-icon-dd-pm"></i>私信
-<span id="zh-top-nav-pm-count" class="zu-top-nav-pm-count zg-noti-number"
-style="visibility:hidden" data-count="0">
+                <li>
+                    <a href="/inbox">
+                        <i class="zg-icon zg-icon-dd-pm"></i>私信
+                        <span id="zh-top-nav-pm-count" class="zu-top-nav-pm-count zg-noti-number"
+                              style="visibility:hidden" data-count="0">
 
 </span>
-</a>
-</li>
-<li>
-<a href="/settings">
-<i class="zg-icon zg-icon-dd-settings"></i>设置
-</a>
-</li>
-<li>
-<a href="/logout">
-<i class="zg-icon zg-icon-dd-logout"></i>退出
-</a>
-</li>
-</ul>
+                    </a>
+                </li>
+                <li>
+                    <a href="/settings">
+                        <i class="zg-icon zg-icon-dd-settings"></i>设置
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('auth.logout') }}">
+                        <i class="zg-icon zg-icon-dd-logout"></i>退出
+                    </a>
+                </li>
+            </ul>
 
-</div>
-
-
-
-<button class="zu-top-add-question" id="zu-top-add-question">提问</button>
+        </div>
 
 
-<div role="search" id="zh-top-search" class="zu-top-search">
-<form method="GET" action="#" id="zh-top-search-form" class="zu-top-search-form">
+        <button class="zu-top-add-question" id="zu-top-add-question">提问</button>
 
 
-
-<input type="hidden" name="type" value="content">
-<label for="q" class="hide-text">知乎搜索</label><input type="text" class="zu-top-search-input" id="q" name="q" autocomplete="off" value="" maxlength="100" placeholder="搜索你感兴趣的内容...">
-<button type="submit" class="zu-top-search-button"><span class="hide-text">搜索</span><span class="sprite-global-icon-magnifier-dark"></span></button>
-</form>
-</div>
+        <div role="search" id="zh-top-search" class="zu-top-search">
+            <form method="GET" action="#" id="zh-top-search-form" class="zu-top-search-form">
 
 
-
-<div id="zg-top-nav" class="zu-top-nav">
-<ul class="zu-top-nav-ul zg-clear">
-
-<li class="zu-top-nav-li current" id="zh-top-nav-home">
-<a class="zu-top-nav-link" href="/" id="zh-top-link-home" data-za-c="view_home" data-za-a="visit_home" data-za-l="top_navigation_home">首页</a>
-</li>
-
-
-
-<li class="top-nav-topic-selector zu-top-nav-li " id="zh-top-nav-topic">
-<a class="zu-top-nav-link" href="/topic" id="top-nav-dd-topic">话题</a>
-</li>
-
-<li class="zu-top-nav-li " id="zh-top-nav-explore">
-<a class="zu-top-nav-link" href="/explore">发现</a>
-</li>
-
-<li class="top-nav-noti zu-top-nav-li ">
-<a class="zu-top-nav-link" href="javascript:;" id="zh-top-nav-count-wrap" role="button"><span class="mobi-arrow"></span>消息</a>
-</li>
+                <input type="hidden" name="type" value="content">
+                <label for="q" class="hide-text">知乎搜索</label><input type="text" class="zu-top-search-input" id="q"
+                                                                    name="q" autocomplete="off" value="" maxlength="100"
+                                                                    placeholder="搜索你感兴趣的内容...">
+                <button type="submit" class="zu-top-search-button"><span class="hide-text">搜索</span><span
+                        class="sprite-global-icon-magnifier-dark"></span></button>
+            </form>
+        </div>
 
 
+        <div id="zg-top-nav" class="zu-top-nav">
+            <ul class="zu-top-nav-ul zg-clear">
 
-</ul>
-<div class="zu-top-nav-live zu-noti7-popup zg-r5px no-hovercard" id="zh-top-nav-live-new" role="popup" tabindex="0">
-<div class="zu-top-nav-live-inner zg-r5px">
-<div class="zu-top-live-icon">&nbsp;</div>
-<div class="zu-home-noti-inner" id="zh-top-nav-live-new-inner">
-<div class="zm-noti7-popup-tab-container clearfix" tabindex="0">
-<button class="zm-noti7-popup-tab-item message">
-<span class="icon">消息</span>
-</button>
-<button class="zm-noti7-popup-tab-item user">
-<span class="icon">用户</span>
-</button>
-<button class="zm-noti7-popup-tab-item thanks">
-<span class="icon">赞同和感谢</span>
-</button>
-</div>
-</div>
-<div class="zm-noti7-frame-border top"></div>
-<div class="zm-noti7-frame">
-<div class="zm-noti7-content message">
-<div class="zm-noti7-content-inner">
-<div class="zm-noti7-content-body">
-<div class="zm-noti7-popup-loading">
-<span class="noti-spinner-loading"></span>
-</div>
-</div>
-</div>
-</div>
-<div class="zm-noti7-content user" style="display:none;">
-<div class="zm-noti7-content-inner">
-<div class="zm-noti7-content-body">
-<div class="zm-noti7-popup-loading">
-<span class="noti-spinner-loading"></span>
-</div>
-</div>
-</div>
-</div>
-<div class="zm-noti7-content thanks" style="display:none;">
-<div class="zm-noti7-content-inner">
-<div class="zm-noti7-content-body">
-<div class="zm-noti7-popup-loading">
-<span class="noti-spinner-loading"></span>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="zm-noti7-frame-border bottom"></div>
-<div class="zm-noti7-popup-footer">
-<a href="/notifications" class="zm-noti7-popup-footer-all zg-right">查看全部 &raquo;</a>
-<a href="/settings/notification" class="zm-noti7-popup-footer-set" title="通知设置" ><i class="zg-icon zg-icon-settings"></i></a>
-</div>
-</div>
-</div>
+                <li class="zu-top-nav-li current" id="zh-top-nav-home">
+                    <a class="zu-top-nav-link" href="/" id="zh-top-link-home" data-za-c="view_home"
+                       data-za-a="visit_home" data-za-l="top_navigation_home">首页</a>
+                </li>
 
-</div>
 
-</div>
+                <li class="top-nav-topic-selector zu-top-nav-li " id="zh-top-nav-topic">
+                    <a class="zu-top-nav-link" href="/topic" id="top-nav-dd-topic">话题</a>
+                </li>
+
+                <li class="zu-top-nav-li " id="zh-top-nav-explore">
+                    <a class="zu-top-nav-link" href="/explore">发现</a>
+                </li>
+
+                <li class="top-nav-noti zu-top-nav-li ">
+                    <a class="zu-top-nav-link" href="javascript:;" id="zh-top-nav-count-wrap" role="button"><span
+                            class="mobi-arrow"></span>消息</a>
+                </li>
+
+
+            </ul>
+            <div class="zu-top-nav-live zu-noti7-popup zg-r5px no-hovercard" id="zh-top-nav-live-new" role="popup"
+                 tabindex="0">
+                <div class="zu-top-nav-live-inner zg-r5px">
+                    <div class="zu-top-live-icon">&nbsp;</div>
+                    <div class="zu-home-noti-inner" id="zh-top-nav-live-new-inner">
+                        <div class="zm-noti7-popup-tab-container clearfix" tabindex="0">
+                            <button class="zm-noti7-popup-tab-item message">
+                                <span class="icon">消息</span>
+                            </button>
+                            <button class="zm-noti7-popup-tab-item user">
+                                <span class="icon">用户</span>
+                            </button>
+                            <button class="zm-noti7-popup-tab-item thanks">
+                                <span class="icon">赞同和感谢</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="zm-noti7-frame-border top"></div>
+                    <div class="zm-noti7-frame">
+                        <div class="zm-noti7-content message">
+                            <div class="zm-noti7-content-inner">
+                                <div class="zm-noti7-content-body">
+                                    <div class="zm-noti7-popup-loading">
+                                        <span class="noti-spinner-loading"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="zm-noti7-content user" style="display:none;">
+                            <div class="zm-noti7-content-inner">
+                                <div class="zm-noti7-content-body">
+                                    <div class="zm-noti7-popup-loading">
+                                        <span class="noti-spinner-loading"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="zm-noti7-content thanks" style="display:none;">
+                            <div class="zm-noti7-content-inner">
+                                <div class="zm-noti7-content-body">
+                                    <div class="zm-noti7-popup-loading">
+                                        <span class="noti-spinner-loading"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="zm-noti7-frame-border bottom"></div>
+                    <div class="zm-noti7-popup-footer">
+                        <a href="/notifications" class="zm-noti7-popup-footer-all zg-right">查看全部 &raquo;</a>
+                        <a href="/settings/notification" class="zm-noti7-popup-footer-set" title="通知设置"><i
+                                class="zg-icon zg-icon-settings"></i></a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
 </div>
 
 
 <div class="zu-global-notify" id="zh-global-message" style="display:none">
-<div class="zg-wrap">
-<div class="zu-global-nitify-inner">
-<a class="zu-global-notify-close" href="javascript:;" title="关闭" name="close">x</a>
-<span class="zu-global-notify-icon"></span>
-<span class="zu-global-notify-msg"></span>
-</div>
-</div>
-</div>
-
-
-
-<div class="zg-wrap zu-main clearfix "  role="main">
-<div class="zu-main-content">
-<div class="zu-main-content-inner">
-
-{% block body %}
-
-{% endblock %}
-
-{% block title %}
-
-{% endblock %}
-
-{% block page_content %}
-{% endblock %}
-
-
-</div>
-</div>
+    <div class="zg-wrap">
+        <div class="zu-global-nitify-inner">
+            <a class="zu-global-notify-close" href="javascript:;" title="关闭" name="close">x</a>
+            <span class="zu-global-notify-icon"></span>
+            <span class="zu-global-notify-msg"></span>
+        </div>
+    </div>
 </div>
 
 
+<div class="zg-wrap zu-main clearfix " role="main">
+    <div class="zu-main-content">
+        <div class="zu-main-content-inner">
+            <div class="container">
+                {% for message in get_flashed_messages() %}
+                <div class="alert alert-warning">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message }}
+                </div>
+                {% endfor %}
+
+            </div>
+            {% block body %}{% endblock %}
+
+            {% block page_content %}{% endblock %}
 
 
-
-
-
+        </div>
+    </div>
+</div>
 
 
 <meta name="entry" content="ZH.entryHome" data-module-id="page-main">

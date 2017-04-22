@@ -1,3 +1,179 @@
 .container {
     width: auto;
 }
+
+.top-nav-dropdowntop-nav-dropdown-other{
+    display: inline;
+}
+
+
+/*user_pages*/
+.App-main {
+    display: block;
+}
+
+.ProfileHeader {
+    position: relative;
+    width: 1000px;
+    padding: 0 16px;
+    margin: 10px auto;
+}
+
+.Card:last-child {
+    margin-bottom: 0;
+}
+
+.Card {
+    margin-bottom: 10px;
+    background: #fff;
+    border: 1px solid #e7eaf1;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0,37,55,.05);
+    box-sizing: border-box;
+}
+
+.ProfileHeader-userCover {
+    width: 100%;
+}
+
+.UserCoverEditor {
+    position: relative;
+}
+
+.UserCover {
+    position: relative;
+    height: 240px;
+    overflow: hidden;
+    background: #f7f8fa;
+    border-top-right-radius: 1px;
+    border-top-left-radius: 1px;
+    -webkit-transition: height .3s;
+    transition: height .3s;
+}
+
+.UserCover-image, .UserCover-image img {
+    width: 100%;
+    height: 100%;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
+
+.UserCover-image {
+    -webkit-transition: -webkit-transform 6s ease-out;
+    transition: -webkit-transform 6s ease-out;
+    transition: transform 6s ease-out;
+    transition: transform 6s ease-out,-webkit-transform 6s ease-out;
+}
+
+.ProfileHeader-wrapper {
+    position: relative;
+    width: 100%;
+    background: #fff;
+    box-sizing: border-box;
+}
+
+.ProfileHeader-main {
+    position: relative;
+    margin: 0 20px 24px;
+}
+
+.ProfileHeader-content {
+    padding-top: 16px;
+    padding-left: 32px;
+    border-left: 164px solid transparent;
+}
+
+.ProfileHeader-contentHead {
+    position: relative;
+    padding-right: 106px;
+    margin-bottom: 16px;
+}
+
+.ProfileHeader-title {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+h1, h2, h3 {
+    margin: 0;
+    font: inherit;
+}
+
+h1 {
+    display: block;
+    font-size: 2em;
+    -webkit-margin-before: 0.67em;
+    -webkit-margin-after: 0.67em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    font-weight: bold;
+}
+
+.ProfileHeader-contentBody {
+    position: relative;
+    width: 524px;
+    overflow: hidden;
+    -webkit-transition: height .3s;
+    transition: height .3s;
+}
+
+.ProfileHeader-detail {
+    width: 100%;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #262626;
+}
+
+.ProfileHeader-detailItem {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    margin-bottom: 18px;
+}
+
+.ProfileHeader-detailLabel {
+    width: 60px;
+    margin-right: 37px;
+    font-weight: 500;
+}
+
+.ProfileHeader-detailValue {
+    -webkit-box-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    overflow: hidden;
+}
+
+.ProfileHeader-contentFooter {
+    position: relative;
+    padding-top: 8px;
+}
+
+.ProfileHeader-buttons {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.Button--blue {
+    color: #0f88eb;
+    border: 1px solid #0f88eb;
+}
+
+.Button {
+    display: inline-block;
+    padding: 0 16px;
+    font-size: 14px;
+    line-height: 32px;
+    color: #8590a6;
+    text-align: center;
+    cursor: pointer;
+    border: 1px solid #ccd8e1;
+    border-radius: 3px;
+    background: none;
+}
+

@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}{{user.username}}{% endblock %}
+{% block page_content %}
+<main role="main" class="App-main">
+    <div id="ProfileHeader" class="ProfileHeader">
+        <div class="Card">
+            <div class="ProfileHeader-userCover">
+                <div class="UserCover">
+                    <img class="UserCover-image" src="{{url_for('static', filename='images/user_images.jpg')}}"
+                         alt="用户封面">
+                </div>
+            </div>
+
+            <div class="ProfileHeader-wrapper">
+                <div class="ProfileHeader-main">
+                    <div class="ProfileHeader-content">
+                        <div class="ProfileHeader-contentHead">
+                            <h1 class="ProfileHeader-title">
+                                <span class="ProfileHeader-name">{{user.username}}</span>
+                                <span class="RichText ProfileHeader-headline">{{user.short_intr}}</span>
+                            </h1>
+                        </div>
+                        <div class="ProfileHeader-contentBody">
+                            <span>
+                                <div class="ProfileHeader-detail">
+                                    <div class="ProfileHeader-detailItem">
+                                        <span class="ProfileHeader-detailLabel">居住地</span>
+                                        <div class="ProfileHeader-detailValue">
+                                            <span>
+                                                <!-- react-text: 3858 -->现居<!-- /react-text --><!-- react-text: 3859 -->{{user.location}}
+                                                <!-- /react-text -->
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="ProfileHeader-detailItem">
+                                        <span class="ProfileHeader-detailLabel">
+                                            所在行业
+                                        </span>
+                                        <div class="ProfileHeader-detailValue">{{user.industry}}</div>
+                                    </div>
+                                    <div class="ProfileHeader-detailItem">
+                                        <span class="ProfileHeader-detailLabel">
+                                            教育经历
+                                        </span>
+                                        <div class="ProfileHeader-detailValue">
+                                            <div class="ProfileHeader-field">
+                                                <img class="Avatar ProfileHeader-iconWrapper" width="20" height="20"
+                                                     src="{{url_for('static', filename='images/e82bab09c_s.jpg')}}">
+                                                <!-- react-text: 3868 -->{{user.school}}<!-- /react-text -->
+                                                <!-- react-text: 3869 --> · <!-- /react-text -->
+                                                <!-- react-text: 3870 -->{{user.discipline}}<!-- /react-text -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="ProfileHeader-detailItem">
+                                        <span class="ProfileHeader-detailLabel">个人简介</span>
+                                        <div class="RichText ProfileHeader-detailValue">
+                                            {{user.introduction}}
+                                        </div>
+                                    </div>
+
+                                </div>
+                                </span>
+                        </div>
+                        {% if user == current_user %}
+                        <div class="ProfileHeader-contentFooter">
+                            <div class="ProfileButtonGroup ProfileHeader-buttons">
+                                <button class="Button Button--blue" type="button" >
+                                    <a href="{{url_for('main.edit_profile')}}"> 编辑个人资料</a>
+
+
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</main>
+
+{% endblock %}
