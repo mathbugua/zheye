@@ -18,7 +18,7 @@
 <link rel="shortcut icon" href="https://static.zhihu.com/static/favicon.ico" type="image/x-icon">
 
 <link rel="search" type="application/opensearchdescription+xml" href="https://static.zhihu.com/static/search.xml" title="知乎" />
-<link rel="stylesheet" href="https://static.zhihu.com/static/revved/-/css/z.c138a781.css">
+<link rel="stylesheet" href="{{url_for('static', filename='style/zheye.css')}}">
 
 
 
@@ -194,6 +194,12 @@ style="visibility:hidden" data-count="0">
 
 {% endblock %}
 
+{% block title %}
+
+{% endblock %}
+
+{% block page_content %}
+{% endblock %}
 
 
 </div>

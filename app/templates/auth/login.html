@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN" class="">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="renderer" content="webkit" />
+<meta name="description" content="一个真实的网络问答社区，帮助你寻找答案，分享知识。"/>
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>者也 - 与世界分享你的知识、经验和见解</title>
+
+
+<link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-152.87c020b9.png" sizes="152x152">
+<link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-120.496c913b.png" sizes="120x120">
+<link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-76.dcf79352.png" sizes="76x76">
+<link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-60.9911cffb.png" sizes="60x60">
+
+<link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="{{url_for('static', filename='style/main.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='style/mycss.css')}}">
+{% import "bootstrap/wtf.html" as wtf %}
+</head>
+<body class="zhi ">
+
+<div class="index-main">
+<div class="index-main-body">
+<div class="index-header">
+
+<h1 class="logo hide-text">者也</h1>
+
+<h2 class="subtitle">与世界分享你的知识、经验和见解</h2>
+</div>
+<div class="container">
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+</div>
+<div class="desk-front sign-flow clearfix sign-flow-simple">
+
+<ul class="nav nav-tabs">
+	<li class="active">
+		<a href="#signup" data-toggle="tab">
+			注册
+		</a>
+	</li>
+	<li><a href="#signin" data-toggle="tab">登陆</a></li>
+</ul>
+
+<div class="tab-content">
+
+<div class="tab-pane fade" id="signin">
+ {{ wtf.quick_form(form1) }}
+
+
+</div>
+<div class="tab-pane fade in active" id="signup">
+
+   {{ wtf.quick_form(form2) }}
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+<input type="hidden" name="_xsrf" value="9b14b6954a3a69abb9a5832bb0cc9ab8"/>
+</body>
+</html>
