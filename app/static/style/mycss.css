@@ -166,7 +166,7 @@ h1 {
 
 .Button {
     display: inline-block;
-    padding: 0 16px;
+    /*padding: 0 16px;*/
     font-size: 14px;
     line-height: 32px;
     color: #8590a6;
@@ -177,3 +177,14 @@ h1 {
     background: none;
 }
 
+.top-nav-profile-login {
+    float: right;
+    position: relative;
+    min-width: 120px;
+    margin-left: 15px;
+    z-index: 10;
+}
+
+.top-nav-profile-login a{
+    color: #f4f4f4;
+}

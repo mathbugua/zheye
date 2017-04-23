@@ -110,6 +110,43 @@ class User(db.Model, UserMixin):
         db.session.commit()
         return True
 
+    def change_password(self, newpassword):
+        """修改密码"""
+        try:
+            self.password = newpassword
+            db.session.add(self)
+            db.session.commit()
+        except:
+            return False
+        return True
+
+    def generate_email_change_token(self, new_email, expiration=3600):
+        """生成邮箱秘钥"""
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'change_email': self.id, 'new_email': new_email})
+
+    def change_email(self, token):
+        """修改邮箱"""
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return False
+        if data.get('change_email') != self.id:
+            return False
+        new_email = data.get('new_email')
+        if new_email is None:
+            return False
+        if self.query.filter_by(email=new_email).first() is not None:
+            return False
+        self.email = new_email
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except:
+            return False
+        return True
+
 
 @login_manager.user_loader
 def load_user(user_id):

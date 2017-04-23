@@ -4,7 +4,7 @@ from flask import render_template, redirect, url_for, request, flash
 
 from app import db
 from app.auth import auth
-from app.auth.forms import LoginForm, RegistrationForm
+from app.auth.forms import LoginForm, RegistrationForm, ChangepasswordForm, ChangeEmailForm
 from app.helpers.email import send_email
 from app.models.models import User
 
@@ -84,3 +84,57 @@ def resend_confirmation():
                'auth/email/confirm', user=current_user, token=token)
     flash(u'验证邮件已发送到你的邮箱')
     return redirect(url_for('main.index'))
+
+
+@auth.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    return redirect(url_for("auth.profile"))
+
+
+@auth.route('/settings/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    """账户邮箱设置"""
+    form = ChangeEmailForm()
+    if form.validate_on_submit():
+        if current_user.verify_password(form.password.data):
+            new_email = form.email.data
+            token = current_user.generate_email_change_token(new_email)
+            send_email(new_email, 'Confirm your email address',
+                       'auth/email/change_email',
+                       user=current_user, token=token)
+            flash(u'验证已发送到你的邮箱')
+            return redirect(url_for('auth.profile'))
+        else:
+            flash(u'密码错误')
+    return render_template("email_settings.html", user=current_user, form=form)
+
+
+@auth.route('/change-email/<token>')
+@login_required
+def change_email(token):
+    if current_user.change_email(token):
+        flash(u'邮箱账户已修改')
+    else:
+        flash(u'未修改成功')
+    return redirect(url_for('auth.profile'))
+
+
+@auth.route('/settings/password', methods=['GET', 'POST'])
+@login_required
+def password():
+    """用户密码设置"""
+    form = ChangepasswordForm()
+    if form.validate_on_submit():
+        if current_user.verify_password(form.oldpassword.data):
+            if current_user.change_password(form.password.data):
+                flash(u"密码设置成功")
+                logout_user()
+                return redirect(url_for('auth.login_register'))
+            else:
+                flash(u'未能设置成功')
+        else:
+            flash(u"密码错误")
+
+    return render_template("password_settings.html", user=current_user, form=form)

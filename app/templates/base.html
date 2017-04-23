@@ -45,7 +45,7 @@
     <div class="zg-wrap modal-shifting clearfix" id="zh-top-inner">
         <a href="/" class="zu-top-link-logo" id="zh-top-link-logo" data-za-c="view_home" data-za-a="visit_home"
            data-za-l="top_navigation_zhihu_logo">知乎</a>
-
+        {% if current_user.is_authenticated %}
         <div onmouseover="mOver(this)" onmouseout="mOut(this)" class="top-nav-profile">
             <a href="{{ url_for('main.people', username = user.username) }}" class="zu-top-nav-userinfo ">
                 <span class="name">{{user.username}}</span>
@@ -67,7 +67,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/settings">
+                    <a href="{{url_for('auth.settings')}}">
                         <i class="zg-icon zg-icon-dd-settings"></i>设置
                     </a>
                 </li>
@@ -79,6 +79,12 @@
             </ul>
 
         </div>
+
+        {% else %}
+        <div class="top-nav-profile-login">
+            <button class="Button " type="button" ><a href="{{url_for('auth.login_register')}}">登录</a></button>
+            </div>
+    {% endif %}
 
 
         <button class="zu-top-add-question" id="zu-top-add-question">提问</button>

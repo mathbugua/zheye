@@ -33,3 +33,24 @@ class RegistrationForm(FlaskForm):
     def validate_username(self, field):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('Username already in use.')
+
+
+class ChangepasswordForm(FlaskForm):
+    """修改密码"""
+    oldpassword = PasswordField(u'原始密码', validators=[Required()])
+    password = PasswordField(u'新密码', validators=[
+        Required(), EqualTo('password2', message='Passwords must match.')])
+    password2 = PasswordField(u'再次输入', validators=[Required()])
+    submit = SubmitField(u'保存')
+
+
+class ChangeEmailForm(FlaskForm):
+    """修改邮箱"""
+    email = StringField(u'新邮箱', validators=[Required(), Length(1, 64),
+                                                 Email()])
+    password = PasswordField(u'密码', validators=[Required()])
+    submit = SubmitField(u'保存')
+
+    def validate_email(self, field):
+        if User.query.filter_by(email=field.data).first():
+            raise ValidationError('Email already registered.')
