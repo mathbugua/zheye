@@ -1,6 +1,31 @@
 {% extends "base.html" %}
 
 {% block title %}{{user.username}}{% endblock %}
+{% block head %}
+{{super()}}
+<script>
+    function mover_img(obj) {
+        $(".UserAvatarEditor .Mask").removeClass("Mask-hidden");
+    }
+    function mout_img(obj) {
+        $(".UserAvatarEditor .Mask").addClass("Mask-hidden");
+    }
+</script>
+<script type="text/javascript">
+    function openFile() {
+        document.getElementById("file").click();
+//             document.getElementById("submit").click();
+    }
+    function is_upload(obj) {
+        var ok = confirm("确定修改");
+        if (ok == true){
+            obj.form.submit();
+        }
+
+    }
+</script>
+
+{% endblock %}
 {% block page_content %}
 <main role="main" class="App-main">
     <div id="ProfileHeader" class="ProfileHeader">
@@ -14,6 +39,42 @@
 
             <div class="ProfileHeader-wrapper">
                 <div class="ProfileHeader-main">
+                    <!--用户头像-->
+                    <div onclick="javascript:openFile();" onmouseover="mover_img(this)" onmouseout="mout_img(this)"
+                         class="UserAvatarEditor ProfileHeader-avatar" style="top: -25px;">
+                        <div class="UserAvatar">
+                            <img class="Avatar Avatar--large UserAvatar-inner" width="160" height="160"
+                                 {% if user.avatar %}
+                                 src="data:;base64,{{ base64.b64encode(user.avatar)}}">
+                                {% else %}
+                                src="{{url_for('static', filename='images/default.jpg')}}">
+                                {% endif %}
+                        </div>
+                        <div class="Mask UserAvatarEditor-mask Mask-hidden">
+                            <div class="Mask-mask Mask-mask--black UserAvatarEditor-maskInner">
+
+                            </div>
+                            <div class="Mask-content">
+                                <svg viewBox="0 0 20 16" class="Icon UserAvatarEditor-cameraIcon Icon--camera"
+                                     width="30" height="27" aria-hidden="true" style="height: 27px; width: 30px;">
+                                    <title></title>
+                                    <g>
+                                        <path d="M18.094 2H15s-1-2-2-2H7C6 0 5 2 5 2H2C0 2 0 3.967 0 3.967V14c0 2 2.036 2 2.036 2H17c3 0 3-1.983 3-1.983V4c0-2-1.906-2-1.906-2zM10 12c-1.933 0-3.5-1.567-3.5-3.5S8.067 5 10 5s3.5 1.567 3.5 3.5S11.933 12 10 12zm0 1.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm7.5-8c-.552 0-1-.448-1-1s.448-1 1-1 1 .448 1 1-.448 1-1 1z"
+                                              fill-rule="evenodd"></path>
+                                    </g>
+                                </svg>
+                                <div class="UserAvatarEditor-maskInnerText">
+                                    修改我的头像
+                                </div>
+                            </div>
+                        </div>
+                        <form action="{{url_for('main.images')}}" method="post" enctype="multipart/form-data">
+                            <input type="file" id="file" name="file" onchange="is_upload(this)"
+                                   accept="image/png,image/jpeg" style="display: none;" required>
+                        </form>
+                    </div>
+
+                    <!--基本资料-->
                     <div class="ProfileHeader-content">
                         <div class="ProfileHeader-contentHead">
                             <h1 class="ProfileHeader-title">

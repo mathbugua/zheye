@@ -45,6 +45,12 @@
         <div onmouseover="mOver(this)" onmouseout="mOut(this)" class="top-nav-profile">
             <a href="{{ url_for('main.people', username = current_user.username) }}" class="zu-top-nav-userinfo ">
                 <span class="name">{{current_user.username}}</span>
+                <img class="Avatar"
+                      {% if current_user.avatar %}
+                                 src="data:;base64,{{ base64.b64encode(current_user.avatar)}}">
+                                {% else %}
+                                src="{{url_for('static', filename='images/default.jpg')}}">
+                                {% endif %}
             </a>
             <ul id="top-nav-profile-dropdown" class="top-nav-dropdown" aria-labelledby=":0" aria-hidden="true">
                 <li>

@@ -1,4 +1,6 @@
 # coding=utf-8
+import base64
+
 from flask_login import login_user, login_required, logout_user, current_user
 from flask import render_template, redirect, url_for, request, flash
 
@@ -108,7 +110,7 @@ def profile():
             return redirect(url_for('auth.profile'))
         else:
             flash(u'密码错误')
-    return render_template("email_settings.html", user=current_user, form=form)
+    return render_template("email_settings.html", user=current_user, form=form, base64=base64)
 
 
 @auth.route('/change-email/<token>')
@@ -137,4 +139,4 @@ def password():
         else:
             flash(u"密码错误")
 
-    return render_template("password_settings.html", user=current_user, form=form)
+    return render_template("password_settings.html", user=current_user, form=form, base64=base64)

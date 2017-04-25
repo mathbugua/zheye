@@ -4,7 +4,7 @@
 import hashlib
 
 from flask import current_app
-from flask_login import UserMixin
+from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from app import db, login_manager
@@ -78,7 +78,7 @@ class User(db.Model, UserMixin):
     discipline = db.Column(db.String(64))
     username = db.Column(db.String(30), nullable=False)
     password_hash = db.Column(db.String(128))
-    avatar_hash = db.Column(db.String(32))
+    avatar = db.Column(db.LargeBinary(length=2048))
     confirmed = db.Column(db.Boolean, default=True)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
 
@@ -188,6 +188,26 @@ class User(db.Model, UserMixin):
     def is_followed_by(self, user):
         return self.followers.filter_by(
             follower_id=user.id).first() is not None
+
+    def change_avatar(self, images):
+        """改变头像"""
+        try:
+            self.avatar = images
+            db.session.add(self)
+            db.session.commit()
+        except:
+            return False
+        return True
+
+
+class AnonymousUser(AnonymousUserMixin):
+    def can(self, permissions):
+        return False
+
+    def is_administrator(self):
+        return False
+
+login_manager.anonymous_user = AnonymousUser
 
 
 @login_manager.user_loader

@@ -444,6 +444,10 @@ avatar .Popover {
     border-radius: 2px;
 }
 
+.UserAvatar .Avatar{
+    width: 160px;
+    height: 160px;
+}
 img {
     width: 60px;
     height: 60px;
@@ -558,4 +562,167 @@ li {
     text-decoration: none;
     background-color: #fff;
     border: 1px solid #ddd;
+}
+
+
+/*修改头像*/
+.ProfileHeader-avatar {
+    position: absolute;
+    top: -25px;
+    left: 0;
+    z-index: 4;
+}
+.UserAvatarEditor {
+    cursor: pointer;
+}
+.UserAvatar, .UserAvatar-inner {
+    vertical-align: top;
+}
+.UserAvatar {
+    display: inline-block;
+    overflow: hidden;
+    border: 4px solid #fff;
+    border-radius: 8px;
+}
+.UserAvatar, .UserAvatar-inner {
+    vertical-align: top;
+}
+.Avatar--large {
+    border-radius: 4px;
+}
+
+.Avatar {
+    background: #fff;
+    border-radius: 2px;
+}
+img {
+    width: 160px;
+    height: 160px;
+}
+.Mask-hidden {
+    pointer-events: none;
+    opacity: 0;
+}
+
+.Mask {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    -webkit-transition: opacity .2s ease-in;
+    transition: opacity .2s ease-in;
+}
+.UserAvatarEditor-maskInner {
+    z-index: 4;
+    border: 4px solid #fff;
+    border-radius: 8px;
+}
+.Mask-mask--black {
+    background: #000;
+}
+
+.Mask-mask {
+    position: absolute;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    opacity: .4;
+    box-sizing: border-box;
+}
+
+.Mask-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 5;
+    color: #fff;
+    text-align: center;
+    -webkit-transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%);
+}
+.UserAvatarEditor-cameraIcon {
+    margin-bottom: 14px;
+    fill: #fff;
+}
+.Icon {
+    vertical-align: text-bottom;
+    fill: #9fadc7;
+}
+
+html|* > svg {
+    transform-origin: 50% 50% 0px;
+}
+
+svg:not(:root), symbol, image, marker, pattern, foreignObject {
+    overflow: hidden;
+}
+
+* {
+    transform-origin: 0px 0px 0px;
+}
+input[type="file" ] {
+    align-items: baseline;
+    color: inherit;
+    text-align: start;
+}
+
+input[type="hidden" ], input[type="image" ], input[type="file" ] {
+    -webkit-appearance: initial;
+    background-color: initial;
+    padding: initial;
+    border: initial;
+}
+
+input {
+    /*-webkit-appearance: textfield;*/
+    background-color: white;
+    border-image-source: initial;
+    border-image-slice: initial;
+    border-image-width: initial;
+    border-image-outset: initial;
+    border-image-repeat: initial;
+    -webkit-rtl-ordering: logical;
+    -webkit-user-select: text;
+    cursor: auto;
+    padding: 1px;
+    border-width: 2px;
+    border-style: inset;
+    border-color: initial;
+}
+
+input, textarea, keygen, select, button {
+    text-rendering: auto;
+    color: initial;
+    letter-spacing: normal;
+    word-spacing: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: start;
+    margin: 0em 0em 0em 0em;
+    font: 13.3333px Arial;
+}
+
+input, textarea, keygen, select, button, meter, progress {
+    -webkit-writing-mode: horizontal-tb;
+}
+
+.zu-top-nav-userinfo .Avatar {
+    position: absolute;
+    top: 9px;
+    left: 10px;
+    border: 1px solid rgba(0,0,0,.1);
+    box-shadow: 0 1px 0 rgba(255,255,255,.1);
+    background-color: transparent;
+}
+
+.UserLink-link .Avatar{
+    width: 60px;
+    height: 60px;
+}
+.zu-main{
+    padding: 0px;
 }

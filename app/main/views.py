@@ -1,4 +1,7 @@
 # coding=utf-8
+import base64
+import os
+
 from flask import current_app
 from flask import redirect, flash
 from flask import render_template
@@ -15,14 +18,14 @@ from . import main
 @main.route("/")
 @login_required
 def index():
-    return render_template("zheye.html", user=current_user)
+    return render_template("zheye.html", user=current_user, base64=base64)
 
 
 @main.route('/people/<username>')
 def people(username):
     """个人资料界面"""
     user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html', user=user)
+    return render_template('user.html', user=user, base64=base64)
 
 
 @main.route('/edit-profile', methods=['POST', 'GET'])
@@ -53,7 +56,7 @@ def edit_profile():
     form.introduction.data = current_user.introduction
     form.location.data = current_user.location
 
-    return render_template('edit_profile.html', form=form, user=current_user)
+    return render_template('edit_profile.html', form=form, user=current_user, base64=base64)
 
 
 @main.route('/follow/<username>')
@@ -64,11 +67,13 @@ def follow(username):
     if user is None:
         flash(u'未找到此人')
         return redirect(url_for('main.index'))
+
+    if user == current_user:
+        flash(u'不能关注本身')
+        return redirect(url_for('main.index'))
     if current_user.is_following(user):
-        flash('You are already following this user.')
         return redirect(url_for('main.people', username=username))
     current_user.follow(user)
-    flash('You are now following %s.' % username)
     return redirect(url_for('main.people', username=username))
 
 
@@ -81,10 +86,8 @@ def unfollow(username):
         flash('Invalid user.')
         return redirect(url_for('main.index'))
     if not current_user.is_following(user):
-        flash('You are not following this user.')
         return redirect(url_for('main.people', username=username))
     current_user.unfollow(user)
-    flash('You are not following %s anymore.' % username)
     return redirect(url_for('main.people', username=username))
 
 
@@ -103,7 +106,7 @@ def followers(username):
                for item in pagination.items]
     return render_template('user_followers.html', user=user,
                            endpoint='.followers', pagination=pagination,
-                           follows=follows)
+                           follows=follows,base64=base64)
 
 
 @main.route('/people/<username>/following')
@@ -121,4 +124,16 @@ def following(username):
                for item in pagination.items]
     return render_template('user_followers.html', user=user,
                            endpoint='.following', pagination=pagination,
-                           follows=follows)
+                           follows=follows, base64=base64)
+
+
+@main.route('/people/images', methods=['POST'])
+@login_required
+def images():
+    try:
+        file = request.files['file'].read()
+        if current_user.change_avatar(file):
+            return redirect(url_for("main.people", username=current_user.username))
+    except:
+        pass
+    return redirect(url_for("main.index"))

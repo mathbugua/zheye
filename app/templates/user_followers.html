@@ -45,16 +45,17 @@
                         <div class="ContentItem-image">
                             <span class="UserLink UserItem-avatar">
                                 <div class="Popover">
-                                    <!--<div id="Popover-30259-33431-toggle" aria-haspopup="true" aria-expanded="false"-->
-                                         <!--aria-owns="Popover-30259-33431-content">-->
-                                        <!--<a class="UserLink-link" target="_blank" href="/people/mileijun">-->
-                                            <!--<img class="Avatar Avatar&#45;&#45;large UserLink-avatar" width="60" height="60"-->
-                                                 <!--src="https://pic3.zhimg.com/a6fd28f70584d499f1d1f184c4769d56_im.jpg"-->
-                                                 <!--srcset="https://pic3.zhimg.com/a6fd28f70584d499f1d1f184c4769d56_xl.jpg 2x"-->
-                                                 <!--alt="雷军">-->
-                                        <!--</a>-->
-                                    <!--</div>-->
-                                    <!-- react-empty: 173 -->
+                                    <div id="Popover-30259-33431-toggle" aria-haspopup="true" aria-expanded="false"
+                                         aria-owns="Popover-30259-33431-content">
+                                    <a class="UserLink-link" target="_blank" href="{{url_for('main.people', username=follow.user.username)}}">
+                                    <img class="Avatar Avatar--large UserLink-avatar" width="60" height="60"
+                                         {% if follow.user.avatar %}
+                                            src="data:;base64,{{ base64.b64encode(follow.user.avatar)}}">
+                                            {% else %}
+                                            src="{{url_for('static', filename='images/default.jpg')}}">
+                                            {% endif %}
+                                    </a>
+                                    </div>
                                 </div>
                             </span>
                         </div>
@@ -65,7 +66,8 @@
                                     <div class="Popover">
                                         <div id="Popover-30260-39178-toggle" aria-haspopup="true" aria-expanded="false"
                                              aria-owns="Popover-30260-39178-content">
-                                            <a class="UserLink-link" target="_blank" href="{{ url_for('main.people', username = follow.user.username) }}">{{ follow.user.username }}</a>
+                                            <a class="UserLink-link" target="_blank"
+                                               href="{{ url_for('main.people', username = follow.user.username) }}">{{ follow.user.username }}</a>
                                         </div><!-- react-empty: 181 --></div>
                                    </span><!-- react-empty: 186 -->
                                 </div>
@@ -81,26 +83,29 @@
                                 </div>
                             </div>
                         </div>
-                                    {% if not current_user.is_following(follow.user) %}
-                                    <button class="Button FollowButton Button--primary Button--blue" type="button">
-                                        <svg viewBox="0 0 12 12" class="Icon FollowButton-icon Icon--plus" width="12"
-                                             height="16" aria-hidden="true" style="height: 16px; width: 12px;">
-                                            <title></title>
-                                            <g>
-                                                <path d="M6.994 4.994s-.008-3.593 0-4C6.97-.33 4.97-.33 4.996.994c-.025 1.275 0 4 0 4H1C-.334 5-.334 7 1 7c1.332 0 3.996-.006 3.996-.006v4c0 1.346 2.004 1.346 1.998 0-.006-1.347 0-4 0-4S9.658 7 10.997 7c1.338 0 1.338-2-.007-2.006H6.994z">
+                        {% if current_user != follow.user %}
+                        {% if not current_user.is_following(follow.user) %}
+                        <button class="Button FollowButton Button--primary Button--blue" type="button">
+                            <svg viewBox="0 0 12 12" class="Icon FollowButton-icon Icon--plus" width="12"
+                                 height="16" aria-hidden="true" style="height: 16px; width: 12px;">
+                                <title></title>
+                                <g>
+                                    <path d="M6.994 4.994s-.008-3.593 0-4C6.97-.33 4.97-.33 4.996.994c-.025 1.275 0 4 0 4H1C-.334 5-.334 7 1 7c1.332 0 3.996-.006 3.996-.006v4c0 1.346 2.004 1.346 1.998 0-.006-1.347 0-4 0-4S9.658 7 10.997 7c1.338 0 1.338-2-.007-2.006H6.994z">
 
-                                                </path>
-                                            </g>
-                                        </svg>
-                                        <a href="{{ url_for('main.follow', username=user.username) }}"
-                                           class="btn btn-primary">关注</a>
-                                    </button>
-                                    {% else %}
-                                    <button class="Button FollowButton Button--primary Button--grey" type="button">
-                                        <a href="{{ url_for('main.unfollow', username=user.username) }}"
-                                           class="btn btn-default">取消关注</a>
-                                    </button>
-                                    {% endif %}
+                                    </path>
+                                </g>
+                            </svg>
+                            <a href="{{ url_for('main.follow', username=follow.user.username) }}"
+                               class="btn btn-primary">关注</a>
+                        </button>
+                        {% else %}
+                        <button class="Button FollowButton Button--primary Button--grey" type="button">
+                            <a href="{{ url_for('main.unfollow', username=follow.user.username) }}"
+                               class="btn btn-default">取消关注</a>
+                        </button>
+                        {% endif %}
+                        {% endif %}
+
 
                     </div>
                 </div>
