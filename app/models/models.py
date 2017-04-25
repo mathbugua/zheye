@@ -54,6 +54,16 @@ class Role(db.Model):
         return "<Role %r>" % self.name
 
 
+class Follow(db.Model):
+    __tablename__ = 'follows'
+    # 关注者
+    follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+    # 被关注者
+    followed_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                            primary_key=True)
+
+
 class User(db.Model, UserMixin):
     """用户信息"""
     __tablename__ = "users"
@@ -69,8 +79,21 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(30), nullable=False)
     password_hash = db.Column(db.String(128))
     avatar_hash = db.Column(db.String(32))
-    confirmed = db.Column(db.Boolean, default=False)
+    confirmed = db.Column(db.Boolean, default=True)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
+
+    # followed代表followed_id字段为自身的所有实例。
+    followed = db.relationship('Follow',
+                               foreign_keys=[Follow.follower_id],
+                               backref=db.backref('follower', lazy='joined'),
+                               lazy='dynamic',
+                               cascade='all, delete-orphan')
+    # User为一，Follow为多，这是向Follow表中添加followed属性，foreign_keys代表是外键followed_id的关系。代表被关注者本身。
+    followers = db.relationship('Follow',
+                                foreign_keys=[Follow.followed_id],
+                                backref=db.backref('followed', lazy='joined'),
+                                lazy='dynamic',
+                                cascade='all, delete-orphan')
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -146,6 +169,25 @@ class User(db.Model, UserMixin):
         except:
             return False
         return True
+
+    def follow(self, user):
+        if not self.is_following(user):
+            f = Follow(followed=user)
+            self.followed.append(f)
+            print self.followed.count()
+
+    def unfollow(self, user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f:
+            self.followed.remove(f)
+
+    def is_following(self, user):
+        return self.followed.filter_by(
+            followed_id=user.id).first() is not None
+
+    def is_followed_by(self, user):
+        return self.followers.filter_by(
+            follower_id=user.id).first() is not None
 
 
 @login_manager.user_loader

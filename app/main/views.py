@@ -1,13 +1,14 @@
 # coding=utf-8
-
+from flask import current_app
 from flask import redirect, flash
 from flask import render_template
+from flask import request
 from flask import url_for
 from flask_login import login_required, current_user
 
 from app import db
 from app.main.forms import EditProfileForm
-from app.models.models import User
+from app.models.models import User, Follow
 from . import main
 
 
@@ -53,3 +54,71 @@ def edit_profile():
     form.location.data = current_user.location
 
     return render_template('edit_profile.html', form=form, user=current_user)
+
+
+@main.route('/follow/<username>')
+@login_required
+def follow(username):
+    """关注某人"""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash(u'未找到此人')
+        return redirect(url_for('main.index'))
+    if current_user.is_following(user):
+        flash('You are already following this user.')
+        return redirect(url_for('main.people', username=username))
+    current_user.follow(user)
+    flash('You are now following %s.' % username)
+    return redirect(url_for('main.people', username=username))
+
+
+@main.route('/unfollow/<username>')
+@login_required
+def unfollow(username):
+    """取消关注"""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Invalid user.')
+        return redirect(url_for('main.index'))
+    if not current_user.is_following(user):
+        flash('You are not following this user.')
+        return redirect(url_for('main.people', username=username))
+    current_user.unfollow(user)
+    flash('You are not following %s anymore.' % username)
+    return redirect(url_for('main.people', username=username))
+
+
+@main.route('/people/<username>/followers')
+def followers(username):
+    """显示username的关注者"""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Invalid user.')
+        return redirect(url_for('.index'))
+    page = request.args.get('page', 1, type=int)
+    pagination = user.followers.paginate(
+        page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
+        error_out=False)
+    follows = [{'user': item.follower}
+               for item in pagination.items]
+    return render_template('user_followers.html', user=user,
+                           endpoint='.followers', pagination=pagination,
+                           follows=follows)
+
+
+@main.route('/people/<username>/following')
+def following(username):
+    """分页显示username关注了谁"""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('Invalid user.')
+        return redirect(url_for('.index'))
+    page = request.args.get('page', 1, type=int)
+    pagination = user.followed.paginate(
+        page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
+        error_out=False)
+    follows = [{'user': item.followed}
+               for item in pagination.items]
+    return render_template('user_followers.html', user=user,
+                           endpoint='.following', pagination=pagination,
+                           follows=follows)

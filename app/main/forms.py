@@ -1,10 +1,10 @@
 # coding=utf-8
-from flask_wtf import FlaskForm
+from flask_wtf import Form
 from wtforms import StringField, TextAreaField, SubmitField, RadioField
 from wtforms.validators import Length, Required
 
 
-class EditProfileForm(FlaskForm):
+class EditProfileForm(Form):
     username = StringField(u'用户名', validators=[Required(), Length(0, 64)])
     sex = RadioField(u'性别', choices=[('man', u'男'), ('woman', u'女')], default='man')
     location = StringField(u'居住地', validators=[Length(0, 64)])

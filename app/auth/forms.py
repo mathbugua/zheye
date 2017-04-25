@@ -1,12 +1,12 @@
 # coding=utf-8
-from flask_wtf import FlaskForm
+from flask_wtf import Form
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo, ValidationError
 
 from app.models.models import User
 
 
-class LoginForm(FlaskForm):
+class LoginForm(Form):
     email = StringField('Email', validators=[Required(), Length(1, 64),
                                              Email()])
     password = PasswordField('Password', validators=[Required()])
@@ -14,7 +14,7 @@ class LoginForm(FlaskForm):
     submit1 = SubmitField('Log In')
 
 
-class RegistrationForm(FlaskForm):
+class RegistrationForm(Form):
     email = StringField('Email', validators=[Required(), Length(1, 64),
                                            Email()])
     username = StringField('Username', validators=[
@@ -35,7 +35,7 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Username already in use.')
 
 
-class ChangepasswordForm(FlaskForm):
+class ChangepasswordForm(Form):
     """修改密码"""
     oldpassword = PasswordField(u'原始密码', validators=[Required()])
     password = PasswordField(u'新密码', validators=[
@@ -44,7 +44,7 @@ class ChangepasswordForm(FlaskForm):
     submit = SubmitField(u'保存')
 
 
-class ChangeEmailForm(FlaskForm):
+class ChangeEmailForm(Form):
     """修改邮箱"""
     email = StringField(u'新邮箱', validators=[Required(), Length(1, 64),
                                                  Email()])

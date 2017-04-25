@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}{{user.username}}{% endblock %}
+{% block page_content %}
+<main role="main" class="App-main">
+    <div id="ProfileHeader" class="ProfileHeader">
+        <div class="Card">
+            <div class="ProfileHeader-userCover">
+                <div class="UserCover">
+                    <img class="UserCover-image" src="{{url_for('static', filename='images/user_images.jpg')}}"
+                         alt="用户封面">
+                </div>
+            </div>
+
+            <div class="ProfileHeader-wrapper">
+                <div class="ProfileHeader-main">
+                    <div class="ProfileHeader-content">
+                        <div class="ProfileHeader-contentHead">
+                            <h1 class="ProfileHeader-title">
+                                <span class="ProfileHeader-name">{{user.username}}</span>
+                                <span class="RichText ProfileHeader-headline">{{user.short_intr}}</span>
+                            </h1>
+                        </div>
+                        <div class="ProfileHeader-contentBody">
+                            <span>
+                                <div class="ProfileHeader-detail">
+                                    <div class="ProfileHeader-detailItem">
+                                        <span class="ProfileHeader-detailLabel">居住地</span>
+                                        <div class="ProfileHeader-detailValue">
+                                            <span>
+                                                <!-- react-text: 3858 -->现居<!-- /react-text --><!-- react-text: 3859 -->{{user.location or "未设置"}}
+                                                <!-- /react-text -->
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="ProfileHeader-detailItem">
+                                        <span class="ProfileHeader-detailLabel">
+                                            所在行业
+                                        </span>
+                                        <div class="ProfileHeader-detailValue">{{user.industry or "未设置"}}</div>
+                                    </div>
+                                    <div class="ProfileHeader-detailItem">
+                                        <span class="ProfileHeader-detailLabel">
+                                            教育经历
+                                        </span>
+                                        <div class="ProfileHeader-detailValue">
+                                            <div class="ProfileHeader-field">
+                                                <img class="Avatar ProfileHeader-iconWrapper" width="20" height="20"
+                                                     src="{{url_for('static', filename='images/e82bab09c_s.jpg')}}">
+                                                <!-- react-text: 3868 -->{{user.school or ""}}<!-- /react-text -->
+                                                <!-- react-text: 3869 --> · <!-- /react-text -->
+                                                <!-- react-text: 3870 -->{{user.discipline or ""}}<!-- /react-text -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="ProfileHeader-detailItem">
+                                        <span class="ProfileHeader-detailLabel">个人简介</span>
+                                        <div class="RichText ProfileHeader-detailValue">
+                                            {{user.introduction or ""}}
+                                        </div>
+                                    </div>
+
+                                </div>
+                                </span>
+                        </div>
+                        <div class="ProfileHeader-contentFooter">
+                            <div class="MemberButtonGroup ProfileButtonGroup ProfileHeader-buttons">
+                                <div class="MemberButtonGroup ProfileButtonGroup ProfileHeader-buttons">
+                                    {% if user != current_user %}
+                                    {% if not current_user.is_following(user) %}
+                                    <button class="Button FollowButton Button--primary Button--blue" type="button">
+                                        <svg viewBox="0 0 12 12" class="Icon FollowButton-icon Icon--plus" width="12"
+                                             height="16" aria-hidden="true" style="height: 16px; width: 12px;">
+                                            <title></title>
+                                            <g>
+                                                <path d="M6.994 4.994s-.008-3.593 0-4C6.97-.33 4.97-.33 4.996.994c-.025 1.275 0 4 0 4H1C-.334 5-.334 7 1 7c1.332 0 3.996-.006 3.996-.006v4c0 1.346 2.004 1.346 1.998 0-.006-1.347 0-4 0-4S9.658 7 10.997 7c1.338 0 1.338-2-.007-2.006H6.994z">
+
+                                                </path>
+                                            </g>
+                                        </svg>
+                                        <a href="{{ url_for('main.follow', username=user.username) }}"
+                                           class="btn btn-primary">关注</a>
+                                    </button>
+                                    {% else %}
+                                    <button class="Button FollowButton Button--primary Button--grey" type="button">
+                                        <a href="{{ url_for('main.unfollow', username=user.username) }}"
+                                           class="btn btn-default">取消关注</a>
+                                    </button>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        {% if user == current_user %}
+                        <div class="ProfileHeader-contentFooter">
+                            <div class="ProfileButtonGroup ProfileHeader-buttons">
+                                <button class="Button Button--blue" type="button">
+                                    <a href="{{url_for('main.edit_profile')}}"> 编辑个人资料</a>
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <div class="Profile-main">
+        <div class="Profile-mainColumn">
+            <!--放置动态等-->
+            {% block person_data %}
+            {% endblock %}
+        </div>
+        <div class="Profile-sideColumn">
+            <div class="   Card FollowshipCard">
+                <div class="NumberBoard FollowshipCard-counts">
+                    <a class="Button NumberBoard-item Button--plain" type="button"
+                       href="/people/{{user.username}}/following">
+                        <div class="NumberBoard-name">关注了</div>
+                        <div class="NumberBoard-value">{{ user.followed.count() }}</div>
+                    </a>
+                    <div class="NumberBoard-divider"></div>
+                    <a class="Button NumberBoard-item Button--plain" type="button"
+                       href="/people/{{user.username}}/followers">
+                        <div class="NumberBoard-name">关注者</div>
+                        <div class="NumberBoard-value">{{ user.followers.count() }}</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% endblock %}

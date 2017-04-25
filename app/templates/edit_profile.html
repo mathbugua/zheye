@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
-    {{ super()}}
+{{ super()}}
 <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
 {% endblock %}
 {% import "bootstrap/wtf.html" as wtf %}
@@ -16,7 +16,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
+                {{ wtf.quick_form(form) }}
             </div>
         </div>
     </div>

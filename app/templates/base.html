@@ -13,8 +13,6 @@
           sizes="76x76">
     <link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-60.9911cffb.png"
           sizes="60x60">
-
-
     <link rel="shortcut icon" href="https://static.zhihu.com/static/favicon.ico" type="image/x-icon">
 
     <link rel="search" type="application/opensearchdescription+xml" href="https://static.zhihu.com/static/search.xml"
@@ -39,31 +37,27 @@
 </head>
 
 <body class="zhi ">
-
-
 <div role="navigation" class="zu-top" data-za-module="TopNavBar">
     <div class="zg-wrap modal-shifting clearfix" id="zh-top-inner">
         <a href="/" class="zu-top-link-logo" id="zh-top-link-logo" data-za-c="view_home" data-za-a="visit_home"
            data-za-l="top_navigation_zhihu_logo">知乎</a>
         {% if current_user.is_authenticated %}
         <div onmouseover="mOver(this)" onmouseout="mOut(this)" class="top-nav-profile">
-            <a href="{{ url_for('main.people', username = user.username) }}" class="zu-top-nav-userinfo ">
-                <span class="name">{{user.username}}</span>
+            <a href="{{ url_for('main.people', username = current_user.username) }}" class="zu-top-nav-userinfo ">
+                <span class="name">{{current_user.username}}</span>
             </a>
             <ul id="top-nav-profile-dropdown" class="top-nav-dropdown" aria-labelledby=":0" aria-hidden="true">
                 <li>
-                    <a href="{{ url_for('main.people', username = user.username) }}">
+                    <a href="{{ url_for('main.people', username = current_user.username) }}">
                         <i class="zg-icon zg-icon-dd-home"></i>我的主页
                     </a>
                 </li>
-
                 <li>
                     <a href="/inbox">
                         <i class="zg-icon zg-icon-dd-pm"></i>私信
                         <span id="zh-top-nav-pm-count" class="zu-top-nav-pm-count zg-noti-number"
                               style="visibility:hidden" data-count="0">
-
-</span>
+                        </span>
                     </a>
                 </li>
                 <li>
@@ -77,32 +71,22 @@
                     </a>
                 </li>
             </ul>
-
         </div>
-
         {% else %}
         <div class="top-nav-profile-login">
-            <button class="Button " type="button" ><a href="{{url_for('auth.login_register')}}">登录</a></button>
-            </div>
-    {% endif %}
-
-
+            <button class="Button " type="button"><a href="{{url_for('auth.login_register')}}">登录</a></button>
+        </div>
+        {% endif %}
         <button class="zu-top-add-question" id="zu-top-add-question">提问</button>
-
-
         <div role="search" id="zh-top-search" class="zu-top-search">
             <form method="GET" action="#" id="zh-top-search-form" class="zu-top-search-form">
-
-
                 <input type="hidden" name="type" value="content">
                 <label for="q" class="hide-text">知乎搜索</label><input type="text" class="zu-top-search-input" id="q"
-                                                                    name="q" autocomplete="off" value="" maxlength="100"
-                                                                    placeholder="搜索你感兴趣的内容...">
+                                                                    name="q" autocomplete="off" value="" maxlength="100" placeholder="搜索你感兴趣的内容...">
                 <button type="submit" class="zu-top-search-button"><span class="hide-text">搜索</span><span
                         class="sprite-global-icon-magnifier-dark"></span></button>
             </form>
         </div>
-
 
         <div id="zg-top-nav" class="zu-top-nav">
             <ul class="zu-top-nav-ul zg-clear">
@@ -208,7 +192,9 @@
                 {% for message in get_flashed_messages() %}
                 <div class="alert alert-warning">
                     <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    {{ message }}
+                    <script>
+                    alert("{{ message }}")
+                        </script>
                 </div>
                 {% endfor %}
 
