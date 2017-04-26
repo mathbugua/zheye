@@ -40,8 +40,12 @@
             <div class="ProfileHeader-wrapper">
                 <div class="ProfileHeader-main">
                     <!--用户头像-->
+                    {% if user != current_user %}
+                    <div class="UserAvatarEditor ProfileHeader-avatar" style="top: -25px;">
+                    {% else %}
                     <div onclick="javascript:openFile();" onmouseover="mover_img(this)" onmouseout="mout_img(this)"
                          class="UserAvatarEditor ProfileHeader-avatar" style="top: -25px;">
+                    {% endif %}
                         <div class="UserAvatar">
                             <img class="Avatar Avatar--large UserAvatar-inner" width="160" height="160"
                                  {% if user.avatar %}
@@ -68,10 +72,12 @@
                                 </div>
                             </div>
                         </div>
+                          {% if user == current_user %}
                         <form action="{{url_for('main.images')}}" method="post" enctype="multipart/form-data">
                             <input type="file" id="file" name="file" onchange="is_upload(this)"
                                    accept="image/png,image/jpeg" style="display: none;" required>
                         </form>
+                        {% endif %}
                     </div>
 
                     <!--基本资料-->
@@ -129,7 +135,7 @@
                             <div class="MemberButtonGroup ProfileButtonGroup ProfileHeader-buttons">
                                 <div class="MemberButtonGroup ProfileButtonGroup ProfileHeader-buttons">
                                     {% if user != current_user %}
-                                    {% if not current_user.is_following(user) %}
+                                    {% if current_user.is_anonymous or not current_user.is_following(user) %}
                                     <button class="Button FollowButton Button--primary Button--blue" type="button">
                                         <svg viewBox="0 0 12 12" class="Icon FollowButton-icon Icon--plus" width="12"
                                              height="16" aria-hidden="true" style="height: 16px; width: 12px;">
