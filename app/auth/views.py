@@ -9,6 +9,7 @@ from app.auth import auth
 from app.auth.forms import LoginForm, RegistrationForm, ChangepasswordForm, ChangeEmailForm
 from app.helpers.email import send_email
 from app.models.models import User
+from app.helpers import constant
 
 
 @auth.before_app_request
@@ -30,7 +31,7 @@ def login_register():
         if user is not None and user.verify_password(login_form.password.data):
             login_user(user, login_form.remember_me.data)
             return redirect(url_for('main.index'))
-        flash(u'错误的用户名或密码.')
+        flash(constant.WRONG)
 
     # 进行注册表单的验证
     if register_form.submit2.data and register_form.validate_on_submit():
@@ -43,7 +44,7 @@ def login_register():
             token = user.generate_confirmation_token()
             send_email(user.email, 'Confirm Your Account',
                        'auth/email/confirm', user=user, token=token)
-            flash(u'验证邮件已发送到你的邮箱，请先登录')
+            flash(constant.SEND_EMIAL)
         except Exception as e:
             print e
         return redirect(url_for('auth.login_register'))
@@ -64,9 +65,9 @@ def confirm(token):
     if current_user.confirmed:
         return redirect(url_for('main.index'))
     if current_user.confirm(token):
-        flash(u'账户验证成功')
+        flash(constant.VERIFI_SUCCESS)
     else:
-        flash(u'验证链接已过期或无效.')
+        flash(constant.LINK_FAIL)
     return redirect(url_for('main.index'))
 
 
@@ -84,7 +85,7 @@ def resend_confirmation():
     token = current_user.generate_confirmation_token()
     send_email(current_user.email, 'Confirm Your Account',
                'auth/email/confirm', user=current_user, token=token)
-    flash(u'验证邮件已发送到你的邮箱')
+    flash(constant.SEND_EMIAL)
     return redirect(url_for('main.index'))
 
 
@@ -106,10 +107,10 @@ def profile():
             send_email(new_email, 'Confirm your email address',
                        'auth/email/change_email',
                        user=current_user, token=token)
-            flash(u'验证已发送到你的邮箱')
+            flash(constant.SEND_EMIAL)
             return redirect(url_for('auth.profile'))
         else:
-            flash(u'密码错误')
+            flash(constant.WRONG_PWD)
     return render_template("email_settings.html", user=current_user, form=form, base64=base64)
 
 
@@ -117,9 +118,9 @@ def profile():
 @login_required
 def change_email(token):
     if current_user.change_email(token):
-        flash(u'邮箱账户已修改')
+        flash(constant.EMAIL_UPDATE)
     else:
-        flash(u'未修改成功')
+        flash(constant.UPDATE_FAIL)
     return redirect(url_for('auth.profile'))
 
 
@@ -131,12 +132,12 @@ def password():
     if form.validate_on_submit():
         if current_user.verify_password(form.oldpassword.data):
             if current_user.change_password(form.password.data):
-                flash(u"密码设置成功")
+                flash(constant.UPDATE_SUCC)
                 logout_user()
                 return redirect(url_for('auth.login_register'))
             else:
-                flash(u'未能设置成功')
+                flash(constant.UPDATE_FAIL)
         else:
-            flash(u"密码错误")
+            flash(constant.WRONG_PWD)
 
     return render_template("password_settings.html", user=current_user, form=form, base64=base64)

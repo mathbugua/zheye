@@ -46,11 +46,11 @@
             <a href="{{ url_for('main.people', username = current_user.username) }}" class="zu-top-nav-userinfo ">
                 <span class="name">{{current_user.username}}</span>
                 <img class="Avatar"
-                      {% if current_user.avatar %}
-                                 src="data:;base64,{{ base64.b64encode(current_user.avatar)}}">
-                                {% else %}
-                                src="{{url_for('static', filename='images/default.jpg')}}">
-                                {% endif %}
+                     {% if current_user.avatar %}
+                     src="data:;base64,{{ base64.b64encode(current_user.avatar)}}">
+                {% else %}
+                src="{{url_for('static', filename='images/default.jpg')}}">
+                {% endif %}
             </a>
             <ul id="top-nav-profile-dropdown" class="top-nav-dropdown" aria-labelledby=":0" aria-hidden="true">
                 <li>
@@ -88,7 +88,8 @@
             <form method="GET" action="#" id="zh-top-search-form" class="zu-top-search-form">
                 <input type="hidden" name="type" value="content">
                 <label for="q" class="hide-text">知乎搜索</label><input type="text" class="zu-top-search-input" id="q"
-                                                                    name="q" autocomplete="off" value="" maxlength="100" placeholder="搜索你感兴趣的内容...">
+                                                                    name="q" autocomplete="off" value="" maxlength="100"
+                                                                    placeholder="搜索你感兴趣的内容...">
                 <button type="submit" class="zu-top-search-button"><span class="hide-text">搜索</span><span
                         class="sprite-global-icon-magnifier-dark"></span></button>
             </form>
@@ -199,8 +200,8 @@
                 <div class="alert alert-warning">
                     <button type="button" class="close" data-dismiss="alert">&times;</button>
                     <script>
-                    alert("{{ message }}")
-                        </script>
+                        alert("{{ message }}")
+                    </script>
                 </div>
                 {% endfor %}
 

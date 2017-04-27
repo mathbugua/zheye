@@ -13,6 +13,7 @@ from app import db
 from app.main.forms import EditProfileForm
 from app.models.models import User, Follow
 from . import main
+from app.helpers import constant
 
 
 @main.route("/")
@@ -44,7 +45,8 @@ def edit_profile():
         current_user.introduction = form.introduction.data
         db.session.add(current_user)
         db.session.commit()
-        flash('Your profile has been updated')
+
+        flash(constant.PROFILE_UPDATE)
         return redirect(url_for('main.people', username=current_user.username))
 
     form.username.data = current_user.username
@@ -65,11 +67,11 @@ def follow(username):
     """关注某人"""
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash(u'未找到此人')
+        flash(constant.INVALID_USER)
         return redirect(url_for('main.index'))
 
     if user == current_user:
-        flash(u'不能关注本身')
+        flash(constant.CANNOT_CON_MYSELF)
         return redirect(url_for('main.index'))
     if current_user.is_following(user):
         return redirect(url_for('main.people', username=username))
@@ -83,7 +85,7 @@ def unfollow(username):
     """取消关注"""
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.')
+        flash(constant.INVALID_USER)
         return redirect(url_for('main.index'))
     if not current_user.is_following(user):
         return redirect(url_for('main.people', username=username))
@@ -96,7 +98,7 @@ def followers(username):
     """显示username的关注者"""
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.')
+        flash(constant.INVALID_USER)
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
     pagination = user.followers.paginate(
@@ -114,7 +116,7 @@ def following(username):
     """分页显示username关注了谁"""
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('Invalid user.')
+        flash(constant.INVALID_USER)
         return redirect(url_for('.index'))
     page = request.args.get('page', 1, type=int)
     pagination = user.followed.paginate(
@@ -131,9 +133,12 @@ def following(username):
 @login_required
 def images():
     try:
+        # 读取图片内容
         file = request.files['file'].read()
         if current_user.change_avatar(file):
             return redirect(url_for("main.people", username=current_user.username))
     except:
         pass
+    # 头像修改失败，提示
+    flash(constant.AVATAR_MODI_FAIL)
     return redirect(url_for("main.index"))
