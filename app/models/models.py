@@ -95,6 +95,8 @@ class User(db.Model, UserMixin):
                                 lazy='dynamic',
                                 cascade='all, delete-orphan')
 
+    follow_topics = db.relationship("FollowTopic", backref="users")
+
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         # if self.role is None:
@@ -198,6 +200,83 @@ class User(db.Model, UserMixin):
         except:
             return False
         return True
+
+
+class TopicCategory(db.Model):
+    """话题类别"""
+    __tablename__ = "topiccate"
+    id = db.Column(db.Integer, primary_key=True)
+    category_name = db.Column(db.String(30), nullable=False)
+    category_desc = db.Column(db.String(50))
+    topics = db.relationship("Topic", backref="category")
+
+    @staticmethod
+    def insert_category():
+        for i in range(15):
+            cate_name = "topic" + str(i)
+            topic_cate = TopicCategory(
+                category_name=cate_name
+            )
+            db.session.add(topic_cate)
+        db.session.commit()
+
+
+class Topic(db.Model):
+    """话题"""
+    __tablename__ = "topic"
+    id = db.Column(db.Integer, primary_key=True)
+    topic_name = db.Column(db.String(30), nullable=False)
+    topic_desc = db.Column(db.String(50))
+    category_id = db.Column(db.Integer, db.ForeignKey("topiccate.id"))
+    follow_topics = db.relationship("FollowTopic", backref="topic")
+
+    @staticmethod
+    def insert_topic():
+        topic1 = Topic(
+            topic_name=u"单机",
+            category_id=1
+        )
+        db.session.add(topic1)
+        topic2 = Topic(
+            topic_name=u"网游",
+            category_id=1
+        )
+        db.session.add(topic2)
+        topic3 = Topic(
+                    topic_name=u"多人游戏",
+                    category_id=1
+                )
+        db.session.add(topic3)
+
+        topic4 = Topic(
+            topic_name=u"饮食",
+            category_id=2
+        )
+        db.session.add(topic4)
+        topic5 = Topic(
+            topic_name=u"美食",
+            category_id=2
+        )
+        db.session.add(topic5)
+        topic6 = Topic(
+            topic_name=u"烹饪",
+            category_id=2
+        )
+        db.session.add(topic6)
+        db.session.commit()
+
+
+class FollowTopic(db.Model):
+    """
+    关注话题：
+    多对多的关系
+    """
+    __tablename__ = "followtopic"
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                        primary_key=True)
+    topic_id = db.Column(db.Integer, db.ForeignKey("topic.id"),
+                         primary_key=True)
+    desc = db.Column(db.String(30))
 
 
 class AnonymousUser(AnonymousUserMixin):

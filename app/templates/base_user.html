@@ -137,7 +137,7 @@
                                         {% if user != current_user %}
                                         {% if current_user.is_anonymous or not current_user.is_following(user) %}
                                         <a href="{{ url_for('main.follow', username=user.username) }}"
-                                           class="btn btn-primary">
+                                           >
                                             <button class="Button FollowButton Button--primary Button--blue"
                                                     type="button">
                                                 <svg viewBox="0 0 12 12" class="Icon FollowButton-icon Icon--plus"
@@ -156,7 +156,7 @@
                                         </a>
                                         {% else %}
                                         <a href="{{ url_for('main.unfollow', username=user.username) }}"
-                                           class="btn btn-default">
+                                           >
                                             <button class="Button FollowButton Button--primary Button--grey"
                                                     type="button">
                                                 取消关注

@@ -17,13 +17,17 @@
 
     <link rel="search" type="application/opensearchdescription+xml" href="https://static.zhihu.com/static/search.xml"
           title="知乎"/>
-    <script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js">
-    </script>
+    <!--&lt;!&ndash;<script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js">&ndash;&gt;</script>-->
+    {% block head %}
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
     <link rel="stylesheet" href="{{url_for('static', filename='style/zheye.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='style/mycss.css')}}">
 
-    {% block head %}
+
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     {% endblock %}
+
 
     <script>
         function mOver(obj) {
@@ -37,6 +41,86 @@
 </head>
 
 <body class="zhi ">
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    提问
+                </h4>
+            </div>
+
+            <div class="modal-dialog-content">
+                <div class="zh-add-question-form">
+                    <form class="js-add-question-form">
+                        <div class="zg-section-big clearfix">
+                            <div class="zg-form-text-input add-question-title-form" style="position: relative;">
+                                <textarea rows="1" class="zg-editor-input zu-seamless-input-origin-element"
+                                          title="在这里输入问题" id="zh-question-suggest-title-content" aria-label="写下你的问题"
+                                          placeholder="写下你的问题" role="combobox" aria-autocomplete="list"
+                                          autocomplete="off" style="height: 22px;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="zg-section-big clearfix">
+                            <div class="add-question-section-title">
+                                问题说明（可选）：
+                                <span id="zh-question-form-detail-err"></span>
+                            </div>
+                            <div class="zg-form-text-input add-question-title-form" style="position: relative;">
+                                <textarea rows="1" class="zg-editor-input zu-seamless-input-origin-element"
+                                          title="问题说明" id="test" aria-label="问题说明"
+                                          placeholder="问题说明" role="combobox" aria-autocomplete="list"
+                                          autocomplete="off" style="height: 70px;"></textarea>
+                            </div>
+                        </div>
+                        <div class="zm-add-question-form-topic-wrap">
+                            <div class="add-question-section-title">
+                                <span class="zg-gray zg-right hidden-phone">话题越精准，越容易让相关领域专业人士看到你的问题</span>
+                                选择话题：
+                                <span id="zh-question-form-tag-err"></span>
+                            </div>
+                            <div id="zh-question-suggest-topic-container" class="zm-tag-editor zg-section">
+                                <div class="zm-tag-editor-labels" style="display: none;"></div>
+                                <div class="zm-tag-editor-editor zg-clear">
+                                    <div class="zg-inline"></div>
+                                    <div class="zm-tag-editor-command-buttons-wrap zg-left"><label for="topic"
+                                                                                                   class="zg-icon icon-magnify"></label><input
+                                            class="zu-question-suggest-topic-input label-input-label" type="text"
+                                            role="combobox" aria-autocomplete="list" aria-label="搜索话题"
+                                            placeholder="搜索话题"><a class="zg-mr15 zg-btn-blue" href="#" name="add"
+                                                                  style="display: none;">添加</a><a href="#" name="close"
+                                                                                                  style="display: none;">完成</a><label
+                                            class="err-tip" style="display:none;">最多添加五个话题</label></div>
+                                    <div class="zm-tag-editor-maxcount zg-section" style="display: none;"><span>最多只能为一个问题绑定 5 个话题</span><a
+                                            href="#" name="close" style="display: none;">完成</a></div>
+                                </div>
+                                <div id="zh-question-suggest-autocomplete-container"></div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">取消
+                            </button>
+                            <button type="button" class="btn btn-primary">
+                                发布
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
 <div role="navigation" class="zu-top" data-za-module="TopNavBar">
     <div class="zg-wrap modal-shifting clearfix" id="zh-top-inner">
         <a href="/" class="zu-top-link-logo" id="zh-top-link-logo" data-za-c="view_home" data-za-a="visit_home"
@@ -83,7 +167,8 @@
             <button class="Button " type="button"><a href="{{url_for('auth.login_register')}}">登录</a></button>
         </div>
         {% endif %}
-        <button class="zu-top-add-question" id="zu-top-add-question">提问</button>
+        <button class="zu-top-add-question" id="zu-top-add-question" data-toggle="modal" data-target="#myModal">提问
+        </button>
         <div role="search" id="zh-top-search" class="zu-top-search">
             <form method="GET" action="#" id="zh-top-search-form" class="zu-top-search-form">
                 <input type="hidden" name="type" value="content">
@@ -206,7 +291,8 @@
                 {% endfor %}
 
             </div>
-            {% block body %}{% endblock %}
+            {% block body %}
+            {% endblock %}
 
             {% block page_content %}{% endblock %}
 

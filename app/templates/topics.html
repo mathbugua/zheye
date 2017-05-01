@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block page_content %}
+<script>
+    function add_class(obj, topic_cate) {
+        $.ajax({
+                url: "/topics_search",
+                async: true,
+                data: {"topic_cate": topic_cate},
+                type: "POST",
+                success: function (data, status) {
+                    var content = '<div class="zh-general-list clearfix" id="topic_content" style="display: block;">'
+                    for (var i = 0; i < data.topics.length; i++) {
+                        content = content + '<div class="item"> ' +
+                            '<div class="blk"> ' +
+                            '<a target="_blank" href="/topic/19550994"> ' +
+                            '<img src="https://pic4.zhimg.com/fb89e0ea3_xs.jpg" alt="游戏"> ' +
+                            '<strong>' + data.topics[i][0] + '</strong>' +
+                            '</a>' +
+                            '<p>' + data.topics[i][1] + '</p>' +
+                            '<a id="t::-253" href="javascript:;" class="follow meta-item zg-follow"><i class="z-icon-follow"></i>关注</a>' +
+                            '</div></div>'
+                    }
+
+                    content = content + '</div>';
+
+                    $("#topic_content").replaceWith(content);
+                }
+            }
+        );
+
+//        去除li元素的current样式
+        $("li").each(function () {
+            if ($(this).hasClass("current")) {
+                $(this).removeClass("current")
+            }
+        });
+//        给点击的元素添加current样式
+        $(obj).addClass("current");
+
+    }
+
+</script>
+<div class="zm-topic-cat-page">
+    <div class="zm-topic-cat-title">
+        <a href="/people/chen_long/topics" class="zg-link-gray zg-right"><span>已关注 29 个话题</span></a>
+        <h5><i class="zg-icon zg-icon-topic-square"></i>话题广场</h5>
+    </div>
+
+    <ul class="zm-topic-cat-main clearfix">
+        {% if topic_cate %}
+        <li class="zm-topic-cat-item current" data-id="253"
+            onclick="add_class(this, '{{topic_cate[0].category_name}}')"><a
+                href="#">{{topic_cate[0].category_name}}</a>
+        </li>
+        {% endif %}
+
+        {% for cate in topic_cate[1:] %}
+        <li class="zm-topic-cat-item" data-id="833" onclick="add_class(this, '{{cate.category_name}}')"><a
+                href="#">{{cate.category_name}}</a>
+        </li>
+        {% endfor %}
+        <!--<li class="zm-topic-cat-item current" data-id="253"><a href="#games">游戏</a></li>-->
+        <!--<li class="zm-topic-cat-item" data-id="833"><a href="#运动">运动</a></li>-->
+    </ul>
+    <div class="zm-topic-cat-sub">
+        <div class="zh-general-list clearfix" id="topic_content" style="display: block;">
+            {% for topic in topics %}
+            <div class="item">
+                <div class="blk">
+                    <a target="_blank" href="/topic/19550994">
+                        <img src="https://pic4.zhimg.com/fb89e0ea3_xs.jpg" alt="游戏">
+                        <strong>{{topic.topic_name}}</strong>
+                    </a>
+                    <p>{{topic.topic_desc or ""}}</p>
+                    <a id="t::-253" href="javascript:;" class="follow meta-item zg-follow"><i class="z-icon-follow"></i>关注</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

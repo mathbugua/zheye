@@ -2,7 +2,7 @@
 import base64
 import os
 
-from flask import current_app
+from flask import current_app, jsonify
 from flask import redirect, flash
 from flask import render_template
 from flask import request
@@ -11,7 +11,7 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.main.forms import EditProfileForm
-from app.models.models import User, Follow
+from app.models.models import User, Follow, TopicCategory
 from . import main
 from app.helpers import constant
 
@@ -142,3 +142,24 @@ def images():
     # 头像修改失败，提示
     flash(constant.AVATAR_MODI_FAIL)
     return redirect(url_for("main.index"))
+
+
+@main.route('/topics')
+def topics():
+    """话题广场"""
+    topic_cate = TopicCategory.query.all()
+    return render_template("topics.html", base64=base64, user=current_user,
+                           topic_cate=topic_cate, topics=topic_cate[0].topics)
+
+
+@main.route('/topics_search', methods=['POST'])
+def topics_search():
+    """查询选中话题类型下的所有话题"""
+    cate = request.form.get("topic_cate", None)
+    topic_cate = TopicCategory.query.filter_by(
+        category_name=cate).first()
+    if topic_cate:
+        return jsonify(topics=[[topic.topic_name, topic.topic_desc if topic.topic_desc else ""]
+                               for topic in topic_cate.topics])
+
+    return "error"
