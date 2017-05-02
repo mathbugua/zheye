@@ -11,7 +11,7 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.main.forms import EditProfileForm
-from app.models.models import User, Follow, TopicCategory
+from app.models.models import User, Follow, TopicCategory, Topic
 from . import main
 from app.helpers import constant
 
@@ -108,7 +108,7 @@ def followers(username):
                for item in pagination.items]
     return render_template('user_followers.html', user=user,
                            endpoint='.followers', pagination=pagination,
-                           follows=follows,base64=base64)
+                           follows=follows, base64=base64)
 
 
 @main.route('/people/<username>/following')
@@ -145,6 +145,7 @@ def images():
 
 
 @main.route('/topics')
+@login_required
 def topics():
     """话题广场"""
     topic_cate = TopicCategory.query.all()
@@ -152,14 +153,65 @@ def topics():
                            topic_cate=topic_cate, topics=topic_cate[0].topics)
 
 
+@main.route('/topic')
+@login_required
+def topic():
+    """话题动态"""
+    # 获取当前用户关注的话题
+    topics = current_user.follow_topics.filter_by().all()
+    print topics
+    return render_template("topic.html", base64=base64, user=current_user, topics=topics)
+
+
 @main.route('/topics_search', methods=['POST'])
+@login_required
 def topics_search():
     """查询选中话题类型下的所有话题"""
     cate = request.form.get("topic_cate", None)
     topic_cate = TopicCategory.query.filter_by(
         category_name=cate).first()
     if topic_cate:
-        return jsonify(topics=[[topic.topic_name, topic.topic_desc if topic.topic_desc else ""]
+        # 返回的json数据包含四个参数:
+        # ```topic_name:话题名称```
+        # ```topic_desc:话题描述```
+        # ```id:话题索引```
+        # ```follow or unfollow```:是否被当前用户关注
+        return jsonify(topics=[[topic.topic_name, topic.topic_desc if topic.topic_desc else "",
+                                str(topic.id), "follow" if current_user.is_following_topic(topic) else "unfollow"]
                                for topic in topic_cate.topics])
 
     return "error"
+
+
+@main.route('/follow_topic/<topic_id>')
+@login_required
+def follow_topic(topic_id):
+    """关注某个话题"""
+    topic = Topic.query.filter_by(id=topic_id).first()
+    if topic is None:
+        flash(constant.INVALID_TOPIC)
+        return redirect(url_for('main.topics'))
+
+    if current_user.is_following_topic(topic):
+        return redirect(url_for('main.topic'))
+    # 关注话题
+    current_user.follow_topic(topic)
+
+    return redirect(url_for('main.topic'))
+
+
+@main.route('/unfollow_topic/<topic_id>')
+@login_required
+def unfollow_topic(topic_id):
+    """取消关注某个话题"""
+    topic = Topic.query.filter_by(id=topic_id).first()
+    if topic is None:
+        flash(constant.INVALID_TOPIC)
+        return redirect(url_for('main.topics'))
+
+    if not current_user.is_following_topic(topic):
+        return redirect(url_for('main.topic'))
+    # 取消关注
+    current_user.unfollow_topic(topic)
+
+    return redirect(url_for('main.topic'))

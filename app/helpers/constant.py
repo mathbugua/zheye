@@ -2,6 +2,7 @@
 """配置flash抛出的提示信息"""
 PROFILE_UPDATE = u"个人资料已更新"
 INVALID_USER = u"未找到此人"
+INVALID_TOPIC = u"未找到此话题"
 CANNOT_CON_MYSELF = u"不能关注自己"
 AVATAR_MODI_FAIL = u"头像修改失败"
 WRONG = u"错误的用户名或密码"

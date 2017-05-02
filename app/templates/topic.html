@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}话题动态-者也{% endblock %}
+
+{% block page_content %}
+<div class="topic-feed-title">
+    <i class="zg-icon zg-icon-feedlist"></i>
+    <span>已关注的话题动态</span>
+    <a target="_blank" href="#" class="zg-link-gray zg-right">
+        共关注 <span class="#">{{current_user.follow_topics.count()}}</span> 个话题
+    </a>
+</div>
+<ul class="zm-topic-cat-main js-topic-cat-main clearfix">
+    {% if topics %}
+    <li class="zm-topic-cat-item current"><a href="#{{topics[0].topic.topic_name}}">{{topics[0].topic.topic_name}}</a></li>
+    {% endif %}
+
+    {% for topic in topics[1:] %}
+    <li class="zm-topic-cat-item"><a href="#{{topic.topic.topic_name}}">{{topic.topic.topic_name}}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block page_sidebar %}
+<div class="zu-main-sidebar" data-za-module="RightSideBar">
+    <div class="topics-plaza">
+        <a target="_blank" href="{{url_for('main.topics')}}" class="zg-btn-blue">
+            进入话题广场
+        </a>
+        <a target="_blank" href="{{url_for('main.topics')}}" class="text">
+            来这里发现更多有趣话题
+        </a>
+    </div>
+</div>
+{% endblock %}

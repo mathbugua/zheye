@@ -95,7 +95,10 @@ class User(db.Model, UserMixin):
                                 lazy='dynamic',
                                 cascade='all, delete-orphan')
 
-    follow_topics = db.relationship("FollowTopic", backref="users")
+    follow_topics = db.relationship("FollowTopic", backref="users",
+                                    lazy='dynamic',
+                                    cascade='all, delete-orphan'
+                                    )
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -172,11 +175,11 @@ class User(db.Model, UserMixin):
             return False
         return True
 
+    # 关注人
     def follow(self, user):
         if not self.is_following(user):
             f = Follow(followed=user)
             self.followed.append(f)
-            print self.followed.count()
 
     def unfollow(self, user):
         f = self.followed.filter_by(followed_id=user.id).first()
@@ -190,6 +193,21 @@ class User(db.Model, UserMixin):
     def is_followed_by(self, user):
         return self.followers.filter_by(
             follower_id=user.id).first() is not None
+
+    # 关注话题
+    def follow_topic(self, topic):
+        if not self.is_following_topic(topic):
+            t = FollowTopic(topic=topic)
+            self.follow_topics.append(t)
+
+    def unfollow_topic(self, topic):
+        t = self.follow_topics.filter_by(topic_id=topic.id).first()
+        if t:
+            self.follow_topics.remove(t)
+
+    def is_following_topic(self, topic):
+        return self.follow_topics.filter_by(
+            topic_id=topic.id).first() is not None
 
     def change_avatar(self, images):
         """改变头像"""

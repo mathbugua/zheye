@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% block title %}话题广场-者也{% endblock %}
 {% block page_content %}
 <script>
     function add_class(obj, topic_cate) {
@@ -13,12 +14,18 @@
                         content = content + '<div class="item"> ' +
                             '<div class="blk"> ' +
                             '<a target="_blank" href="/topic/19550994"> ' +
-                            '<img src="https://pic4.zhimg.com/fb89e0ea3_xs.jpg" alt="游戏"> ' +
                             '<strong>' + data.topics[i][0] + '</strong>' +
                             '</a>' +
-                            '<p>' + data.topics[i][1] + '</p>' +
-                            '<a id="t::-253" href="javascript:;" class="follow meta-item zg-follow"><i class="z-icon-follow"></i>关注</a>' +
-                            '</div></div>'
+                            '<p>' + data.topics[i][1] + '</p>';
+                        if (data.topics[i][3] == "unfollow") {
+                            content = content + "<a href=\"/follow_topic/" + data.topics[i][2] + "\" class=\"follow meta-item zg-follow\"><i class=\"z-icon-follow\"></i>关注</a>" +
+                                '</div></div>'
+                        }
+                        else {
+                            content = content + "<a href=\"/unfollow_topic/" + data.topics[i][2] + "\" class=\"follow meta-item zg-follow\"><i class=\"z-icon-follow\"></i>取消关注</a>" +
+                                '</div></div>'
+                        }
+
                     }
 
                     content = content + '</div>';
@@ -42,7 +49,7 @@
 </script>
 <div class="zm-topic-cat-page">
     <div class="zm-topic-cat-title">
-        <a href="/people/chen_long/topics" class="zg-link-gray zg-right"><span>已关注 29 个话题</span></a>
+        <a href="#" class="zg-link-gray zg-right"><span>已关注 {{current_user.follow_topics.count()}} 个话题</span></a>
         <h5><i class="zg-icon zg-icon-topic-square"></i>话题广场</h5>
     </div>
 
@@ -68,11 +75,17 @@
             <div class="item">
                 <div class="blk">
                     <a target="_blank" href="/topic/19550994">
-                        <img src="https://pic4.zhimg.com/fb89e0ea3_xs.jpg" alt="游戏">
                         <strong>{{topic.topic_name}}</strong>
                     </a>
                     <p>{{topic.topic_desc or ""}}</p>
-                    <a id="t::-253" href="javascript:;" class="follow meta-item zg-follow"><i class="z-icon-follow"></i>关注</a>
+                    {% if current_user.is_following_topic(topic) %}
+                    <a href="{{url_for('main.unfollow_topic', topic_id = topic.id)}}"
+                       class="follow meta-item zg-follow"><i class="z-icon-follow"></i>取消关注</a>
+
+                    {% else %}
+                    <a href="{{url_for('main.follow_topic', topic_id = topic.id)}}"
+                       class="follow meta-item zg-follow"><i class="z-icon-follow"></i>关注</a>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}

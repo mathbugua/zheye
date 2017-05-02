@@ -190,7 +190,7 @@
 
 
                 <li class="top-nav-topic-selector zu-top-nav-li " id="zh-top-nav-topic">
-                    <a class="zu-top-nav-link" href="/topic" id="top-nav-dd-topic">话题</a>
+                    <a class="zu-top-nav-link" href="{{url_for('main.topic')}}" id="top-nav-dd-topic">话题</a>
                 </li>
 
                 <li class="zu-top-nav-li " id="zh-top-nav-explore">
@@ -299,6 +299,7 @@
 
         </div>
     </div>
+    {% block page_sidebar %}{% endblock %}
 </div>
 
 
