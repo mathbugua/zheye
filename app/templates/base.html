@@ -38,6 +38,54 @@
         }
     </script>
 
+    <!--初始化话题选择框-->
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.ajax({
+                url: "/topic_all",
+                async: true,
+                type: "GET",
+                success: function (data, status) {
+                    data = data.topics;
+                    for (var i = 0; i < data.length; i++) {
+                        $("#question_topic").append("<option value='" + data[i][0] + "'>" + data[i][1] + "</option>");
+                    }
+                }
+            });
+
+        });
+    </script>
+
+    <!--进行提问的提交-->
+    <script>
+        function submit_question(){
+            var form = document.forms["question_form"];
+            var question = form["question_content"].value;
+            if(question ==null || question == ""){
+                alert("问题不能为空");
+                return;
+            }
+            var question_desc = form["question_desc"].value;
+            var topic = form["question_topic"].value;
+
+            $.ajax({
+                url: "/submit_question",
+                async: true,
+                type: "POST",
+                data:{"question": question, "question_desc":question_desc, "topic":topic},
+                success : function (data, status){
+                    if(data.error != ""){
+                        alert("error");
+                        return;
+                    }
+                    else{
+                        location.href = "/"
+                    }
+            }
+            })
+
+        }
+        </script>
 </head>
 
 <body class="zhi ">
@@ -58,11 +106,11 @@
 
             <div class="modal-dialog-content">
                 <div class="zh-add-question-form">
-                    <form class="js-add-question-form">
+                    <form class="js-add-question-form" name="question_form">
                         <div class="zg-section-big clearfix">
                             <div class="zg-form-text-input add-question-title-form" style="position: relative;">
                                 <textarea rows="1" class="zg-editor-input zu-seamless-input-origin-element"
-                                          title="在这里输入问题" id="zh-question-suggest-title-content" aria-label="写下你的问题"
+                                          title="在这里输入问题" name="question_content" aria-label="写下你的问题"
                                           placeholder="写下你的问题" role="combobox" aria-autocomplete="list"
                                           autocomplete="off" style="height: 22px;"></textarea>
                             </div>
@@ -75,7 +123,7 @@
                             </div>
                             <div class="zg-form-text-input add-question-title-form" style="position: relative;">
                                 <textarea rows="1" class="zg-editor-input zu-seamless-input-origin-element"
-                                          title="问题说明" id="test" aria-label="问题说明"
+                                          title="问题说明" name="question_desc" aria-label="问题说明"
                                           placeholder="问题说明" role="combobox" aria-autocomplete="list"
                                           autocomplete="off" style="height: 70px;"></textarea>
                             </div>
@@ -86,29 +134,15 @@
                                 选择话题：
                                 <span id="zh-question-form-tag-err"></span>
                             </div>
-                            <div id="zh-question-suggest-topic-container" class="zm-tag-editor zg-section">
-                                <div class="zm-tag-editor-labels" style="display: none;"></div>
-                                <div class="zm-tag-editor-editor zg-clear">
-                                    <div class="zg-inline"></div>
-                                    <div class="zm-tag-editor-command-buttons-wrap zg-left"><label for="topic"
-                                                                                                   class="zg-icon icon-magnify"></label><input
-                                            class="zu-question-suggest-topic-input label-input-label" type="text"
-                                            role="combobox" aria-autocomplete="list" aria-label="搜索话题"
-                                            placeholder="搜索话题"><a class="zg-mr15 zg-btn-blue" href="#" name="add"
-                                                                  style="display: none;">添加</a><a href="#" name="close"
-                                                                                                  style="display: none;">完成</a><label
-                                            class="err-tip" style="display:none;">最多添加五个话题</label></div>
-                                    <div class="zm-tag-editor-maxcount zg-section" style="display: none;"><span>最多只能为一个问题绑定 5 个话题</span><a
-                                            href="#" name="close" style="display: none;">完成</a></div>
-                                </div>
-                                <div id="zh-question-suggest-autocomplete-container"></div>
-                            </div>
+                            <select class="form-control" id="question_topic" name="question_topic">
+                            </select>
+
 
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">取消
                             </button>
-                            <button type="button" class="btn btn-primary">
+                            <button type="button" class="btn btn-primary" onclick="submit_question()">
                                 发布
                             </button>
                         </div>

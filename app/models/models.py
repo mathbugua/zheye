@@ -3,6 +3,7 @@
 """定义数据库的models"""
 import hashlib
 
+from datetime import datetime
 from flask import current_app
 from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -99,6 +100,9 @@ class User(db.Model, UserMixin):
                                     lazy='dynamic',
                                     cascade='all, delete-orphan'
                                     )
+
+    # 用户与提问题之间是一对多的关系，即一个用户能够提多个问题，而一个问题只属于一个人
+    questions = db.relationship("Question", backref="uesrs")
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -247,6 +251,7 @@ class Topic(db.Model):
     topic_desc = db.Column(db.String(50))
     category_id = db.Column(db.Integer, db.ForeignKey("topiccate.id"))
     follow_topics = db.relationship("FollowTopic", backref="topic")
+    question_topic = db.relationship("QuestionTopic", backref="topic")
 
     @staticmethod
     def insert_topic():
@@ -295,6 +300,57 @@ class FollowTopic(db.Model):
     topic_id = db.Column(db.Integer, db.ForeignKey("topic.id"),
                          primary_key=True)
     desc = db.Column(db.String(30))
+
+
+class Question(db.Model):
+    """问题"""
+    __tablename__ = "question"
+    id = db.Column(db.Integer, primary_key=True)
+    question_name = db.Column(db.String(30), nullable=False)
+    question_desc = db.Column(db.String(50))
+    author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    question_time = db.Column(db.DateTime(), default=datetime.utcnow)
+    question_topic = db.relationship("QuestionTopic", backref="question")
+
+    @staticmethod
+    def add_question(question_name, question_desc, topic, current_user_id):
+        question = Question(
+            question_name=question_name,
+            question_desc=question_desc,
+            author_id=current_user_id
+        )
+        db.session.add(question)
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            return u"提交失败"
+
+        question = Question.query.filter_by(question_name=question_name).first()
+        if question:
+            question_topic = QuestionTopic(
+                question_id=question.id,
+                topic_id=topic
+            )
+            db.session.add(question_topic)
+            try:
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                # 提交失败，删除问题
+                db.session.delete(question)
+                db.session.commit()
+                return u"提交失败"
+        return u"提交成功"
+
+
+class QuestionTopic(db.Model):
+    """问题与话题之间是多对多的关系"""
+    __tablename__ = "question_topic"
+    question_id = db.Column(db.Integer, db.ForeignKey("question.id"),
+                            primary_key=True)
+    topic_id = db.Column(db.Integer, db.ForeignKey("topic.id"),
+                         primary_key=True)
 
 
 class AnonymousUser(AnonymousUserMixin):

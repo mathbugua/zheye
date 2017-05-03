@@ -11,7 +11,7 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.main.forms import EditProfileForm
-from app.models.models import User, Follow, TopicCategory, Topic
+from app.models.models import User, Follow, TopicCategory, Topic, Question
 from . import main
 from app.helpers import constant
 
@@ -183,6 +183,14 @@ def topics_search():
     return "error"
 
 
+@main.route('/topic_all')
+@login_required
+def topic_all():
+    """返回所有的话题，初始化问题中的话题选择框"""
+    topics = Topic.query.filter_by().all()
+    return jsonify(topics=[[topic.id, topic.topic_name] for topic in topics])
+
+
 @main.route('/follow_topic/<topic_id>')
 @login_required
 def follow_topic(topic_id):
@@ -215,3 +223,17 @@ def unfollow_topic(topic_id):
     current_user.unfollow_topic(topic)
 
     return redirect(url_for('main.topic'))
+
+
+@main.route('/submit_question', methods=['POST'])
+def submit_question():
+    question = request.form.get("question")
+    question_desc = request.form.get("question_desc")
+    topic = request.form.get("topic")
+    if len(question) > 30 or len(question_desc) > 50:
+        return jsonify(error=constant.QUESTION_ERROR)
+
+    # 添加问题
+    result = Question.add_question(question, question_desc, topic, current_user.id)
+
+    return jsonify(result=result, error="")
