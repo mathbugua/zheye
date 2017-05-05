@@ -75,14 +75,17 @@
                 data:{"question": question, "question_desc":question_desc, "topic":topic},
                 success : function (data, status){
                     if(data.error != ""){
-                        alert("error");
+                        alert(data.error);
                         return;
                     }
                     else{
                         location.href = "/"
                     }
+            },
+            error: function (xhr) {
+                alert("请求失败，请先登录");
             }
-            })
+            });
 
         }
         </script>
@@ -201,8 +204,10 @@
             <button class="Button " type="button"><a href="{{url_for('auth.login_register')}}">登录</a></button>
         </div>
         {% endif %}
+        {% if current_user.is_authenticated %}
         <button class="zu-top-add-question" id="zu-top-add-question" data-toggle="modal" data-target="#myModal">提问
         </button>
+        {% endif %}
         <div role="search" id="zh-top-search" class="zu-top-search">
             <form method="GET" action="#" id="zh-top-search-form" class="zu-top-search-form">
                 <input type="hidden" name="type" value="content">

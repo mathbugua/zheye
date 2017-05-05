@@ -74,7 +74,7 @@
             {% for topic in topics %}
             <div class="item">
                 <div class="blk">
-                    <a target="_blank" href="/topic/19550994">
+                    <a target="_blank" href="{{url_for('main.topic_detail', id = topic.id)}}">
                         <strong>{{topic.topic_name}}</strong>
                     </a>
                     <p>{{topic.topic_desc or ""}}</p>

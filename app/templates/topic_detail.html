@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='style/style.css')}}">
+<script data-main="{{url_for('static', filename='js/main')}}"
+        src="{{url_for('static', filename='js/require.js')}}"></script>
+
+<script>
+    function follow_question(question_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/follow_question/' + question_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a href=\"#\" id=\"" + id + "\"  onclick=\"unfollow_question(" + "'" + question_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"follow-link zg-follow meta-item\"><i class=\"z-icon-follow\"></i>取消关注</a>";
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+            }
+        })
+
+    }
+
+    function unfollow_question(question_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/unfollow_question/' + question_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a href=\"#\" id=\"" + id + "\"  onclick=\"follow_question(" + "'" + question_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"follow-link zg-follow meta-item\"><i class=\"z-icon-follow\"></i>关注问题</a>";
+
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+            }
+        })
+
+    }
+</script>
+{% endblock %}
+
+{% block body %}
+<div>
+    <div class="topic-avatar" itemprop="image" itemscope="" itemtype="http://schema.org/ImageObject">
+        <div>
+            <a class="zm-entry-head-avatar-link" href="/topic/19550994" id="zh-avartar-edit-form">
+                <img alt="游戏" src="{{url_for('static', filename='images/default.jpg')}}"
+                     style="width: 50px;height: 50px"></a>
+        </div>
+    </div>
+
+    <div class="topic-info">
+        <div class="topic-name zm-editable-status-normal" id="zh-topic-title">
+            <h4 class="zm-editable-content" data-disabled="1">{{topic.topic_name}}</h4>
+        </div>
+        <div class="zm-topic-topbar">
+            <div class="zm-topic-topbar-nav clearfix">
+            </div>
+        </div>
+
+
+        <div class="zm-topic-list-container">
+            <div class="zu-top-feed-list navigable">
+                {% for question in topic.question_topic %}
+                <div class="feed-item feed-item-hook">
+                    <div class="feed-main">
+                        <div class="feed-content">
+                            <h5><a class="question_link" href="/question/59214151" target="_blank">
+                                {{question.question.question_name}}?
+                            </a></h5>
+                            <div class="expandable entry-body">
+                                <div class="zm-item-answer-author-info">
+                                    <span class="summary-wrapper">
+                                    <span class="author-link-line">
+
+                                    <a class="author-link" data-hovercard="p$t$vincent-54-38" target="_blank"
+                                       href="{{url_for('main.people', username=question.question.uesrs.username)}}">{{question.question.uesrs.username}}</a></span><span
+                                            class="bio">
+                                    {{question.question.uesrs.short_intr or ""}}
+                                    </span>
+                                    </span>
+                                </div>
+
+                                <div class="zm-item-rich-text expandable js-collapse-body">
+                                    <ul class="wrap">
+                                        <li>
+                                            <div class="content all-content" style="display: none;">
+                                                <p>In the winter that seat is close enough to the radiator to remain
+                                                    warm and yet not so close as to cause perspiration. In the summer
+                                                    it's directly in the path of a cross breeze created by opening
+                                                    windows there, and there.
+                                                    It faces the television at an angle that is neither direct, thus
+                                                    discouraging conversation,
+                                                    nor so far wide to create a parallax distortion. I could go on,
+                                                    but ... I think I've made my point.
+                                                    冬季的时候，这个地方离电暖器很近、最暖和，但是又不会近到让你感觉热、流汗；夏天的时候，这里又可以吹由那两扇窗户吹进来的徐徐微风；
+                                                    坐这的角度可以让我同时看电视又同时和他人聊天而不受影响，恰好不会太远也不会产生视觉上的错觉。</p>
+                                                <p>In the winter that seat is close enough to the radiator to remain
+                                                    warm and yet not so close as to cause perspiration. In the summer
+                                                    it's directly in the path of a cross breeze created by opening
+                                                    windows there, and there.
+                                                    It faces the television at an angle that is neither direct, thus
+                                                    discouraging conversation,
+                                                    nor so far wide to create a parallax distortion. I could go on,
+                                                    but ... I think I've made my point.
+                                                    冬季的时候，这个地方离电暖器很近、最暖和，但是又不会近到让你感觉热、流汗；夏天的时候，这里又可以吹由那两扇窗户吹进来的徐徐微风；
+                                                    坐这的角度可以让我同时看电视又同时和他人聊天而不受影响，恰好不会太远也不会产生视觉上的错觉。</p>
+
+                                            </div>
+                                            <div class="content part-content">In the winter that seat is close enough to
+                                                the radiator to remain warm and yet not so close as to cause
+                                                perspiration. In the summer<b> ...</b></div>
+                                            <div class="sign unfold">显示全部</div>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                            <div class="zm-item-meta feed-meta">
+                                <div class="zm-item-meta answer-actions clearfix js-contentActions">
+                                    <div class="zm-meta-panel">
+
+                                        {% if not current_user.is_following_question(question.question) %}
+                                        <a id="follow_quesrion_{{question.question.id}}" href="#"
+                                           onclick="follow_question('{{question.question.id}}', id)"
+                                           class="follow-link zg-follow meta-item"><i class="z-icon-follow"></i>关注问题</a>
+                                        {% else %}
+                                        <a id="follow_quesrion_{{question.question.id}}" href="#"
+                                           onclick="unfollow_question('{{question.question.id}}', id)"
+                                           class="follow-link zg-follow meta-item"><i class="z-icon-follow"></i>取消关注</a>
+                                        {% endif %}
+
+                                        <a href="#" name="addcomment"
+                                           class="meta-item toggle-comment js-toggleCommentBox">
+                                            <i class="z-icon-comment"></i>353 条评论</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_sidebar %}
+<div class="zu-main-sidebar">
+    <div class="zm-side-section">
+        <div class="zm-side-section-inner">
+            <div class="topic-header-side zm-entry-head-wrap">
+
+                <div class="clearfix">
+                    <div id="zh-topic-side-head">
+
+                        {% if not current_user.is_following_topic(topic) %}
+                        <a href="{{url_for('main.follow_topic', topic_id = topic.id)}}"
+                           class="zg-btn-green zu-entry-focus-button zg-mr10">关注话题</a>
+
+                        {% else %}
+                        <a href="{{url_for('main.unfollow_topic', topic_id = topic.id)}}" class="zg-mr10 zu-entry-focus-button zg-btn-white" id="tf-253">取消关注</a>
+                        {% endif %}
+                        <div class="zm-topic-side-followers-info">
+
+                            <a href="#"><strong>{{count}}</strong></a> 人关注了该话题
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="zm-side-section">
+        <div class="zm-side-section-inner">
+            <h4 class="zm-topic-side-organize-title">描述
+            </h4>
+            <div id="zh-topic-desc" data-resourceid="253" data-action="/topic-introduction"
+                 class="zm-editable-status-normal">
+                <div class="zm-editable-tip" style="display: none;"><a href="javascript:;" name="edit">添加话题描述</a></div>
+                <div class="zm-editable-content" data-editable-maxlength="130"><b>游戏</b><br>是一种在特定时间、空间范围内遵循某种特定规则的，追求精神满足的行为活动
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

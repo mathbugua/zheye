@@ -55,6 +55,19 @@ class Role(db.Model):
         return "<Role %r>" % self.name
 
 
+class Comments(db.Model):
+    """评论回答"""
+    __tablename__ = "comments"
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),
+                        primary_key=True)
+    answer_id = db.Column(db.Integer, db.ForeignKey("answer.id"),
+                          primary_key=True)
+    content_body = db.Column(db.String(200), nullable=False)
+    content_time = db.Column(db.DateTime(), default=datetime.utcnow)
+    comment_type = db.Column(db.String(64), default='comment')
+    reply_to = db.Column(db.Integer, db.ForeignKey("users.id"))
+
+
 class Follow(db.Model):
     __tablename__ = 'follows'
     # 关注者
@@ -101,8 +114,32 @@ class User(db.Model, UserMixin):
                                     cascade='all, delete-orphan'
                                     )
 
+    follow_questions = db.relationship("FollowQuestion", backref="users",
+                                      lazy='dynamic',
+                                      cascade='all, delete-orphan'
+                                      )
+
+    answers = db.relationship("Answer", backref="users",
+                                    lazy='dynamic',
+                                    cascade='all, delete-orphan'
+                                    )
+
     # 用户与提问题之间是一对多的关系，即一个用户能够提多个问题，而一个问题只属于一个人
     questions = db.relationship("Question", backref="uesrs")
+
+    comments = db.relationship("Comments",
+                               foreign_keys=[Comments.user_id],
+                               backref="comment_user",
+                               lazy='dynamic',
+                               cascade='all, delete-orphan'
+                               )
+
+    replay = db.relationship("Comments",
+                               foreign_keys=[Comments.reply_to],
+                               backref="replay_user",
+                               lazy='dynamic',
+                               cascade='all, delete-orphan'
+                               )
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -213,6 +250,21 @@ class User(db.Model, UserMixin):
         return self.follow_topics.filter_by(
             topic_id=topic.id).first() is not None
 
+    # 关注问题
+    def follow_question(self, question):
+        if not self.is_following_question(question):
+            q = FollowQuestion(question=question)
+            self.follow_questions.append(q)
+
+    def unfollow_question(self, question):
+        t = self.follow_questions.filter_by(question_id=question.id).first()
+        if t:
+            self.follow_questions.remove(t)
+
+    def is_following_question(self, question):
+        return self.follow_questions.filter_by(
+            question_id=question.id).first() is not None
+
     def change_avatar(self, images):
         """改变头像"""
         try:
@@ -307,11 +359,19 @@ class Question(db.Model):
     __tablename__ = "question"
     id = db.Column(db.Integer, primary_key=True)
     question_name = db.Column(db.String(30), nullable=False)
-    question_desc = db.Column(db.String(50))
+    question_desc = db.Column(db.String(500))
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     question_time = db.Column(db.DateTime(), default=datetime.utcnow)
     question_topic = db.relationship("QuestionTopic", backref="question")
 
+    answers = db.relationship("Answer", backref="question",
+                              lazy='dynamic',
+                              cascade='all, delete-orphan'
+                              )
+    follow_questions = db.relationship("FollowQuestion", backref="question",
+                                       lazy='dynamic',
+                                       cascade='all, delete-orphan'
+                                       )
     @staticmethod
     def add_question(question_name, question_desc, topic, current_user_id):
         question = Question(
@@ -351,6 +411,31 @@ class QuestionTopic(db.Model):
                             primary_key=True)
     topic_id = db.Column(db.Integer, db.ForeignKey("topic.id"),
                          primary_key=True)
+
+
+class Answer(db.Model):
+    """用户回答问题是多对多的关系"""
+    __tablename__ = "answer"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                        primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey("question.id"),
+                        primary_key=True)
+    timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
+    answer_body = db.Column(db.String(1000), nullable=False)
+    comments = db.relationship("Comments", backref="answer",
+                               lazy='dynamic',
+                               cascade='all, delete-orphan'
+                               )
+
+
+class FollowQuestion(db.Model):
+    __tablename__ = "follow_question"
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
+                        primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey("question.id"),
+                         primary_key=True)
+    desc = db.Column(db.String(30))
 
 
 class AnonymousUser(AnonymousUserMixin):

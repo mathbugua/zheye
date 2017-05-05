@@ -724,6 +724,28 @@ input, textarea, keygen, select, button, meter, progress {
     width: 60px;
     height: 60px;
 }
+.topic-pages .topic-avatar .zm-entry-head-avatar-link, .topic-feed-page .topic-avatar .zm-entry-head-avatar-link {
+    display: block;
+    position: relative;
+    width: 50px;
+    height: 50px;
+}
+.topic-pages .topic-avatar .zm-entry-head-avatar-link img.zm-avatar-editor-preview, .topic-feed-page .topic-avatar .zm-entry-head-avatar-link img.zm-avatar-editor-preview {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+}
 
+.topic-info .topic-name, .topic-info .topic-name {
+    margin: 0 0 8px 65px;
+}
 
-
+.zm-topic-list-container .feed-main, .zm-topic-list-container .feed-main {
+    margin-left: 0;
+}
+.feed-switcher, .feed-switcher {
+    text-align: right;
+    padding: 10px 0;
+    color: #999;
+    font-size: 12px;
+}

@@ -1,6 +1,311 @@
 {% extends "base.html" %}
-{% block title %} 首页-者也 {% endblock %}ss
-{% block body %}
+{% block title %} 首页-者也 {% endblock %}
+
+{% block head %}
 {{super()}}
-<h1>你好</h1>
+<link rel="stylesheet" href="{{url_for('static', filename='style/style.css')}}">
+<script data-main="{{url_for('static', filename='js/main')}}"
+        src="{{url_for('static', filename='js/require.js')}}"></script>
+{% endblock %}
+
+{% block body %}
+<div class="HomeEntry">
+    <div class="HomeEntry-avatar">
+        <img class="Avatar Avatar--xs"
+             {% if current_user.avatar %}
+             src="data:;base64,{{ base64.b64encode(current_user.avatar)}}" alt="{{current_user.username}}">
+        {% else %}
+        src="{{url_for('static', filename='images/default.jpg')}}" alt="{{current_user.username}}">
+        {% endif %}
+    </div>
+    <div class="HomeEntry-box">
+        <span class="HomeEntry-boxArrow"></span>
+        <ul class="HomeEntry-list" >
+            <li class="HomeEntry-item" data-toggle="modal" data-target="#myModal">
+                <a href="#" class="HomeEntry-ask js-HomeEntry-ask">
+                    <i class="sprite-home-question-off"></i>
+                    提问
+                </a>
+            </li>
+            <li class="HomeEntry-item">
+                <a href="/question" target="_blank" class="HomeEntry-answer js-HomeEntry-answer">
+                    <i class="sprite-home-answer-off"></i>
+                    回答
+                </a>
+            </li>
+            <li class="HomeEntry-item">
+                <a href="#" class="HomeEntry-post js-HomeEntry-post">
+                    <i class="sprite-home-post-off"></i>
+                    写文章
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="zg-section" id="zh-home-list-title">
+    <i class="zg-icon zg-icon-feedlist"></i>
+    最新动态 <input type="hidden" id="is-topstory">
+    <span class="zg-right zm-noti-cleaner-setting" style="list-style:none"><a href="#"
+                                                                              class="zg-link-gray-normal"><i
+            class="zg-icon zg-icon-settings"></i>设置</a></span>
+</div>
+
+<div class="zu-main-feed-con navigable">
+    <div class="zh-general-list topstory clearfix">
+        <div class="feed-item folding feed-item-hook feed-item-2">
+            <div class="feed-item-inner">
+                <div class="avatar">
+                    <a title="Python 程序员" data-hovercard="t$t$19744308" class="zm-item-link-avatar"
+                       href="/topic/19744308" target="_blank">
+                        <img src="https://pic1.zhimg.com/e82bab09c_m.jpg" alt="Python 程序员" class="side-topic-avatar">
+                    </a>
+                </div>
+                <div class="feed-main">
+                    <div class="feed-source" data-za-module="FeedSource">
+                        来自话题: <a href="/topic/19744308" data-hovercard="t$t$19744308" data-token="19744308"
+                                 data-topicid="64827" data-follow="1" data-interest="1" target="_blank"
+                                 data-za-element-name="Title">Python 程序员</a>
+
+                    </div>
+                    <div class="feed-content" data-za-module="AnswerItem">
+                        <meta itemprop="answer-id" content="59825897">
+                        <meta itemprop="answer-url-token" content="163697991">
+                        <h5 class="feed-title"><a class="question_link" href="/question/43758029/answer/163697991"
+                                                  target="_blank" data-id="9712831" data-za-element-name="Title">
+                            想参加马哥python培训，怎么样？
+                        </a></h5>
+                        <div class="feed-question-detail-item">
+
+                            <a href="#"
+                               class="toggle-expand btn-toggle-question-detail ellipsis js-expandQuestionDetail">想参加马哥python培训，好不好？本人...&nbsp;<span>显示问题详情</span></a>
+                            <div class="question-description zm-editable-content">
+                                <p>
+                                    想参加马哥python培训，好不好？本人以前没有编程基础，目前在自学基础语法，有时碰到问题后，如果百度找不到答案，不知道找谁帮忙解答。想到以后深入学习，碰到的问题又更多，到时更是困惑。这样肯定会造成影响进度又打击信心。所以决定想参加系统的培训。希望懂的朋友帮忙回复一下。打广告的，就不要来了，谢谢！</p>
+                            </div>
+
+                        </div>
+                        <div class="expandable entry-body">
+                            <link itemprop="url" href="/question/43758029/answer/163697991">
+                            <!-- <meta itemprop="answer-id" content="59825897">
+                            <meta itemprop="answer-url-token" content="163697991"> -->
+
+                            <div class="zm-item-vote">
+                                <a class="zm-item-vote-count js-expand js-vote-count" href="javascript:;"
+                                   data-bind-votecount="">6</a>
+                            </div>
+
+                            <div class="zm-votebar" data-za-module="VoteBar">
+                                <button class="up" aria-pressed="false" title="赞同">
+                                    <i class="icon vote-arrow"></i>
+                                    <span class="count">6</span>
+                                    <span class="label sr-only">赞同</span>
+                                </button>
+                                <button class="down" aria-pressed="false" title="反对，不会显示你的姓名">
+                                    <i class="icon vote-arrow"></i>
+                                    <span class="label sr-only">反对，不会显示你的姓名</span>
+                                </button>
+                            </div>
+
+
+                            <div class="zm-item-answer-author-info">
+
+                            <span class="summary-wrapper">
+                            <span class="author-link-line">
+                                <a class="author-link" data-hovercard="p$t$tang-ge-71-52" target="_blank" href="/people/tang-ge-71-52">陈龙</a>
+                            </span>
+                            <span title="神奇的八卦IT人" class="bio">神奇的八卦IT人</span>
+                            </span>
+                            </div>
+
+                            <div class="zm-item-vote-info" data-votecount="6" data-za-module="VoteInfo">
+
+
+                                <span class="voters text"><a href="#" class="more text"><span
+                                        class="js-voteCount">6</span>&nbsp;人赞同</a></span>
+
+
+                            </div>
+                            <div class="zm-item-rich-text expandable js-collapse-body" data-resourceid="9712831"
+                                 data-action="/answer/content" data-author-name="汤哥"
+                                 data-entry-url="/question/43758029/answer/163697991">
+
+                                <div class="zh-summary summary clearfix">
+
+                                    <!--作为一个IT小白，但是有认识很多的IT达人，看到这个忍不住说说自己的一些看法。-->
+                                    <!--本条内容不管谁做的，但是这条内容作为一个从业者而言都是非常不尊重的。一边是竞争方貌似带有专业度的赤裸裸的广告，一遍是不动脑子的为了保住颜面的一起乱做，感觉其实很搞…-->
+
+                                    <!--<a href="/question/43758029/answer/163697991" class="toggle-expand">显示全部</a>-->
+
+                                    <ul class="wrap">
+                                        <li>
+                                            <div class="content all-content" style="display: none;">
+                                                <p>In the winter that seat is close enough to the radiator to remain
+                                                    warm and yet not so close as to cause perspiration. In the summer
+                                                    it's directly in the path of a cross breeze created by opening
+                                                    windows there, and there.
+                                                    It faces the television at an angle that is neither direct, thus
+                                                    discouraging conversation,
+                                                    nor so far wide to create a parallax distortion. I could go on,
+                                                    but ... I think I've made my point.
+                                                    冬季的时候，这个地方离电暖器很近、最暖和，但是又不会近到让你感觉热、流汗；夏天的时候，这里又可以吹由那两扇窗户吹进来的徐徐微风；
+                                                    坐这的角度可以让我同时看电视又同时和他人聊天而不受影响，恰好不会太远也不会产生视觉上的错觉。</p>
+                                                 <p>In the winter that seat is close enough to the radiator to remain
+                                                    warm and yet not so close as to cause perspiration. In the summer
+                                                    it's directly in the path of a cross breeze created by opening
+                                                    windows there, and there.
+                                                    It faces the television at an angle that is neither direct, thus
+                                                    discouraging conversation,
+                                                    nor so far wide to create a parallax distortion. I could go on,
+                                                    but ... I think I've made my point.
+                                                    冬季的时候，这个地方离电暖器很近、最暖和，但是又不会近到让你感觉热、流汗；夏天的时候，这里又可以吹由那两扇窗户吹进来的徐徐微风；
+                                                    坐这的角度可以让我同时看电视又同时和他人聊天而不受影响，恰好不会太远也不会产生视觉上的错觉。</p>
+                                                 <p>In the winter that seat is close enough to the radiator to remain
+                                                    warm and yet not so close as to cause perspiration. In the summer
+                                                    it's directly in the path of a cross breeze created by opening
+                                                    windows there, and there.
+                                                    It faces the television at an angle that is neither direct, thus
+                                                    discouraging conversation,
+                                                    nor so far wide to create a parallax distortion. I could go on,
+                                                    but ... I think I've made my point.
+                                                    冬季的时候，这个地方离电暖器很近、最暖和，但是又不会近到让你感觉热、流汗；夏天的时候，这里又可以吹由那两扇窗户吹进来的徐徐微风；
+                                                    坐这的角度可以让我同时看电视又同时和他人聊天而不受影响，恰好不会太远也不会产生视觉上的错觉。</p>
+                                                 <p>In the winter that seat is close enough to the radiator to remain
+                                                    warm and yet not so close as to cause perspiration. In the summer
+                                                    it's directly in the path of a cross breeze created by opening
+                                                    windows there, and there.
+                                                    It faces the television at an angle that is neither direct, thus
+                                                    discouraging conversation,
+                                                    nor so far wide to create a parallax distortion. I could go on,
+                                                    but ... I think I've made my point.
+                                                    冬季的时候，这个地方离电暖器很近、最暖和，但是又不会近到让你感觉热、流汗；夏天的时候，这里又可以吹由那两扇窗户吹进来的徐徐微风；
+                                                    坐这的角度可以让我同时看电视又同时和他人聊天而不受影响，恰好不会太远也不会产生视觉上的错觉。</p>
+                                                <p>That is my spot. In an ever-changing world it is a simple point of
+                                                    consistency.
+                                                    If my life were expressed as a function in a four-dimensional
+                                                    Cartesian coordinate system,
+                                                    that spot, at the moment I first sat on it, would be 0000.</p>
+                                                <p>那是我的专座。在这个不断变化的世界里，这是不变的一点。假设我的生命用一个建立在四维直角坐标系里的方程来表示的话，
+                                                    这个座位从我坐上那一刻开始就成为了(0,0,0,0)。</p>
+                                            </div>
+                                            <div class="content part-content">In the winter that seat is close enough to
+                                                the radiator to remain warm and yet not so close as to cause
+                                                perspiration. In the summer<b> ...</b></div>
+                                            <div class="sign unfold">显示全部</div>
+                                        </li>
+                                    </ul>
+
+                                </div>
+
+
+                                <p class="visible-expanded"><a itemprop="url" class="answer-date-link meta-item"
+                                                               target="_blank"
+                                                               href="/question/43758029/answer/163697991">发布于
+                                    2017-05-02</a></p>
+
+                            </div>
+                        </div>
+                        <div class="feed-meta">
+                            <div class="zm-item-meta answer-actions clearfix js-contentActions">
+                                <div class="zm-meta-panel">
+
+                                    <a data-follow="q:link" class="follow-link zg-follow meta-item" href="javascript:;"
+                                       id="sfb-9712831"><i class="z-icon-follow"></i>关注问题</a>
+
+                                    <a href="#" name="addcomment" class="meta-item toggle-comment js-toggleCommentBox">
+                                        <i class="z-icon-comment"></i>4 条评论</a>
+
+
+                                    <a href="#" class="meta-item zu-autohide js-thank" data-thanked="false"><i
+                                            class="z-icon-thank"></i>感谢</a>
+
+                                    <button class="meta-item item-collapse js-collapse">
+                                        <i class="z-icon-fold"></i>收起
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!--{% for topic in topic_all %}-->
+<!--{% for question in topic.question_topic %}-->
+<!--话题：{{topic.topic_name}}<br>-->
+<!--问题:{{question.question.question_name}}<br>-->
+<!--{% endfor %}-->
+<!--{% endfor %}-->
+{% endblock %}
+
+<!--定义侧边栏-->
+{% block page_sidebar %}
+<div class="zu-main-sidebar" data-za-module="RightSideBar">
+    <div class="zm-side-section">
+        <div class="zm-side-section-inner">
+            <div class="zm-side-nav-group">
+                <ul class="zm-side-nav" id="zg-sidebar-nav">
+
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link" href="/collections" data-za-c="collection"
+                           data-za-l="sidebar_collections" data-za-a="visit_collections">
+                            <i class="zg-icon zg-icon-sidenav-fav"></i>
+                            我的收藏
+
+                        </a>
+                    </li>
+
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link" href="/question/following">
+                            <i class="zg-icon zg-icon-sidenav-follow"></i>
+                            我关注的问题
+                        </a>
+                    </li>
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link" href="/question/invited">
+                            <i class="zg-icon zg-icon-sidenav-invite"></i>
+                            邀请我回答的问题
+
+                        </a>
+                    </li>
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link z-icon-container " href="/balance">
+                            <i class="zg-icon icon icon-purse"></i>
+                            我的余额
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="zm-side-nav-group">
+                <ul class="zm-side-nav">
+
+
+                    <li class="zm-side-nav-li rq3-publiceditlink" id="rq3-sidenav-link">
+                        <a class="zm-side-nav-link" href="/watch">
+                            <i class="zg-icon zg-icon-sidenav-publicedit"></i>
+                            公共编辑动态
+                            <span class="zg-num hidden">0</span>
+                        </a>
+                    </li>
+
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link z-ico-container" href="/community">
+                            <i class="z-ico-community"></i>
+                            社区服务中心
+                        </a>
+                    </li>
+
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link z-ico-container" href="/copyright">
+                            <i class="zg-icon icon icon-copyright"></i>
+                            版权服务中心
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

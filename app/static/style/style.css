@@ -1,0 +1,46 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+.wrap {
+	margin: 0 auto;
+}
+.wrap li {
+	list-style: none;
+	margin: 20px 0;
+	padding: 20px 80px 30px 20px;
+	color: #666;
+	line-height: 2;
+	border: 1px solid #81baeb;
+	box-shadow: 5px 6px 5px #ccc;
+	position: relative;
+}
+.content {
+	text-indent: 2em;
+}
+.content p {
+	margin-bottom: 15px;
+}
+.sign {
+    font-size: 12px;
+    padding: 1px 5px;
+    position: absolute;
+    bottom: 10px;
+    right: 20px;
+    text-align: center;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    color: #0c5897;
+    background-color: #eff6fa;
+    cursor: pointer;
+}
+.fold-fix {
+    color: #fff;
+    background-color: #81baeb;
+    position: fixed;
+}
+h2 {
+	font-size: 26px;
+	line-height: 2.5;
+}

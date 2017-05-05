@@ -19,7 +19,8 @@ from app.helpers import constant
 @main.route("/")
 @login_required
 def index():
-    return render_template("zheye.html", user=current_user, base64=base64)
+    topic_all = Topic.query.filter_by().all()
+    return render_template("zheye.html", user=current_user, base64=base64, topic_all=topic_all)
 
 
 @main.route('/people/<username>')
@@ -205,7 +206,7 @@ def follow_topic(topic_id):
     # 关注话题
     current_user.follow_topic(topic)
 
-    return redirect(url_for('main.topic'))
+    return redirect(url_for('main.topic_detail', id=topic_id))
 
 
 @main.route('/unfollow_topic/<topic_id>')
@@ -222,18 +223,61 @@ def unfollow_topic(topic_id):
     # 取消关注
     current_user.unfollow_topic(topic)
 
-    return redirect(url_for('main.topic'))
+    return redirect(url_for('main.topic_detail', id=topic_id))
+
+
+@main.route('/follow_question/<question_id>')
+@login_required
+def follow_question(question_id):
+    """关注某个问题"""
+    question = Question.query.filter_by(id=question_id).first()
+    if question is None or current_user.is_following_question(question):
+        return jsonify(error=constant.FAIL)
+
+    # 关注问题
+    try:
+        current_user.follow_question(question)
+        return jsonify(error="")
+    except Exception as e:
+        return jsonify(error=constant.FAIL)
+
+
+@main.route('/unfollow_question/<question_id>')
+@login_required
+def unfollow_question(question_id):
+    """取消关注某个话题"""
+    question = Question.query.filter_by(id=question_id).first()
+    if question is None or not current_user.is_following_question(question):
+        return jsonify(error=constant.FAIL)
+
+    # 取消关注
+    try:
+        current_user.unfollow_question(question)
+        return jsonify(error="")
+    except Exception as e:
+        return jsonify(error=constant.FAIL)
 
 
 @main.route('/submit_question', methods=['POST'])
+@login_required
 def submit_question():
     question = request.form.get("question")
     question_desc = request.form.get("question_desc")
     topic = request.form.get("topic")
-    if len(question) > 30 or len(question_desc) > 50:
+    if len(question) > 30 or len(question_desc) > 500:
         return jsonify(error=constant.QUESTION_ERROR)
 
     # 添加问题
     result = Question.add_question(question, question_desc, topic, current_user.id)
 
     return jsonify(result=result, error="")
+
+
+@main.route('/topic/<int:id>')
+@login_required
+def topic_detail(id):
+    topic = Topic.query.filter_by(id=id).first()
+    if topic:
+        return render_template("topic_detail.html", topic=topic, count=len(topic.follow_topics))
+
+    return redirect(url_for("main.index"))
