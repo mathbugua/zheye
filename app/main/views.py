@@ -11,7 +11,7 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.main.forms import EditProfileForm
-from app.models.models import User, Follow, TopicCategory, Topic, Question
+from app.models.models import User, Follow, TopicCategory, Topic, Question, Answer
 from . import main
 from app.helpers import constant
 
@@ -279,7 +279,7 @@ def topic_detail(id):
     """话题详细页面"""
     topic = Topic.query.filter_by(id=id).first()
     if topic:
-        return render_template("topic_detail.html", topic=topic, count=len(topic.follow_topics))
+        return render_template("topic_detail.html", topic=topic, count=len(topic.follow_topics), base64=base64)
 
     return redirect(url_for("main.index"))
 
@@ -288,7 +288,7 @@ def topic_detail(id):
 @login_required
 def question_follow_all():
     questions = current_user.follow_questions.filter_by().all()
-    return render_template("question_follow_all.html", questions=questions)
+    return render_template("question_follow_all.html", questions=questions, base64=base64)
 
 
 @main.route('/question/<int:id>')
@@ -296,7 +296,21 @@ def question_follow_all():
 def question_detail(id):
     question = Question.query.filter_by(id=id).first()
     if question:
-        return render_template("question_detail.html", question=question)
+        return render_template("question_detail.html", question=question, base64=base64)
 
     flash(constant.INVALID_TOPIC)
     return redirect(url_for('main.index'))
+
+
+@main.route('/answer_submit', methods=['POST'])
+def answer_submit():
+    answer_body = request.form.get("write_answer")
+    question_id = request.form.get("question_id")
+    if not answer_body or not question_id:
+        flash(constant.FAIL)
+        return redirect(url_for('main.question_detail', id=question_id))
+
+    flag = Answer.answer_question(current_user.id, question_id, answer_body)
+    if not flag:
+        flash(constant.FAIL)
+    return redirect(url_for('main.question_detail', id=question_id))

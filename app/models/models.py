@@ -275,6 +275,11 @@ class User(db.Model, UserMixin):
             return False
         return True
 
+    def is_answer_question(self, question_id):
+        """是否回答了某个问题"""
+        return self.answers.filter_by(
+            user_id=self.id, question_id=question_id).first() is not None
+
 
 class TopicCategory(db.Model):
     """话题类别"""
@@ -372,6 +377,7 @@ class Question(db.Model):
                                        lazy='dynamic',
                                        cascade='all, delete-orphan'
                                        )
+
     @staticmethod
     def add_question(question_name, question_desc, topic, current_user_id):
         question = Question(
@@ -417,16 +423,30 @@ class Answer(db.Model):
     """用户回答问题是多对多的关系"""
     __tablename__ = "answer"
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
-                        primary_key=True)
-    question_id = db.Column(db.Integer, db.ForeignKey("question.id"),
-                        primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    question_id = db.Column(db.Integer, db.ForeignKey("question.id"))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
     answer_body = db.Column(db.String(1000), nullable=False)
     comments = db.relationship("Comments", backref="answer",
                                lazy='dynamic',
                                cascade='all, delete-orphan'
                                )
+
+    @staticmethod
+    def answer_question(user_id, question_id, answer_body):
+        answer = Answer(
+            user_id=user_id,
+            question_id=question_id,
+            answer_body=answer_body
+        )
+        db.session.add(answer)
+        try:
+            db.session.commit()
+        except Exception as e:
+            print e
+            db.session.rollback()
+            return False
+        return True
 
 
 class FollowQuestion(db.Model):

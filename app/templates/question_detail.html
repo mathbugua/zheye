@@ -45,7 +45,7 @@
         })
 
     }
-    </script>
+</script>
 {% endblock %}
 {% block body %}
 <div class="QuestionItem">
@@ -56,7 +56,9 @@
                 <div class="QuestionHeader-topics">
                     {% for topic in question.question_topic %}
                     <div class="Tag QuestionTopic" data-za-module="TopicItem">
-                        <span class="Tag-content"><a class="TopicLink" href="{{url_for('main.topic_detail', id=topic.topic.id)}}"><div class="Popover"><div
+                        <span class="Tag-content"><a class="TopicLink"
+                                                     href="{{url_for('main.topic_detail', id=topic.topic.id)}}"><div
+                                class="Popover"><div
                                 id="Popover-72480-76222-toggle" aria-haspopup="true" aria-expanded="false"
                                 aria-owns="Popover-72480-76222-content">{{topic.topic.topic_name}}</div>
                             <!-- react-empty: 64 --></div></a></span></div>
@@ -75,7 +77,9 @@
                         <div class="NumberBoard QuestionFollowStatus-counts">
                             <button class="Button NumberBoard-item Button--plain" type="button" style="box-shadow:0;">
                                 <div class="NumberBoard-name">关注者</div>
-                                <div id ="NumberBoard-value" class="NumberBoard-value">{{question.follow_questions.count()}}</div>
+                                <div id="NumberBoard-value" class="NumberBoard-value">
+                                    {{question.follow_questions.count()}}
+                                </div>
                             </button>
                             <div class="NumberBoard-divider"></div>
                             <div class="NumberBoard-item">
@@ -90,23 +94,19 @@
             <div class="QuestionHeader-footer-inner">
                 <div class="QuestionHeader-main QuestionHeader-footer-main">
                     <div class="QuestionHeader-actions">
-                        <button class="Button--plain" type="button" style="margin: 0 12px;">
-                            <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"
-                                 class="Icon Icon--comment Icon--left" width="12" height="16" aria-hidden="true"
-                                 style="height: 16px; width: 12px;"><title></title>
-                                <g>
-                                    <path d="M7.24 16.313c-.272-.047-.553.026-.77.2-1.106.813-2.406 1.324-3.77 1.482-.16.017-.313-.06-.394-.197-.082-.136-.077-.308.012-.44.528-.656.906-1.42 1.11-2.237.04-.222-.046-.45-.226-.588C1.212 13.052.027 10.73 0 8.25 0 3.7 4.03 0 9 0s9 3.7 9 8.25-4.373 9.108-10.76 8.063z"></path>
-                                </g>
-                            </svg><!-- react-text: 97 -->2 条评论<!-- /react-text --><!-- react-empty: 98 --></button>
                     </div>
                     <div class="QuestionHeader-actions"></div>
                 </div>
                 <div class="QuestionHeader-side">
                     <div class="QuestionButtonGroup">
                         {% if current_user.is_following_question(question) %}
-                        <button id = "question_{{question.id}}" onclick="unfollow_question_detail('{{question.id}}', id)" class="Button Button--primary Button--grey" type="button">取消关注</button>
+                        <button id="question_{{question.id}}" onclick="unfollow_question_detail('{{question.id}}', id)"
+                                class="Button Button--primary Button--grey" type="button">取消关注
+                        </button>
                         {% else %}
-                        <button id = "question_{{question.id}}" onclick="follow_question_detail('{{question.id}}', id)" class="Button Button--primary Button--blue" type="button">关注问题</button>
+                        <button id="question_{{question.id}}" onclick="follow_question_detail('{{question.id}}', id)"
+                                class="Button Button--primary Button--blue" type="button">关注问题
+                        </button>
                         {% endif %}
                         <button class="Button" type="button">
                             <svg viewBox="0 0 12 12" class="Icon Button-icon Icon--modify" width="14" height="16"
@@ -115,8 +115,132 @@
                                     <path d="M.423 10.32L0 12l1.667-.474 1.55-.44-2.4-2.33-.394 1.564zM10.153.233c-.327-.318-.85-.31-1.17.018l-.793.817 2.49 2.414.792-.814c.318-.328.312-.852-.017-1.17l-1.3-1.263zM3.84 10.536L1.35 8.122l6.265-6.46 2.49 2.414-6.265 6.46z"
                                           fill-rule="evenodd"></path>
                                 </g>
-                            </svg><!-- react-text: 138 -->写回答<!-- /react-text --></button>
+                            </svg>
+                            <a href="#write_answer"><!-- react-text: 138 -->写回答<!-- /react-text --></a></button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="Question-main">
+    <div class="Question-mainColumn">
+        <div>
+            <div class="QuestionAnswers-answers">
+                <div class="Card">
+                    <div class="List">
+                        <div class="List-header"><h4 class="List-headerText"><span><!-- react-text: 151 -->{{question.answers.count()}}
+                            <!-- /react-text --><!-- react-text: 152 --> 个回答<!-- /react-text --></span></h4>
+                            <div class="List-headerOptions">
+                                <div class="Popover">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            {% for answer in question.answers.filter_by().all() %}
+                            <div class="List-item">
+                                <div class="ContentItem AnswerItem">
+                                    <div class="ContentItem-meta">
+                                        <div class="AnswerItem-meta AnswerItem-meta--related">
+                                            <div class="AuthorInfo"><span class="UserLink AuthorInfo-avatarWrapper"><div
+                                                    class="Popover"><div id="Popover-39169-6113-toggle"><a
+                                                    class="UserLink-link" href="{{url_for('main.people', username=answer.users.username)}}">
+                                                <img
+                                                    class="Avatar AuthorInfo-avatar" width="38" height="38"
+
+                                                     {% if answer.users.avatar %}
+                                                        src="data:;base64,{{ base64.b64encode(answer.users.avatar)}}"
+                                                     {% else %}
+                                                        src="{{url_for('static', filename='images/default.jpg')}}"
+                                                     {% endif %}
+
+                                                    alt="{{answer.users.username}}">
+                                            </a></div><!-- react-empty: 668 --></div></span>
+                                                <div class="AuthorInfo-content">
+                                                    <div class="AuthorInfo-head"><span class="UserLink AuthorInfo-name"><div
+                                                            class="Popover"><div id="Popover-39170-24086-toggle">
+                                                        <a class="UserLink-link" href="{{url_for('main.people', username=answer.users.username)}}">{{answer.users.username}}</a></div>
+                                                        <!-- react-empty: 675 --></div></span></div>
+                                                    <div class="AuthorInfo-detail">
+                                                        <div class="RichText AuthorInfo-badge">{{answer.users.short_intr}}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="RichContent RichContent--unescapable">
+                                        <div class="RichContent-inner"><span>
+                                            {{answer.answer_body}}
+                                              </span>
+                                            <!-- react-empty: 685 --></div>
+                                        <div class="ContentItem-time">发布于 {{answer.timestamp}}</div>
+                                        <div class="ContentItem-actions">
+                                            <button class="Button ContentItem-action Button--plain" type="button">
+                                                <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"
+                                                     class="Icon Icon--comment Icon--left" width="12" height="16"
+                                                     aria-hidden="true" style="height: 16px; width: 12px;">
+                                                    <title></title>
+                                                    <g>
+                                                        <path d="M7.24 16.313c-.272-.047-.553.026-.77.2-1.106.813-2.406 1.324-3.77 1.482-.16.017-.313-.06-.394-.197-.082-.136-.077-.308.012-.44.528-.656.906-1.42 1.11-2.237.04-.222-.046-.45-.226-.588C1.212 13.052.027 10.73 0 8.25 0 3.7 4.03 0 9 0s9 3.7 9 8.25-4.373 9.108-10.76 8.063z"></path>
+                                                    </g>
+                                                </svg><!-- react-text: 703 -->4 条评论<!-- /react-text --></button>
+                                        </div>
+                                    </div><!-- react-empty: 734 --><!-- react-empty: 735 --><!-- react-empty: 736 -->
+                                </div>
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="Card QuestionAnswers-answerAdd">
+                <div class="AnswerAdd">
+                    <div class="AnswerAdd-header">
+                        {% if not current_user.is_answer_question(question.id) %}
+                        <div class="AuthorInfo AnswerAdd-info">
+                            <span class="UserLink AuthorInfo-avatarWrapper"><img
+                                class="Avatar AuthorInfo-avatar" width="38" height="38"
+
+                                {% if current_user.avatar %}
+                                src="data:;base64,{{ base64.b64encode(current_user.avatar)}}"
+                                {% else %}
+                                src="{{url_for('static', filename='images/default.jpg')}}"
+                                {% endif %}
+                                alt="{{current_user.username}}">
+                            </span>
+                            <div class="AuthorInfo-content">
+                                <div class="AuthorInfo-head"><span class="UserLink AuthorInfo-name">
+                                    {{current_user.username}}</span></div>
+                                <div class="AuthorInfo-detail">
+                                    <div class="AuthorInfo-badge"><span class="RichText AnswerAdd-bio">{{current_user.short_intr or ""}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <form class="AnswerForm" action="/answer_submit" method="post">
+                        <div class="zg-form-text-input add-question-title-form" style="position: relative;">
+                                <textarea rows="1" class="zg-editor-input zu-seamless-input-origin-element"
+                                          id="write_answer" name="write_answer" placeholder="写回答..." style="height: 70px;" required></textarea>
+                        </div>
+                        <input type="hidden" name="question_id" value="{{question.id}}" required/>
+                        <div>
+                            <div class="Sticky AnswerForm-footer is-bottom">
+                                <div class="AnswerForm-status"></div>
+                                <div class="AnswerForm-footerRight">
+                                    <input class="Button AnswerForm-submit Button--primary Button--blue" type="submit"/>
+
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    {% else %}
+                        已经回答
+                    {% endif %}
                 </div>
             </div>
         </div>
