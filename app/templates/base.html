@@ -13,8 +13,6 @@
           sizes="76x76">
     <link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-60.9911cffb.png"
           sizes="60x60">
-    <link rel="shortcut icon" href="https://static.zhihu.com/static/favicon.ico" type="image/x-icon">
-
     <link rel="search" type="application/opensearchdescription+xml" href="https://static.zhihu.com/static/search.xml"
           title="知乎"/>
     <!--&lt;!&ndash;<script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js">&ndash;&gt;</script>-->
@@ -89,6 +87,48 @@
 
         }
         </script>
+
+    <!--关注、取消关注问题-->
+    <script>
+    function follow_question(question_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/follow_question/' + question_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a href=\"#\" id=\"" + id + "\"  onclick=\"unfollow_question(" + "'" + question_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"follow-link zg-unfollow meta-item\"><i class=\"z-icon-follow\"></i>取消关注</a>";
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+            }
+        })
+
+    }
+
+    function unfollow_question(question_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/unfollow_question/' + question_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a href=\"#\" id=\"" + id + "\"  onclick=\"follow_question(" + "'" + question_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"follow-link zg-follow meta-item\"><i class=\"z-icon-follow\"></i>关注问题</a>";
+
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+            }
+        })
+
+    }
+</script>
 </head>
 
 <body class="zhi ">

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}我关注的问题-者也{% endblock %}
+{% block head %}
+{{super()}}
+{% endblock %}
+{% block body %}
+<div class="section-title">
+    <h5 class="zg-section">我关注的问题<span class="zg-gray-normal">（20）</span></h5>
+</div>
+<div>
+    <div class="zh-general-list clearfix navigable">
+        {% for question in questions %}
+        <div class="zm-profile-section-item zg-clear">
+            <span class="zm-profile-vote-count">
+            <div class="zm-profile-vote-num">6002</div>
+            <div class="zm-profile-vote-type">浏览</div>
+            </span>
+            <div class="zm-profile-section-main">
+                <h5 class="zm-profile-question" style="margin-top: 0px;">
+                    <a class="question_link" href="{{url_for('main.question_detail', id=question.question.id)}}" target="_blank" data-id="7500929"
+                       data-za-element-name="Title">
+                        {{question.question.question_name}}?
+                    </a>
+                </h5>
+                <div class="meta zg-gray">
+                    {% if current_user.is_following_question(question.question) %}
+                    <a class="follow-link zg-unfollow meta-item" href="#" onclick="unfollow_question('{{question.question.id}}', id)"
+                       id="sfb-{{question.question.id}}"><i class="z-icon-follow"></i>取消关注</a>
+                    {% else %}
+                    <a class="follow-link meta-item zg-follow" href="#" onclick="follow_question('{{question.question.id}}', id)"
+                       id="sfb-{{question.question.id}}"><i class="z-icon-follow"></i>关注问题</a>
+                    {% endif %}
+                    <span class="zg-bull">•</span>
+                    {{question.question.answers.count()}} 个回答
+                    <span class="zg-bull">•</span>
+                    {{question.question.follow_questions.count()}} 人关注
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

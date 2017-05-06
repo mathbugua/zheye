@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}{% endblock %}
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
+<script>
+    function follow_question_detail(question_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/follow_question/' + question_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<button id=\"" + id + "\"  onclick=\"unfollow_question_detail(" + "'" + question_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"Button Button--primary Button--grey\" type=\"button\">取消关注</button>";
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+                $("#NumberBoard-value").text((parseInt($("#NumberBoard-value").text()) + 1));
+            }
+        })
+
+    }
+
+    function unfollow_question_detail(question_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/unfollow_question/' + question_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+
+                var content = "<button id=\"" + id + "\"  onclick=\"follow_question_detail(" + "'" + question_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"Button Button--primary Button--blue\" type=\"button\">关注问题</button>";
+
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+                $("#NumberBoard-value").text((parseInt($("#NumberBoard-value").text()) - 1));
+            }
+        })
+
+    }
+    </script>
+{% endblock %}
+{% block body %}
+<div class="QuestionItem">
+    <div class="QuestionStatus"><!-- react-empty: 52 --><!-- react-empty: 53 --><!-- react-empty: 54 --></div>
+    <div class="QuestionHeader">
+        <div class="QuestionHeader-content">
+            <div class="QuestionHeader-main">
+                <div class="QuestionHeader-topics">
+                    {% for topic in question.question_topic %}
+                    <div class="Tag QuestionTopic" data-za-module="TopicItem">
+                        <span class="Tag-content"><a class="TopicLink" href="{{url_for('main.topic_detail', id=topic.topic.id)}}"><div class="Popover"><div
+                                id="Popover-72480-76222-toggle" aria-haspopup="true" aria-expanded="false"
+                                aria-owns="Popover-72480-76222-content">{{topic.topic.topic_name}}</div>
+                            <!-- react-empty: 64 --></div></a></span></div>
+                    {% endfor %}
+                </div>
+                <h1 class="QuestionHeader-title">{{question.question_name}}?</h1>
+                <div class="QuestionHeader-detail">
+                    <div class="QuestionRichText QuestionRichText--collapsed">
+                        <div><span class="RichText">{{question.question_desc or ""}}</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="QuestionHeader-side">
+                <div class="QuestionHeader-follow-status">
+                    <div class="QuestionFollowStatus">
+                        <div class="NumberBoard QuestionFollowStatus-counts">
+                            <button class="Button NumberBoard-item Button--plain" type="button" style="box-shadow:0;">
+                                <div class="NumberBoard-name">关注者</div>
+                                <div id ="NumberBoard-value" class="NumberBoard-value">{{question.follow_questions.count()}}</div>
+                            </button>
+                            <div class="NumberBoard-divider"></div>
+                            <div class="NumberBoard-item">
+                                <div class="NumberBoard-name">被浏览</div>
+                                <div class="NumberBoard-value">6387</div>
+                            </div>
+                        </div><!-- react-empty: 88 --></div>
+                </div>
+            </div>
+        </div>
+        <div class="QuestionHeader-footer">
+            <div class="QuestionHeader-footer-inner">
+                <div class="QuestionHeader-main QuestionHeader-footer-main">
+                    <div class="QuestionHeader-actions">
+                        <button class="Button--plain" type="button" style="margin: 0 12px;">
+                            <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"
+                                 class="Icon Icon--comment Icon--left" width="12" height="16" aria-hidden="true"
+                                 style="height: 16px; width: 12px;"><title></title>
+                                <g>
+                                    <path d="M7.24 16.313c-.272-.047-.553.026-.77.2-1.106.813-2.406 1.324-3.77 1.482-.16.017-.313-.06-.394-.197-.082-.136-.077-.308.012-.44.528-.656.906-1.42 1.11-2.237.04-.222-.046-.45-.226-.588C1.212 13.052.027 10.73 0 8.25 0 3.7 4.03 0 9 0s9 3.7 9 8.25-4.373 9.108-10.76 8.063z"></path>
+                                </g>
+                            </svg><!-- react-text: 97 -->2 条评论<!-- /react-text --><!-- react-empty: 98 --></button>
+                    </div>
+                    <div class="QuestionHeader-actions"></div>
+                </div>
+                <div class="QuestionHeader-side">
+                    <div class="QuestionButtonGroup">
+                        {% if current_user.is_following_question(question) %}
+                        <button id = "question_{{question.id}}" onclick="unfollow_question_detail('{{question.id}}', id)" class="Button Button--primary Button--grey" type="button">取消关注</button>
+                        {% else %}
+                        <button id = "question_{{question.id}}" onclick="follow_question_detail('{{question.id}}', id)" class="Button Button--primary Button--blue" type="button">关注问题</button>
+                        {% endif %}
+                        <button class="Button" type="button">
+                            <svg viewBox="0 0 12 12" class="Icon Button-icon Icon--modify" width="14" height="16"
+                                 aria-hidden="true" style="height: 16px; width: 14px;"><title></title>
+                                <g>
+                                    <path d="M.423 10.32L0 12l1.667-.474 1.55-.44-2.4-2.33-.394 1.564zM10.153.233c-.327-.318-.85-.31-1.17.018l-.793.817 2.49 2.414.792-.814c.318-.328.312-.852-.017-1.17l-1.3-1.263zM3.84 10.536L1.35 8.122l6.265-6.46 2.49 2.414-6.265 6.46z"
+                                          fill-rule="evenodd"></path>
+                                </g>
+                            </svg><!-- react-text: 138 -->写回答<!-- /react-text --></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

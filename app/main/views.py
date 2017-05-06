@@ -245,7 +245,7 @@ def follow_question(question_id):
 @main.route('/unfollow_question/<question_id>')
 @login_required
 def unfollow_question(question_id):
-    """取消关注某个话题"""
+    """取消关注某个问题"""
     question = Question.query.filter_by(id=question_id).first()
     if question is None or not current_user.is_following_question(question):
         return jsonify(error=constant.FAIL)
@@ -276,8 +276,27 @@ def submit_question():
 @main.route('/topic/<int:id>')
 @login_required
 def topic_detail(id):
+    """话题详细页面"""
     topic = Topic.query.filter_by(id=id).first()
     if topic:
         return render_template("topic_detail.html", topic=topic, count=len(topic.follow_topics))
 
     return redirect(url_for("main.index"))
+
+
+@main.route('/question/following')
+@login_required
+def question_follow_all():
+    questions = current_user.follow_questions.filter_by().all()
+    return render_template("question_follow_all.html", questions=questions)
+
+
+@main.route('/question/<int:id>')
+@login_required
+def question_detail(id):
+    question = Question.query.filter_by(id=id).first()
+    if question:
+        return render_template("question_detail.html", question=question)
+
+    flash(constant.INVALID_TOPIC)
+    return redirect(url_for('main.index'))

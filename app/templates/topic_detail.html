@@ -4,47 +4,6 @@
 <link rel="stylesheet" href="{{url_for('static', filename='style/style.css')}}">
 <script data-main="{{url_for('static', filename='js/main')}}"
         src="{{url_for('static', filename='js/require.js')}}"></script>
-
-<script>
-    function follow_question(question_id, id) {
-        id = id.toString();
-        $.ajax({
-            url: '/follow_question/' + question_id,
-            async: true,
-            type: "GET",
-            success: function (data, status) {
-                if (data.error != "") {
-                    alert(data.error);
-                    return;
-                }
-                var content = "<a href=\"#\" id=\"" + id + "\"  onclick=\"unfollow_question(" + "'" + question_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"follow-link zg-follow meta-item\"><i class=\"z-icon-follow\"></i>取消关注</a>";
-                var ID = "#" + id;
-                $(ID).replaceWith(content);
-            }
-        })
-
-    }
-
-    function unfollow_question(question_id, id) {
-        id = id.toString();
-        $.ajax({
-            url: '/unfollow_question/' + question_id,
-            async: true,
-            type: "GET",
-            success: function (data, status) {
-                if (data.error != "") {
-                    alert(data.error);
-                    return;
-                }
-                var content = "<a href=\"#\" id=\"" + id + "\"  onclick=\"follow_question(" + "'" + question_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"follow-link zg-follow meta-item\"><i class=\"z-icon-follow\"></i>关注问题</a>";
-
-                var ID = "#" + id;
-                $(ID).replaceWith(content);
-            }
-        })
-
-    }
-</script>
 {% endblock %}
 
 {% block body %}
@@ -73,7 +32,7 @@
                 <div class="feed-item feed-item-hook">
                     <div class="feed-main">
                         <div class="feed-content">
-                            <h5><a class="question_link" href="/question/59214151" target="_blank">
+                            <h5><a class="question_link" href="{{url_for('main.question_detail', id=question.question.id)}}" target="_blank">
                                 {{question.question.question_name}}?
                             </a></h5>
                             <div class="expandable entry-body">
@@ -135,7 +94,7 @@
                                         {% else %}
                                         <a id="follow_quesrion_{{question.question.id}}" href="#"
                                            onclick="unfollow_question('{{question.question.id}}', id)"
-                                           class="follow-link zg-follow meta-item"><i class="z-icon-follow"></i>取消关注</a>
+                                           class="follow-link zg-unfollow meta-item"><i class="z-icon-follow"></i>取消关注</a>
                                         {% endif %}
 
                                         <a href="#" name="addcomment"
