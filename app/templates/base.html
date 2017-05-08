@@ -128,6 +128,82 @@
         })
 
     }
+
+
+
+    //    评论的隐藏与显示
+    function show_comments(id, answer_id){
+        var content =  '<button class="ContentItem-action Button--plain" type="button" id="' + id + '" onclick="hide_comments(\'' + id +'\'' + ',' +'\''+answer_id+'\')">' +
+                '<svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"' +
+                'class="Icon Icon--comment Icon--left" width="12" height="16"' +
+                'aria-hidden="true" style="height: 16px; width: 12px;"> <title></title> ' +
+                '<g> <path d="M7.24 16.313c-.272-.047-.553.026-.77.2-1.106.813-2.406 1.324-3.77 1.482-.16.017-.313-.06-.394-.197-.082-.136-.077-.308.012-.44.528-.656.906-1.42 1.11-2.237.04-.222-.046-.45-.226-.588C1.212 13.052.027 10.73 0 8.25 0 3.7 4.03 0 9 0s9 3.7 9 8.25-4.373 9.108-10.76 8.063z"></path> ' +
+                '</g> </svg>收起评论 </button>';
+
+            var control_id = "#" + id;
+            $(control_id).replaceWith(content);
+            var control_answer_id = "#Comments-container_" + answer_id;
+            $(control_answer_id).show(1000);
+
+    };
+
+    function hide_comments(id, answer_id) {
+        var content =  '<button class="ContentItem-action Button--plain" type="button" id="' + id + '" onclick="show_comments(\'' + id +'\'' + ',' +'\''+answer_id+'\')">' +
+                '<svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"' +
+                'class="Icon Icon--comment Icon--left" width="12" height="16"' +
+                'aria-hidden="true" style="height: 16px; width: 12px;"> <title></title> ' +
+                '<g> <path d="M7.24 16.313c-.272-.047-.553.026-.77.2-1.106.813-2.406 1.324-3.77 1.482-.16.017-.313-.06-.394-.197-.082-.136-.077-.308.012-.44.528-.656.906-1.42 1.11-2.237.04-.222-.046-.45-.226-.588C1.212 13.052.027 10.73 0 8.25 0 3.7 4.03 0 9 0s9 3.7 9 8.25-4.373 9.108-10.76 8.063z"></path> ' +
+                '</g> </svg>添加评论 </button>';
+
+             var control_id = "#" + id;
+            $(control_id).replaceWith(content);
+            var control_answer_id = "#Comments-container_" + answer_id;
+            $(control_answer_id).hide();
+    };
+
+//    提交评论
+    function submit_comment(answer_id) {
+        var form_name = "comment_form_" + answer_id;
+        var comment_name = "comment_answer_" + answer_id;
+        var form = document.forms[form_name];
+            var comment = form[comment_name].value;
+            if(comment ==null || comment == ""){
+                alert("评论不能为空");
+                return;
+            }
+            $.ajax({
+                url: "/submit_comment",
+                async: true,
+                type: "POST",
+                data:{"answer_id": answer_id, "comment_body":comment},
+                success : function (data, status){
+                    if(data.error != ""){
+                        alert(data.error);
+                        return
+                    }
+                    var content = '<div class="CommentItem"> ' +
+                        '<div> ' +
+                        '<div class="CommentItem-meta"><span ' +
+                        'class="UserLink CommentItem-avatar">' +
+                        '<div class="Popover">' +
+                        '</div></span><span class="UserLink">' +
+                        '<a class="UserLink-link" href="/people/' + data.username +'">'+ data.username +'</a></span>' +
+                        '<span class="CommentItem-time">刚刚</span></div>' +
+                        '<div class="RichText CommentItem-content" style="white-space: initial;">'
+                        + data.comment +'</div>' +
+                        '<div class="CommentItem-footer ">' +
+                        '</div><!-- react-empty: 2795 --></div></div>';
+
+                    var comeents_list_all = "#comeents_list_all_" + answer_id;
+                    $(comeents_list_all).append(content);
+//                    提交成功，清空提交框
+
+                    var comment_answer = "#comment_answer_" + answer_id;
+                    $(comment_answer).val("");
+                }
+            })
+
+    }
 </script>
 </head>
 
@@ -273,7 +349,7 @@
                 </li>
 
                 <li class="zu-top-nav-li " id="zh-top-nav-explore">
-                    <a class="zu-top-nav-link" href="/explore">发现</a>
+                    <a class="zu-top-nav-link" href="/#">发现</a>
                 </li>
 
                 <li class="top-nav-noti zu-top-nav-li ">

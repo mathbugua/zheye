@@ -58,14 +58,29 @@ class Role(db.Model):
 class Comments(db.Model):
     """评论回答"""
     __tablename__ = "comments"
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),
-                        primary_key=True)
-    answer_id = db.Column(db.Integer, db.ForeignKey("answer.id"),
-                          primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    answer_id = db.Column(db.Integer, db.ForeignKey("answer.id"))
     content_body = db.Column(db.String(200), nullable=False)
     content_time = db.Column(db.DateTime(), default=datetime.utcnow)
     comment_type = db.Column(db.String(64), default='comment')
     reply_to = db.Column(db.Integer, db.ForeignKey("users.id"))
+
+    @staticmethod
+    def add_comment(answer_id, comment_body, current_user_id):
+        """添加评论"""
+        comment = Comments(
+            user_id=current_user_id,
+            answer_id=answer_id,
+            content_body=comment_body
+        )
+        db.session.add(comment)
+        try:
+            db.session.commit()
+            return True
+        except:
+            db.session.rollback()
+            return False
 
 
 class Follow(db.Model):
@@ -310,6 +325,30 @@ class Topic(db.Model):
     follow_topics = db.relationship("FollowTopic", backref="topic")
     question_topic = db.relationship("QuestionTopic", backref="topic")
 
+    def questions_excellans(self):
+        """
+        列举话题本身下的所有话题，
+         以及最优回答，即评论最多的。
+        """
+        questions_excellans = list()  # 存放所有问题以及最优回答对象
+        for question in self.question_topic:
+            query = question.question.answers.filter_by().all()  # 查询问题下的所有回答
+            question_answer = []  # 存放检索到的目标问题_回答集合
+            if query:
+                answer_excell = query[0]
+                count = answer_excell.comments.count()
+                for answer in query:
+                    if answer.comments.count() > count:
+                        answer_excell = answer
+                        count = answer_excell.comments.count()
+                question_answer.append(question.question)
+                question_answer.append(answer_excell)
+            else:
+                question_answer.append(question.question)
+                question_answer.append(None)
+            questions_excellans.append(question_answer)  # 添加进总集和并返回
+        return questions_excellans
+
     @staticmethod
     def insert_topic():
         topic1 = Topic(
@@ -380,6 +419,7 @@ class Question(db.Model):
 
     @staticmethod
     def add_question(question_name, question_desc, topic, current_user_id):
+        """添加一个话题"""
         question = Question(
             question_name=question_name,
             question_desc=question_desc,

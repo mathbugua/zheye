@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}回答问题-者也{% endblock %}
+{% block body %}
+<div class="QuestionSuggestListTitle zg-hide" style="display: block;">
+    <h4 style="line-height: inherit;">推荐以下问题</h4>
+
+</div>
+<div class="QuestionList QuestionSuggestList">
+    <div class="zh-general-list clearfix">
+        {% for topic in topics %}
+            {% for question in topic.topic.question_topic %}
+                <div class="feed-item feed-item-hook question-item">
+                    <div class="subtopic">来自：<a target="_blank" href="{{url_for('main.topic_detail', id=topic.topic.id)}}">{{topic.topic.topic_name}}</a>
+                    </div>
+                    <h4 class="question-item-title">
+                        <a target="_blank" class="question_link" href="{{url_for('main.question_detail', id=question.question.id)}}">{{question.question.question_name}}?</a>
+                    </h4>
+                    <div class="question-item-meta">
+                        <span class="zg-link-gray-normal meta-item">{{question.question.answers.count()}} 个回答</span>
+                        <span class="zg-bull">•</span>
+                        <span class="zg-link-gray-normal meta-item">{{question.question.follow_questions.count()}} 人关注</span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block page_sidebar %}
+<div class="zu-main-sidebar" data-za-module="RightSideBar">
+    <div class="zm-side-section">
+        <div class="zm-side-section-inner">
+            <div class="zm-side-nav-group">
+                <ul class="zm-side-nav" id="zg-sidebar-nav">
+
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link" href="/collections" data-za-c="collection"
+                           data-za-l="sidebar_collections" data-za-a="visit_collections">
+                            <i class="zg-icon zg-icon-sidenav-fav"></i>
+                            我的收藏
+
+                        </a>
+                    </li>
+
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link" href="{{url_for('main.question_follow_all')}}">
+                            <i class="zg-icon zg-icon-sidenav-follow"></i>
+                            我关注的问题
+                        </a>
+                    </li>
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link" href="/question/invited">
+                            <i class="zg-icon zg-icon-sidenav-invite"></i>
+                            邀请我回答的问题
+
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="zm-side-nav-group">
+                <ul class="zm-side-nav">
+
+
+                    <li class="zm-side-nav-li rq3-publiceditlink" id="rq3-sidenav-link">
+                        <a class="zm-side-nav-link" href="/watch">
+                            <i class="zg-icon zg-icon-sidenav-publicedit"></i>
+                            公共编辑动态
+                            <span class="zg-num hidden">0</span>
+                        </a>
+                    </li>
+
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link z-ico-container" href="/community">
+                            <i class="z-ico-community"></i>
+                            社区服务中心
+                        </a>
+                    </li>
+
+                    <li class="zm-side-nav-li">
+                        <a class="zm-side-nav-link z-ico-container" href="/copyright">
+                            <i class="zg-icon icon icon-copyright"></i>
+                            版权服务中心
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

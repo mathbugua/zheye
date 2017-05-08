@@ -11,7 +11,7 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.main.forms import EditProfileForm
-from app.models.models import User, Follow, TopicCategory, Topic, Question, Answer
+from app.models.models import User, Follow, TopicCategory, Topic, Question, Answer, Comments
 from . import main
 from app.helpers import constant
 
@@ -273,15 +273,40 @@ def submit_question():
     return jsonify(result=result, error="")
 
 
+@main.route('/submit_comment', methods=['POST'])
+@login_required
+def submit_comment():
+    answer_id = request.form.get("answer_id")
+    comment_body = request.form.get("comment_body")
+    if not answer_id or len(comment_body) > 200:
+        return jsonify(error=constant.COMMENT_ERROR)
+
+    # 添加评论
+    result = Comments.add_comment(answer_id, comment_body, current_user.id)
+    if not result:
+        return jsonify(error=constant.FAIL)
+    return jsonify(error="", username=current_user.username, comment=comment_body)
+
+
 @main.route('/topic/<int:id>')
 @login_required
 def topic_detail(id):
     """话题详细页面"""
     topic = Topic.query.filter_by(id=id).first()
+    print topic.questions_excellans()
     if topic:
-        return render_template("topic_detail.html", topic=topic, count=len(topic.follow_topics), base64=base64)
+        return render_template("topic_detail.html", topic=topic, count=len(topic.follow_topics),
+                               base64=base64, questions_excellans=topic.questions_excellans())
 
     return redirect(url_for("main.index"))
+
+
+@main.route('/question')
+@login_required
+def answer_question():
+    """回答问题页面，默认显示关注话题下的问题"""
+    topics_all = current_user.follow_topics.filter_by().all()
+    return render_template("answer_questions.html", base64=base64, topics=topics_all)
 
 
 @main.route('/question/following')
@@ -314,3 +339,16 @@ def answer_submit():
     if not flag:
         flash(constant.FAIL)
     return redirect(url_for('main.question_detail', id=question_id))
+
+
+@main.route('/delete/answer/<int:id>')
+def delete_answer(id):
+    answer = Answer.query.filter_by(id=id).first()
+    if answer is None or answer.users != current_user:
+        return jsonify(error=constant.FAIL)
+    db.session.delete(answer)
+    try:
+       db.session.commit()
+       return jsonify(error="")
+    except:
+        return jsonify(error=constant.FAIL)
