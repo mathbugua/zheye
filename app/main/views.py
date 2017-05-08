@@ -157,11 +157,23 @@ def topics():
 @main.route('/topic')
 @login_required
 def topic():
-    """话题动态"""
-    # 获取当前用户关注的话题
-    topics = current_user.follow_topics.filter_by().all()
-    print topics
-    return render_template("topic.html", base64=base64, user=current_user, topics=topics)
+    """话题动态, 用户关注的话题"""
+    topics = current_user.follow_topics.filter_by().all()  # 获取当前用户关注的话题
+    topic_id = request.args.get("topic")  # 获取选择的话题的id
+    topic_selete = None    # 选择的话题默认为None
+
+    if topics:
+        if topic_id:
+            for topic in topics:
+                if topic.topic.id == int(topic_id):
+                    topic_selete = topic.topic
+                    break
+        if not topic_selete:
+            topic_selete = topics[0].topic
+            if topic_id:
+                flash(constant.NOFOUND)
+    return render_template("topic.html", base64=base64, user=current_user,
+                           topics=topics, topic_selete=topic_selete)
 
 
 @main.route('/topics_search', methods=['POST'])
@@ -293,7 +305,6 @@ def submit_comment():
 def topic_detail(id):
     """话题详细页面"""
     topic = Topic.query.filter_by(id=id).first()
-    print topic.questions_excellans()
     if topic:
         return render_template("topic_detail.html", topic=topic, count=len(topic.follow_topics),
                                base64=base64, questions_excellans=topic.questions_excellans())

@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block title %}话题动态-者也{% endblock %}
 
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='style/style.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
+<script data-main="{{url_for('static', filename='js/main')}}"
+        src="{{url_for('static', filename='js/require.js')}}"></script>
+{% endblock %}
+
 {% block page_content %}
 <div class="topic-feed-title">
     <i class="zg-icon zg-icon-feedlist"></i>
@@ -10,14 +18,174 @@
     </a>
 </div>
 <ul class="zm-topic-cat-main js-topic-cat-main clearfix">
-    {% if topics %}
-    <li class="zm-topic-cat-item current"><a href="#{{topics[0].topic.topic_name}}">{{topics[0].topic.topic_name}}</a></li>
+    {% for topic in topics %}
+    {% if topic.topic.id == topic_selete.id %}
+    <li class="zm-topic-cat-item current"><a href="{{url_for('main.topic', topic=topic.topic.id)}}">{{topic.topic.topic_name}}</a></li>
+    {% else %}
+     <li class="zm-topic-cat-item"><a href="{{url_for('main.topic', topic=topic.topic.id)}}">{{topic.topic.topic_name}}</a></li>
     {% endif %}
-
-    {% for topic in topics[1:] %}
-    <li class="zm-topic-cat-item"><a href="#{{topic.topic.topic_name}}">{{topic.topic.topic_name}}</a></li>
     {% endfor %}
 </ul>
+
+{% if topic_selete %}
+<div class="topic-title clearfix js-topic-title" style="display: block;">
+    <a href="/topic/19550228" target="_blank" class="zg-left js-topic-title-avatar">
+        <img class="Avatar Avatar--m js-topic-avatar" style="width: 40px;height: 40px;"
+             src="https://pic1.zhimg.com/2e33f063f1bd9221df967219167b5de0_m.jpg"
+             srcset="https://pic1.zhimg.com/2e33f063f1bd9221df967219167b5de0_t.jpg 2x" alt="知乎">
+    </a>
+    <a href="{{url_for('main.topic_detail', id=topic_selete.id)}}" target="_blank" class="zg-left topic-title-name js-topic-title-name">
+        {{topic_selete.topic_name}}
+    </a>
+</div>
+
+
+
+ <div class="zm-topic-list-container">
+            <div class="zu-top-feed-list navigable">
+                {% for question_answer in topic_selete.questions_excellans() %}
+                <div class="feed-item feed-item-hook">
+                    <div class="feed-main">
+                        <div class="feed-content">
+                            <h5><a class="question_link"
+                                   href="{{url_for('main.question_detail', id=question_answer[0].id)}}" target="_blank">
+                                {{question_answer[0].question_name}}?
+                                <!--{{max}}?-->
+                            </a></h5>
+                            {% if question_answer[1] %}
+                            <div class="expandable entry-body">
+                                <div class="zm-item-answer-author-info">
+                                    <span class="summary-wrapper">
+                                    <span class="author-link-line">
+
+                                    <a class="author-link" data-hovercard="p$t$vincent-54-38" target="_blank"
+                                       href="{{url_for('main.people', username=question_answer[1].users.username)}}">{{question_answer[1].users.username}}</a></span><span
+                                            class="bio">
+                                    {{question_answer[1].users.short_intr or ""}}
+                                    </span>
+                                    </span>
+                                </div>
+
+                                <div class="zm-item-rich-text expandable js-collapse-body">
+                                    <ul class="wrap">
+                                        <li>
+                                            <div class="content all-content" style="display: none;">
+                                                {{question_answer[1].answer_body}}
+
+                                            </div>
+                                            <div class="content part-content">
+                                                {{question_answer[1].answer_body|truncate(50, False)}}<b> ...</b></div>
+                                            <div class="sign unfold">显示全部</div>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                            {% endif %}
+                            <div class="zm-item-meta feed-meta">
+                                <div class="zm-item-meta answer-actions clearfix js-contentActions">
+                                    <div class="zm-meta-panel">
+
+                                        {% if not current_user.is_following_question(question_answer[0]) %}
+                                        <a id="follow_quesrion_{{question_answer[0].id}}" href="#"
+                                           onclick="follow_question('{{question_answer[0].id}}', id)"
+                                           class="follow-link zg-follow meta-item"><i class="z-icon-follow"></i>关注问题</a>
+                                        {% else %}
+                                        <a id="follow_quesrion_{{question_answer[0].id}}" href="#"
+                                           onclick="unfollow_question('{{question_answer[0].id}}', id)"
+                                           class="follow-link zg-unfollow meta-item"><i
+                                                class="z-icon-follow"></i>取消关注</a>
+                                        {% endif %}
+
+                                        {% if question_answer[1] %}
+                                        <button class="ContentItem-action Button--plain" type="button" id="comments-button-show_{{question_answer[1].id}}" onclick="show_comments(id, '{{question_answer[1].id}}')">
+                                                <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"
+                                                     class="Icon Icon--comment Icon--left" width="12" height="16"
+                                                     aria-hidden="true" style="height: 16px; width: 12px;">
+                                                    <title></title>
+                                                    <g>
+                                                        <path d="M7.24 16.313c-.272-.047-.553.026-.77.2-1.106.813-2.406 1.324-3.77 1.482-.16.017-.313-.06-.394-.197-.082-.136-.077-.308.012-.44.528-.656.906-1.42 1.11-2.237.04-.222-.046-.45-.226-.588C1.212 13.052.027 10.73 0 8.25 0 3.7 4.03 0 9 0s9 3.7 9 8.25-4.373 9.108-10.76 8.063z"></path>
+                                                    </g>
+                                                </svg>
+                                                {% if question_answer[1].comments.count() == 0 %}
+                                                <!-- react-text: 703 --> 添加评论<!-- /react-text -->
+                                                {% else %}
+                                                <!-- react-text: 703 --> {{question_answer[1].comments.count()}}条评论
+                                                <!-- /react-text -->
+                                                {% endif %}
+                                            </button>
+                                        {% endif %}
+                                    </div>
+
+
+                                      <!--<div class="Comments-container" style="display: None;" id="Comments-container">&lt;!&ndash; react-empty: 2651 &ndash;&gt;-->
+                                       {% if question_answer[1] %}
+                                    <div class="Comments-container" style="display: None;" id="Comments-container_{{question_answer[1].id}}"><!-- react-empty: 2651 -->
+                                        <div class="Comments Comments--withEditor Comments-withPagination">
+                                            <div class="CommentTopbar">
+                                                <div class="CommentTopbar-meta"><h2 class="CommentTopbar-title" id="CommentTopbar-title">
+                                                    <!-- react-text: 2656 -->{{question_answer[1].comments.count()}}<!-- /react-text -->
+                                                    <!-- react-text: 2657 --> 条评论<!-- /react-text --></h2>
+                                                    <div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="comeents_list_all_{{question_answer[1].id}}">
+                                                {% for comment in question_answer[1].comments.filter_by().all() %}
+                                                <div class="CommentItem">
+                                                    <div>
+                                                        <div class="CommentItem-meta"><span
+                                                                class="UserLink CommentItem-avatar"><div
+                                                                class="Popover">
+                                                            <div id="Popover-33049-66261-toggle">
+                                                            <a
+                                                               class="UserLink-link"
+                                                                href="{{url_for('main.people', username=comment.comment_user.username)}}"><img
+                                                                class="Avatar UserLink-avatar" style="width: 25px;height: 25px;"
+                                                                        {% if comment.comment_user.avatar %}
+                                                                        src="data:;base64,{{ base64.b64encode(comment.comment_user.avatar)}}"
+                                                                            {% else %}
+                                                                        src="{{url_for('static', filename='images/default.jpg')}}"
+                                                                            {% endif %}
+                                                                alt="{{comment.comment_user.username}}"></a></div>
+                                                            <!-- react-empty: 2768 --></div></span><span
+                                                                class="UserLink"><a class="UserLink-link"
+                                                                                     href="{{url_for('main.people', username=comment.comment_user.username)}}">{{comment.comment_user.username}}</a></span><span
+                                                                class="CommentItem-time">{{comment.content_time}}</span></div>
+                                                        <div class="RichText CommentItem-content" style="white-space: initial;">
+                                                            {{comment.content_body}}
+                                                        </div>
+                                                        <div class="CommentItem-footer ">
+
+                                                        </div><!-- react-empty: 2795 --></div>
+                                                </div>
+                                                {% endfor %}
+                                                <span></span></div>
+                                            <div class="Comments-footer Comments-footer-withPagination CommentEditor--normal CommentEditor--active">
+                                                <form action="" method="post" name="comment_form_{{question_answer[1].id}}">
+                                                <div class="CommentEditor-input Input-wrapper Input-wrapper--spread Input-wrapper--large Input-wrapper--noPadding is-focus">
+                                                    <div class="Input Editable Editable--focus">
+                                                        <textarea rows="1" class="zg-editor-input zu-seamless-input-origin-element"
+                                                                  name="comment_answer_{{question_answer[1].id}}" id="comment_answer_{{question_answer[1].id}}" required placeholder="写下你的评论" style="min-height: 30px;"></textarea>
+                                                    </div>
+                                                </div>
+                                                    <button onclick="submit_comment('{{question_answer[1].id}}')" class="Button CommentEditor-singleButton Button--primary Button--blue" type="button">评论</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+{% endif %}
+
 {% endblock %}
 
 {% block page_sidebar %}

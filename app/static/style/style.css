@@ -44,3 +44,25 @@ h2 {
 	font-size: 26px;
 	line-height: 2.5;
 }
+
+.topic-title .Avatar {
+    width: 40px;
+    height: 40px;
+    margin-right: 16px;
+}
+
+.topic-title .topic-title-name {
+    color: #555;
+    font-weight: 700;
+    font-size: 14px;
+    max-width: 40%;
+    word-wrap: normal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.topic-title {
+    padding-top: 15px;
+    line-height: 40px;
+    margin-bottom: 16px;
+}
