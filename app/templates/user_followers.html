@@ -1,30 +1,24 @@
 {% extends "base_user.html" %}
 {% import "_macros.html" as macros %}
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
+{% endblock %}
 {% block person_data %}
 <div class="Card ProfileMain">
     <div class="ProfileMain-header">
         <ul role="tablist" class="Tabs ProfileMain-tabs">
             <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-activities">
-                <a class="Tabs-link is-active" href="/people/chen_long/activities">动态</a>
+                <a class="Tabs-link" href="/people/chen_long/activities">动态</a>
             </li>
             <li role="tab" class="Tabs-item" aria-controls="Profile-answers">
-                <a class="Tabs-link" href="#">
+                <a class="Tabs-link" href="/people/{{user.username}}/answers">
                     <!-- react-text: 124 -->回答<!-- /react-text --><span class="Tabs-meta">1</span>
                 </a>
             </li>
-            <li role="tab" class="Tabs-item" aria-controls="Profile-posts">
-                <a class="Tabs-link" href="#">
-                    <!-- react-text: 128 -->分享<!-- /react-text --><span class="Tabs-meta">10</span>
-                </a>
-            </li>
             <li role="tab" class="Tabs-item" aria-controls="Profile-asks">
-                <a class="Tabs-link" href="#">
-                    <!-- react-text: 132 -->提问<!-- /react-text --><span class="Tabs-meta">1</span>
-                </a>
-            </li>
-            <li role="tab" class="Tabs-item" aria-controls="Profile-collections">
-                <a class="Tabs-link" href="#">
-                    <!-- react-text: 136 -->收藏<!-- /react-text --><span class="Tabs-meta">6</span>
+                <a class="Tabs-link" href="/people/{{user.username}}/asks">
+                    <!-- react-text: 132 -->提问<!-- /react-text --><span class="Tabs-meta"> {{user.questions.count()}}</span>
                 </a>
             </li>
             <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-following">

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}关注[{{topic.topic_name}}]话题的人-者也{% endblock %}
+{% block head %}
+{{super()}}
+{% endblock %}
+{% block body %}
+<div class="topic-avatar" itemprop="image" itemscope="" itemtype="http://schema.org/ImageObject">
+    <div>
+        <a class="zm-entry-head-avatar-link" href="{{url_for('main.topic_detail', id=topic.id)}}"
+           id="zh-avartar-edit-form">
+            <img alt="知乎" src="/static/images/default.jpg"
+                 class="zm-avatar-editor-preview" style="width: 50px;height: 50px;"></a>
+    </div>
+</div>
+<div class="topic-info">
+    <div class="topic-name zm-editable-status-normal" id="zh-topic-title">
+        <h4 class="zm-editable-content" data-disabled="1">{{topic.topic_name}}</h4>
+    </div>
+    <div class="zm-topic-topbar">
+        <div class="zm-topic-topbar-nav clearfix">
+            <a href="{{url_for('main.topic_detail', id=topic.id)}}">{{topic.topic_name}}</a>&nbsp;&nbsp;<span
+                class="zg-gray-normal">»</span>&nbsp;&nbsp;<span>{{topic.follow_topics.count()}}人关注该话题</span>
+        </div>
+
+    </div>
+</div>
+
+<div>
+    {% for topic_follow in topic.follow_topics.all() %}
+    <div class="zm-person-item" id="mi-1292813075">
+        <div class="zg-right">
+            {% if topic_follow.users == current_user %}
+
+            {% else %}
+            {% if not current_user.is_following(topic_follow.users) %}
+            <a href="javasctipt:;" name="focus" class="zg-btn zg-btn-follow" id="pp-6733f12c60e7e98ea7491f20de46f79e">关注</a>
+            {% else %}
+            <a href="javasctipt:;" class="zg-btn zg-btn-unfollow" name="focus" id="pp-6733f12c60e7e98ea7491f20de46f79e">取消关注</a>
+            {% endif %}
+            {% endif %}
+
+        </div>
+
+        <a class="zm-list-avatar-medium" href="{{url_for('main.people', username=topic_follow.users.username)}}"><img
+                class="avatar-img-50"
+                {% if topic_follow.users.avatar %}
+                src="data:;base64,{{ base64.b64encode(topic_follow.users.avatar)}}">
+            {% else %}
+            src="{{url_for('static', filename='images/default.jpg')}}">
+            {% endif %}</a>
+
+        <div class="zm-list-content-medium">
+
+            <h5 class="zm-list-content-title">
+                <a href="{{url_for('main.people', username=topic_follow.users.username)}}" class="zg-link author-link">{{topic_follow.users.username}}</a>
+            </h5>
+            <div class="summary-wrapper summary-wrapper--medium">
+                <span class="badge-summary">{{topic_follow.users.short_intr or ""}}</span>
+            </div>
+            <div class="zg-gray-normal">
+                <a href="/people/{{topic_follow.users.username}}/answers" class="zg-link-gray-normal">回答了
+                    {{topic_follow.users.answers.count()}} 个问题</a>
+            </div>
+
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block page_sidebar %}
+<div class="zu-main-sidebar">
+    <div class="zm-side-section">
+        <div class="zm-side-section-inner">
+            <div class="topic-header-side zm-entry-head-wrap">
+
+                <div class="clearfix">
+                    <div id="zh-topic-side-head">
+
+                        {% if not current_user.is_following_topic(topic) %}
+                        <a href="javascript:;" id="topic_{{topic.id}}" onclick="follow_topic_detail('{{topic.id}}', id)"
+                           class="zg-btn-green zu-entry-focus-button zg-mr10">关注话题</a>
+
+                        {% else %}
+                        <a href="javascript:;"
+                           class="zg-mr10 zu-entry-focus-button zg-btn-white" id="topic_{{topic.id}}" onclick="unfollow_topic_detail('{{topic.id}}', id)">取消关注</a>
+                        {% endif %}
+                        <div class="zm-topic-side-followers-info">
+
+                            <a href="#" style="color: #259;"><strong id="topic_follow_count">{{topic.follow_topics.count()}}</strong></a> 人关注了该话题
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="zm-side-section">
+        <div class="zm-side-section-inner">
+            <h4 class="zm-topic-side-organize-title">描述
+            </h4>
+            <div id="zh-topic-desc" data-resourceid="253" data-action="/topic-introduction"
+                 class="zm-editable-status-normal">
+                <div class="zm-editable-tip" style="display: none;"><a href="javascript:;" name="edit">添加话题描述</a></div>
+                <div class="zm-editable-content" data-editable-maxlength="130"><b>{{topic.topic_name}}</b><br>{{topic.topic_desc
+                    or ""}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

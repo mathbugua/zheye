@@ -140,7 +140,10 @@ class User(db.Model, UserMixin):
                                     )
 
     # 用户与提问题之间是一对多的关系，即一个用户能够提多个问题，而一个问题只属于一个人
-    questions = db.relationship("Question", backref="uesrs")
+    questions = db.relationship("Question", backref="uesrs",
+                                lazy='dynamic',
+                                cascade='all, delete-orphan'
+                                )
 
     comments = db.relationship("Comments",
                                foreign_keys=[Comments.user_id],
@@ -322,7 +325,10 @@ class Topic(db.Model):
     topic_name = db.Column(db.String(30), nullable=False)
     topic_desc = db.Column(db.String(50))
     category_id = db.Column(db.Integer, db.ForeignKey("topiccate.id"))
-    follow_topics = db.relationship("FollowTopic", backref="topic")
+    follow_topics = db.relationship("FollowTopic", backref="topic",
+                                    lazy='dynamic',
+                                    cascade='all, delete-orphan'
+                                    )
     question_topic = db.relationship("QuestionTopic", backref="topic")
 
     def questions_excellans(self):
@@ -430,7 +436,7 @@ class Question(db.Model):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            return u"提交失败"
+            return False
 
         question = Question.query.filter_by(question_name=question_name).first()
         if question:
@@ -446,8 +452,9 @@ class Question(db.Model):
                 # 提交失败，删除问题
                 db.session.delete(question)
                 db.session.commit()
-                return u"提交失败"
-        return u"提交成功"
+                return False
+
+        return question               # 提交成功返回问题
 
 
 class QuestionTopic(db.Model):

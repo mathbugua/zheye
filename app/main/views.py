@@ -130,6 +130,39 @@ def following(username):
                            follows=follows, base64=base64)
 
 
+@main.route('/people/<username>/asks')
+def asks(username):
+    """分页显示username提了哪些问题"""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash(constant.INVALID_USER)
+        return redirect(url_for('.index'))
+    page = request.args.get('page', 1, type=int)
+    pagination = user.questions.paginate(
+        page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
+        error_out=False)
+
+    return render_template('user_asks.html', user=user, base64=base64,
+                           endpoint='.asks', pagination=pagination, items=pagination.items
+                           )
+
+
+@main.route('/people/<username>/answers')
+def answers(username):
+    """分页显示username回答了哪些问题"""
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash(constant.INVALID_USER)
+        return redirect(url_for('.index'))
+    page = request.args.get('page', 1, type=int)
+    pagination = user.answers.paginate(
+        page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
+        error_out=False)
+
+    return render_template('user_answers.html', user=user, base64=base64,
+                           endpoint='.answers', pagination=pagination, items=pagination.items)
+
+
 @main.route('/people/images', methods=['POST'])
 @login_required
 def images():
@@ -292,8 +325,11 @@ def submit_question():
 
     # 添加问题
     result = Question.add_question(question, question_desc, topic, current_user.id)
+    if not result:  # 操作失败
+        return jsonify(error=constant.FAIL)
 
-    return jsonify(result=result, error="")
+    current_user.follow_question(result)   # 提问者默认关注提出的问题
+    return jsonify(result=result.id, error="")
 
 
 @main.route('/submit_comment', methods=['POST'])
@@ -317,7 +353,7 @@ def topic_detail(id):
     """话题详细页面"""
     topic = Topic.query.filter_by(id=id).first()
     if topic:
-        return render_template("topic_detail.html", topic=topic, count=len(topic.follow_topics),
+        return render_template("topic_detail.html", topic=topic, count=topic.follow_topics.count(),
                                base64=base64, questions_excellans=topic.questions_excellans())
 
     return redirect(url_for("main.index"))
@@ -374,3 +410,11 @@ def delete_answer(id):
        return jsonify(error="")
     except:
         return jsonify(error=constant.FAIL)
+
+
+@main.route('/topic/<int:id>/followers')
+def topic_followers(id):
+    """显示某个话题的所有关注者"""
+    topic = Topic.query.get_or_404(id)
+    return render_template('alluser_follow_topic.html', base64=base64, topic=topic)
+

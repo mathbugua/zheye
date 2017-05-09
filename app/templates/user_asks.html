@@ -1,0 +1,56 @@
+{% extends "base_user.html" %}
+{% import "_macros.html" as macros %}
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
+{% endblock %}
+{% block person_data %}
+<div class="Card ProfileMain">
+    <div class="ProfileMain-header">
+        <ul role="tablist" class="Tabs ProfileMain-tabs">
+            <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-activities">
+                <a class="Tabs-link" href="/people/chen_long/activities">动态</a>
+            </li>
+            <li role="tab" class="Tabs-item" aria-controls="Profile-answers">
+                 <a class="Tabs-link" href="/people/{{user.username}}/answers">
+                    <!-- react-text: 124 -->回答<!-- /react-text --><span class="Tabs-meta"> {{user.answers.count()}}</span>
+                </a>
+            </li>
+            <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-asks">
+                <a class="Tabs-link" href="/people/{{user.username}}/asks" style="color: #0f88eb;">
+                    <!-- react-text: 132 -->提问<!-- /react-text --><span class="Tabs-meta"> {{user.questions.count()}}</span>
+                </a>
+            </li>
+            <li role="tab" class="Tabs-item" aria-controls="Profile-following">
+                <a class="Tabs-link" href="/people/{{user.username}}/following">关注</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="List" id="Profile-asks">
+        <div>
+            {% for item in items %}
+            <div class="List-item">
+                <div class="ContentItem" data-za-module="QuestionItem">
+                    <h2 class="ContentItem-title">
+                        <div class="QuestionItem-title">
+                            <a href="{{url_for('main.question_detail', id=item.id)}}" target="_blank" style="color: #333;">
+                            {{item.question_name}}?
+                            </a>
+                        </div>
+                    </h2>
+                    <div class="ContentItem-status">
+                        <span class="ContentItem-statusItem">{{item.question_time}}</span>
+                        <span class="ContentItem-statusItem">{{item.answers.count()}} 个回答</span>
+                        <span class="ContentItem-statusItem">{{item.follow_questions.count()}} 个关注</span>
+                    </div><!-- react-empty: 609 --></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="pagination">
+        {{ macros.pagination_widget(pagination, endpoint, username = user.username) }}
+    </div>
+</div>
+{% endblock %}

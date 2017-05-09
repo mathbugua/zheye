@@ -2,47 +2,88 @@
 {% block title %}话题广场-者也{% endblock %}
 {% block page_content %}
 <script>
-    function add_class(obj, topic_cate) {
+//    function add_class(obj, topic_cate) {
+//        $.ajax({
+//                url: "/topics_search",
+//                async: true,
+//                data: {"topic_cate": topic_cate},
+//                type: "POST",
+//                success: function (data, status) {
+//                    var content = '<div class="zh-general-list clearfix" id="topic_content" style="display: block;">'
+//                    for (var i = 0; i < data.topics.length; i++) {
+//                        content = content + '<div class="item"> ' +
+//                            '<div class="blk"> ' +
+//                            '<a target="_blank" href="/topic/' + data.topics[i][2] + '"> ' +
+//                            '<strong>' + data.topics[i][0] + '</strong>' +
+//                            '</a>' +
+//                            '<p>' + data.topics[i][1] + '</p>';
+//                        if (data.topics[i][3] == "unfollow") {
+//                            content = content + "<a href=\"/follow_topic/" + data.topics[i][2] + "\" class=\"follow meta-item zg-follow\"><i class=\"z-icon-follow\"></i>关注</a>" +
+//                                '</div></div>'
+//                        }
+//                        else {
+//                            content = content + "<a href=\"/unfollow_topic/" + data.topics[i][2] + "\" class=\"follow meta-item zg-follow\"><i class=\"z-icon-follow\"></i>取消关注</a>" +
+//                                '</div></div>'
+//                        }
+//
+//                    }
+//
+//                    content = content + '</div>';
+//
+//                    $("#topic_content").replaceWith(content);
+//                }
+//            }
+//        );
+//
+////        去除li元素的current样式
+//        $("li").each(function () {
+//            if ($(this).hasClass("current")) {
+//                $(this).removeClass("current")
+//            }
+//        });
+////        给点击的元素添加current样式
+//        $(obj).addClass("current");
+//
+//    }
+
+    <!--关注、取消关注问题-->
+    function follow_topic(topic_id, id) {
+        id = id.toString();
         $.ajax({
-                url: "/topics_search",
-                async: true,
-                data: {"topic_cate": topic_cate},
-                type: "POST",
-                success: function (data, status) {
-                    var content = '<div class="zh-general-list clearfix" id="topic_content" style="display: block;">'
-                    for (var i = 0; i < data.topics.length; i++) {
-                        content = content + '<div class="item"> ' +
-                            '<div class="blk"> ' +
-                            '<a target="_blank" href="/topic/' + data.topics[i][2] + '"> ' +
-                            '<strong>' + data.topics[i][0] + '</strong>' +
-                            '</a>' +
-                            '<p>' + data.topics[i][1] + '</p>';
-                        if (data.topics[i][3] == "unfollow") {
-                            content = content + "<a href=\"/follow_topic/" + data.topics[i][2] + "\" class=\"follow meta-item zg-follow\"><i class=\"z-icon-follow\"></i>关注</a>" +
-                                '</div></div>'
-                        }
-                        else {
-                            content = content + "<a href=\"/unfollow_topic/" + data.topics[i][2] + "\" class=\"follow meta-item zg-follow\"><i class=\"z-icon-follow\"></i>取消关注</a>" +
-                                '</div></div>'
-                        }
-
-                    }
-
-                    content = content + '</div>';
-
-                    $("#topic_content").replaceWith(content);
+            url: '/follow_topic/' + topic_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
                 }
-            }
-        );
 
-//        去除li元素的current样式
-        $("li").each(function () {
-            if ($(this).hasClass("current")) {
-                $(this).removeClass("current")
+                var content = "<a href=\"#\" id=\"" + id + "\"  onclick=\"unfollow_topic(" + "'" + topic_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"follow meta-item zg-unfollow\"><i class=\"z-icon-follow\"></i>取消关注</a>";
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
             }
-        });
-//        给点击的元素添加current样式
-        $(obj).addClass("current");
+        })
+
+    }
+
+    function unfollow_topic(topic_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/unfollow_topic/' + topic_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a href=\"#\" id=\"" + id + "\"  onclick=\"follow_topic(" + "'" + topic_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"follow meta-item zg-follow\"><i class=\"z-icon-follow\"></i>关注话题</a>";
+
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+            }
+        })
 
     }
 
@@ -54,24 +95,23 @@
     </div>
 
     <ul class="zm-topic-cat-main clearfix">
-        {% if topic_cate %}
-        <li class="zm-topic-cat-item current" data-id="253"
-            onclick="add_class(this, '{{topic_cate[0].category_name}}')"><a
-                href="#">{{topic_cate[0].category_name}}</a>
+        {% for cate in topic_cate %}
+       {% if cate.id == cate_selete.id %}
+        <li class="zm-topic-cat-item current" ><a
+                href="{{url_for('main.topics', cate=cate.id)}}">{{cate.category_name}}</a>
+        </li>
+        {% else %}
+        <li class="zm-topic-cat-item"><a
+                href="{{url_for('main.topics', cate=cate.id)}}">{{cate.category_name}}</a>
         </li>
         {% endif %}
-
-        {% for cate in topic_cate[1:] %}
-        <li class="zm-topic-cat-item" data-id="833" onclick="add_class(this, '{{cate.category_name}}')"><a
-                href="#">{{cate.category_name}}</a>
-        </li>
         {% endfor %}
-        <!--<li class="zm-topic-cat-item current" data-id="253"><a href="#games">游戏</a></li>-->
-        <!--<li class="zm-topic-cat-item" data-id="833"><a href="#运动">运动</a></li>-->
     </ul>
+
+    {% if cate_selete %}
     <div class="zm-topic-cat-sub">
         <div class="zh-general-list clearfix" id="topic_content" style="display: block;">
-            {% for topic in topics %}
+            {% for topic in cate_selete.topics %}
             <div class="item">
                 <div class="blk">
                     <a target="_blank" href="{{url_for('main.topic_detail', id = topic.id)}}">
@@ -79,11 +119,11 @@
                     </a>
                     <p>{{topic.topic_desc or ""}}</p>
                     {% if current_user.is_following_topic(topic) %}
-                    <a href="{{url_for('main.unfollow_topic', topic_id = topic.id)}}"
-                       class="follow meta-item zg-follow"><i class="z-icon-follow"></i>取消关注</a>
+                    <a href="#" onclick="unfollow_topic('{{topic.id}}', id)" id ="topic_{{topic.id}}"
+                       class="follow meta-item zg-unfollow"><i class="z-icon-follow"></i>取消关注</a>
 
                     {% else %}
-                    <a href="{{url_for('main.follow_topic', topic_id = topic.id)}}"
+                    <a href="#" onclick="follow_topic('{{topic.id}}', id)" id ="topic_{{topic.id}}"
                        class="follow meta-item zg-follow"><i class="z-icon-follow"></i>关注</a>
                     {% endif %}
                 </div>
@@ -91,5 +131,6 @@
             {% endfor %}
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

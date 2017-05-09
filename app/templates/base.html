@@ -4,17 +4,6 @@
     <meta charset="utf-8"/>
 
     <title>{% block title %}{% endblock %}</title>
-
-    <link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-152.87c020b9.png"
-          sizes="152x152">
-    <link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-120.496c913b.png"
-          sizes="120x120">
-    <link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-76.dcf79352.png"
-          sizes="76x76">
-    <link rel="apple-touch-icon" href="https://static.zhihu.com/static/revved/img/ios/touch-icon-60.9911cffb.png"
-          sizes="60x60">
-    <link rel="search" type="application/opensearchdescription+xml" href="https://static.zhihu.com/static/search.xml"
-          title="知乎"/>
     <!--&lt;!&ndash;<script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js">&ndash;&gt;</script>-->
     {% block head %}
     <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
@@ -77,7 +66,7 @@
                         return;
                     }
                     else{
-                        location.href = "/"
+                        window.location.href = "/question/" + data.result;
                     }
             },
             error: function (xhr) {
@@ -202,6 +191,68 @@
                     $(comment_answer).val("");
                 }
             })
+
+    }
+
+    function delete_answer(answer_id) {
+        r = confirm("确认删除");
+        if (r == true) {
+            $.ajax({
+                url: '/delete/answer/' + answer_id,
+                async: true,
+                type: "GET",
+                success: function (data, status) {
+                    if (data.error != "") {
+                        alert(data.error);
+                        return;
+                    }
+                    location.replace(document.referrer);
+                }
+            });
+        }
+        else {
+            return;
+        }
+    }
+
+    function follow_topic_detail(topic_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/follow_topic/' + topic_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a href=\"javascript:;\" id=\"" + id + "\"  onclick=\"unfollow_topic_detail(" + "'" + topic_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"zg-mr10 zu-entry-focus-button zg-btn-white\">取消关注</a>";
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+                $("#topic_follow_count").text((parseInt($("#topic_follow_count").text()) + 1));
+            }
+        })
+
+    }
+
+    function unfollow_topic_detail(topic_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/unfollow_topic/' + topic_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a href=\"javascript:;\" id=\"" + id + "\"  onclick=\"follow_topic_detail(" + "'" + topic_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"zg-btn-green zu-entry-focus-button zg-mr10\" >关注问题</a>";
+
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+                $("#topic_follow_count").text((parseInt($("#topic_follow_count").text()) - 1));
+            }
+        })
 
     }
 </script>

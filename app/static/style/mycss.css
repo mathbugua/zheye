@@ -749,3 +749,10 @@ input, textarea, keygen, select, button, meter, progress {
     color: #999;
     font-size: 12px;
 }
+
+.topic-info .zm-topic-topbar-nav {
+    margin-left: 65px;
+}
+.zm-topic-topbar {
+    margin-top: 4px;
+}

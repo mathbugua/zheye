@@ -46,27 +46,6 @@
 
     }
 
-    function delete_answer(answer_id) {
-        r = confirm("确认删除");
-        if (r == true) {
-            $.ajax({
-                url: '/delete/answer/' + answer_id,
-                async: true,
-                type: "GET",
-                success: function (data, status) {
-                    if (data.error != "") {
-                        alert(data.error);
-                        return;
-                    }
-                    location.replace(document.referrer);
-                }
-            });
-        }
-        else {
-            return;
-        }
-    }
-
 </script>
 {% endblock %}
 {% block body %}

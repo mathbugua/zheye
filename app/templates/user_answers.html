@@ -1,0 +1,190 @@
+{% extends "base_user.html" %}
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
+{% endblock %}
+{% import "_macros.html" as macros %}
+{% block person_data %}
+<div class="Card ProfileMain">
+    <div class="ProfileMain-header">
+        <ul role="tablist" class="Tabs ProfileMain-tabs">
+            <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-activities">
+                <a class="Tabs-link" href="/people/chen_long/activities">动态</a>
+            </li>
+            <li role="tab" class="Tabs-item" aria-controls="Profile-answers">
+                <a class="Tabs-link" href="/people/{{user.username}}/answers" style="color: #0f88eb;">
+                    <!-- react-text: 124 -->回答<!-- /react-text --><span
+                        class="Tabs-meta"> {{user.answers.count()}}</span>
+                </a>
+            </li>
+            <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-asks">
+                <a class="Tabs-link" href="/people/{{user.username}}/asks">
+                    <!-- react-text: 132 -->提问<!-- /react-text --><span
+                        class="Tabs-meta"> {{user.questions.count()}}</span>
+                </a>
+            </li>
+            <li role="tab" class="Tabs-item" aria-controls="Profile-following">
+                <a class="Tabs-link" href="/people/{{user.username}}/following">关注</a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="List Profile-answers" id="Profile-answers">
+        <div>
+            {% for item in items %}
+            <div class="List-item">
+                <div class="ContentItem AnswerItem">
+                    <h2 class="ContentItem-title">
+                        <a target="_blank" href="{{url_for('main.question_detail', id=item.question.id)}}">
+                            {{item.question.question_name}}？
+                        </a>
+                    </h2>
+                    <div class="ContentItem-meta">
+                        <div class="AnswerItem-meta">
+                            <div class="AuthorInfo">
+                                <span class="UserLink AuthorInfo-avatarWrapper">
+                                    <div class="Popover">
+                                        <div><a class="UserLink-link"
+                                                href="{{url_for('main.people', username=item.users.username)}}">
+                                            <img class="Avatar AuthorInfo-avatar" width="38" height="38"
+                                                 {% if item.users.avatar %}
+                                                 src="data:;base64,{{ base64.b64encode(item.users.avatar)}}"
+                                                 {% else %}
+                                                 src="{{url_for('static', filename='images/default.jpg')}}"
+                                                 {% endif %}
+                                                 alt="{{item.users.username}}"></a></div>
+
+
+                                        <!-- react-empty: 637 --></div></span>
+                                <div class="AuthorInfo-content">
+                                    <div class="AuthorInfo-head"><span class="UserLink AuthorInfo-name"><div
+                                            class="Popover"><div id="Popover-82925-30712-toggle" aria-haspopup="true"
+                                                                 aria-expanded="false"
+                                                                 aria-owns="Popover-82925-30712-content"><a
+                                            class="UserLink-link"
+                                            href="{{url_for('main.people', username=item.users.username)}}">{{item.users.username}}</a></div>
+                                        <!-- react-empty: 644 --></div></span></div>
+                                    <div class="AuthorInfo-detail">
+                                        <div class="RichText AuthorInfo-badge">{{item.users.short_intr or ""}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="RichContent">
+                        <div class="RichContent-inner"><span class="RichText CopyrightRichText-richText">
+                            <p>{{item.answer_body}}</p></span>
+                            <!-- react-empty: 667 --></div>
+                        <div class="ContentItem-time"><a href="javascript:;">发布于
+                            {{item.timestamp}}</a></div>
+                        <div>
+                            <div class="ContentItem-actions Sticky is-bottom">
+
+                                <button class="ContentItem-action Button--plain" type="button"
+                                        id="comments-button-show_{{item.id}}"
+                                        onclick="show_comments(id, '{{item.id}}')">
+                                    <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"
+                                         class="Icon Icon--comment Icon--left" width="12" height="16" aria-hidden="true"
+                                         style="height: 16px; width: 12px;"><title></title>
+                                        <g>
+                                            <path d="M7.24 16.313c-.272-.047-.553.026-.77.2-1.106.813-2.406 1.324-3.77 1.482-.16.017-.313-.06-.394-.197-.082-.136-.077-.308.012-.44.528-.656.906-1.42 1.11-2.237.04-.222-.046-.45-.226-.588C1.212 13.052.027 10.73 0 8.25 0 3.7 4.03 0 9 0s9 3.7 9 8.25-4.373 9.108-10.76 8.063z"></path>
+                                        </g>
+                                    </svg>
+                                    {% if item.comments.count() == 0 %}
+                                    <!-- react-text: 703 --> 添加评论<!-- /react-text -->
+                                    {% else %}
+                                    <!-- react-text: 703 --> {{item.comments.count()}}条评论
+                                    <!-- /react-text -->
+                                    {% endif %}
+                                </button>
+
+                                <div class="Popover ContentItem-action" onclick="delete_answer('{{item.id}}')">
+                                    <button class="Button--plain" type="button" id="Popover-97103-4112-toggle"
+                                            aria-haspopup="true" aria-expanded="false"
+                                            aria-owns="Popover-97103-4112-content">
+                                        <svg viewBox="0 0 20 20" class="Icon Icon--setting Icon--left" width="14"
+                                             height="16" aria-hidden="true" style="height: 16px; width: 14px;">
+                                            <title></title>
+                                            <g>
+                                                <path d="M18.868 15.185c-.164.096-.315.137-.452.137-.123 0-1.397-.26-1.617-.233-1.355.013-1.782 1.275-1.836 1.74-.055.454 0 .893.19 1.304.138.29.125.577-.067.85-.863.893-2.165 1.016-2.357 1.016-.123 0-.247-.055-.356-.15-.11-.097-.685-1.14-1.07-1.47-1.303-.954-2.246-.328-2.63 0-.397.33-.67.7-.835 1.126-.07.18-.18.302-.33.37-1.354.426-2.918-.92-3.014-1.056-.082-.11-.123-.22-.123-.356-.014-.138.383-1.276.342-1.688-.342-1.9-1.836-1.687-2.096-1.673-.303.014-.604.068-.92.178-.205.056-.396.03-.588-.054-.888-.462-1.137-2.332-1.11-2.51.055-.315.192-.52.438-.604.425-.164.81-.452 1.15-.85.932-1.262.344-2.25 0-2.634-.34-.356-.725-.645-1.15-.81-.137-.04-.233-.15-.328-.315C-.27 6.07.724 4.95.978 4.733c.255-.22.6-.055.723 0 .426.164.878.22 1.344.15C4.7 4.636 4.784 3.14 4.81 2.908c.015-.247-.11-1.29-.136-1.4-.027-.123-.014-.22.027-.315C5.318.178 7.073 0 7.223 0c.178 0 .33.055.44.178.108.124.63 1.11 1 1.4.398.338 1.582.83 2.588.013.398-.273.96-1.288 1.083-1.412.123-.123.26-.178.384-.178 1.56 0 2.33 1.03 2.438 1.22.083.124.096.248.07.37-.03.152-.33 1.153-.262 1.606.366 1.537 1.384 1.742 1.89 1.783.494.027 1.645-.357 1.81-.344.164.014.315.083.424.206.535.31.85 1.715.905 2.14.027.233-.014.44-.11.562-.11.138-1.165.714-1.48 1.112-.855.982-.342 2.25-.068 2.606.26.37 1.22.905 1.288.96.15.137.26.302.315.494.146 1.413-.89 2.387-1.07 2.47zm-8.905-.535c.644 0 1.246-.123 1.822-.356.575-.248 1.082-.59 1.493-1.016.425-.425.754-.92 1-1.495.247-.562.357-1.18.357-1.81 0-.66-.11-1.262-.356-1.825-.248-.562-.577-1.056-1.002-1.48-.41-.427-.918-.756-1.493-1.003-.576-.233-1.178-.357-1.822-.357-.644 0-1.247.124-1.81.357-.56.247-1.067.576-1.478 1.002-.425.425-.768.92-1 1.48-.247.564-.37 1.167-.37 1.826 0 .644.123 1.248.37 1.81.232.563.575 1.07 1 1.495.424.426.917.768 1.48 1.016.56.233 1.164.356 1.808.356z"></path>
+                                            </g>
+                                        </svg><!-- react-text: 744 -->删除<!-- /react-text --></button>
+                                    <!-- react-empty: 745 --></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="Comments-container" id="Comments-container_{{item.id}}" style="display: none">
+                        <!-- react-empty: 2651 -->
+                        <div class="Comments Comments--withEditor Comments-withPagination">
+                            <div class="CommentTopbar">
+                                <div class="CommentTopbar-meta"><h2 class="CommentTopbar-title"
+                                                                    id="CommentTopbar-title">
+                                    <!-- react-text: 2656 -->{{item.comments.count()}}<!-- /react-text -->
+                                    <!-- react-text: 2657 --> 条评论<!-- /react-text --></h2>
+                                    <div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="comeents_list_all_{{item.id}}">
+                                {% for comment in item.comments.filter_by().all() %}
+                                <div class="CommentItem">
+                                    <div>
+                                        <div class="CommentItem-meta"><span
+                                                class="UserLink CommentItem-avatar"><div
+                                                class="Popover">
+                                                            <div id="Popover-33049-66261-toggle">
+                                                            <a
+                                                                    class="UserLink-link"
+                                                                    href="{{url_for('main.people', username=comment.comment_user.username)}}"><img
+                                                                    class="Avatar UserLink-avatar"
+                                                                    style="width: 25px;height: 25px;"
+                                                                    {% if comment.comment_user.avatar %}
+                                                                    src="data:;base64,{{ base64.b64encode(comment.comment_user.avatar)}}"
+                                                                    {% else %}
+                                                                    src="{{url_for('static', filename='images/default.jpg')}}"
+                                                                    {% endif %}
+                                                                    alt="{{comment.comment_user.username}}"></a></div>
+                                            <!-- react-empty: 2768 --></div></span><span
+                                                class="UserLink"><a class="UserLink-link"
+                                                                    href="{{url_for('main.people', username=comment.comment_user.username)}}">{{comment.comment_user.username}}</a></span><span
+                                                class="CommentItem-time">{{comment.content_time}}</span></div>
+                                        <div class="RichText CommentItem-content" style="white-space: initial;">
+                                            {{comment.content_body}}
+                                        </div>
+                                        <div class="CommentItem-footer ">
+
+                                        </div><!-- react-empty: 2795 --></div>
+                                </div>
+                                {% endfor %}
+                                <span></span></div>
+                            <div class="Comments-footer Comments-footer-withPagination CommentEditor--normal CommentEditor--active">
+                                <form action="" method="post" name="comment_form_{{item.id}}">
+                                    <div class="CommentEditor-input Input-wrapper Input-wrapper--spread Input-wrapper--large Input-wrapper--noPadding is-focus">
+                                        <div class="Input Editable Editable--focus">
+                                                        <textarea rows="1"
+                                                                  class="zg-editor-input zu-seamless-input-origin-element"
+                                                                  name="comment_answer_{{item.id}}"
+                                                                  id="comment_answer_{{item.id}}" required
+                                                                  placeholder="写下你的评论"
+                                                                  style="min-height: 30px;"></textarea>
+                                        </div>
+                                    </div>
+                                    <button onclick="submit_comment('{{item.id}}')"
+                                            class="Button CommentEditor-singleButton Button--primary Button--blue"
+                                            type="button">评论
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- react-empty: 704 --></div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="pagination">
+        {{ macros.pagination_widget(pagination, endpoint, username = user.username) }}
+    </div>
+</div>
+{% endblock %}}

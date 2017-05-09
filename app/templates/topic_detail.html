@@ -6,48 +6,6 @@
 <script data-main="{{url_for('static', filename='js/main')}}"
         src="{{url_for('static', filename='js/require.js')}}"></script>
 
-<script>
-     function follow_topic_detail(topic_id, id) {
-        id = id.toString();
-        $.ajax({
-            url: '/follow_topic/' + topic_id,
-            async: true,
-            type: "GET",
-            success: function (data, status) {
-                if (data.error != "") {
-                    alert(data.error);
-                    return;
-                }
-                var content = "<a href=\"javascript:;\" id=\"" + id + "\"  onclick=\"unfollow_topic_detail(" + "'" + topic_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"zg-mr10 zu-entry-focus-button zg-btn-white\">取消关注</a>";
-                var ID = "#" + id;
-                $(ID).replaceWith(content);
-                $("#topic_follow_count").text((parseInt($("#topic_follow_count").text()) + 1));
-            }
-        })
-
-    }
-
-    function unfollow_topic_detail(topic_id, id) {
-        id = id.toString();
-        $.ajax({
-            url: '/unfollow_topic/' + topic_id,
-            async: true,
-            type: "GET",
-            success: function (data, status) {
-                if (data.error != "") {
-                    alert(data.error);
-                    return;
-                }
-                var content = "<a href=\"javascript:;\" id=\"" + id + "\"  onclick=\"follow_topic_detail(" + "'" + topic_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"zg-btn-green zu-entry-focus-button zg-mr10\" >关注问题</a>";
-
-                var ID = "#" + id;
-                $(ID).replaceWith(content);
-                $("#topic_follow_count").text((parseInt($("#topic_follow_count").text()) - 1));
-            }
-        })
-
-    }
-    </script>
 {% endblock %}
 
 {% block body %}
@@ -236,7 +194,7 @@
                         {% endif %}
                         <div class="zm-topic-side-followers-info">
 
-                            <a href="#"><strong id="topic_follow_count">{{count}}</strong></a> 人关注了该话题
+                            <a href="/topic/{{topic.id}}/followers" style="color: #259;"><strong id="topic_follow_count">{{count}}</strong></a> 人关注了该话题
 
                         </div>
                     </div>
