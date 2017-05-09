@@ -149,9 +149,22 @@ def images():
 @login_required
 def topics():
     """话题广场"""
-    topic_cate = TopicCategory.query.all()
+    topic_cate = TopicCategory.query.all()  # 获取所有的话题类别
+    cate_id = request.args.get("cate")  # 获取选中类别的id
+    cate_selete = None
+    if topic_cate:
+        if cate_id:
+            for cate in topic_cate:
+                if cate.id == int(cate_id):
+                    cate_selete = cate
+                    break
+        if not cate_selete:
+            cate_selete = topic_cate[0]
+
+    # return render_template("topics.html", base64=base64, user=current_user,
+    #                        topic_cate=topic_cate, topics=topic_cate[0].topics)
     return render_template("topics.html", base64=base64, user=current_user,
-                           topic_cate=topic_cate, topics=topic_cate[0].topics)
+                           topic_cate=topic_cate, cate_selete=cate_selete)
 
 
 @main.route('/topic')
@@ -176,24 +189,24 @@ def topic():
                            topics=topics, topic_selete=topic_selete)
 
 
-@main.route('/topics_search', methods=['POST'])
-@login_required
-def topics_search():
-    """查询选中话题类型下的所有话题"""
-    cate = request.form.get("topic_cate", None)
-    topic_cate = TopicCategory.query.filter_by(
-        category_name=cate).first()
-    if topic_cate:
-        # 返回的json数据包含四个参数:
-        # ```topic_name:话题名称```
-        # ```topic_desc:话题描述```
-        # ```id:话题索引```
-        # ```follow or unfollow```:是否被当前用户关注
-        return jsonify(topics=[[topic.topic_name, topic.topic_desc if topic.topic_desc else "",
-                                str(topic.id), "follow" if current_user.is_following_topic(topic) else "unfollow"]
-                               for topic in topic_cate.topics])
-
-    return "error"
+# @main.route('/topics_search', methods=['POST'])
+# @login_required
+# def topics_search():
+#     """查询选中话题类型下的所有话题"""
+#     cate = request.form.get("topic_cate", None)
+#     topic_cate = TopicCategory.query.filter_by(
+#         category_name=cate).first()
+#     if topic_cate:
+#         # 返回的json数据包含四个参数:
+#         # ```topic_name:话题名称```
+#         # ```topic_desc:话题描述```
+#         # ```id:话题索引```
+#         # ```follow or unfollow```:是否被当前用户关注
+#         return jsonify(topics=[[topic.topic_name, topic.topic_desc if topic.topic_desc else "",
+#                                 str(topic.id), "follow" if current_user.is_following_topic(topic) else "unfollow"]
+#                                for topic in topic_cate.topics])
+#
+#     return "error"
 
 
 @main.route('/topic_all')
@@ -209,16 +222,15 @@ def topic_all():
 def follow_topic(topic_id):
     """关注某个话题"""
     topic = Topic.query.filter_by(id=topic_id).first()
-    if topic is None:
-        flash(constant.INVALID_TOPIC)
-        return redirect(url_for('main.topics'))
+    if topic is None or current_user.is_following_topic(topic):
+        return jsonify(error=constant.FAIL)
 
-    if current_user.is_following_topic(topic):
-        return redirect(url_for('main.topic'))
     # 关注话题
-    current_user.follow_topic(topic)
-
-    return redirect(url_for('main.topic_detail', id=topic_id))
+    try:
+        current_user.follow_topic(topic)
+        return jsonify(error="")
+    except Exception as e:
+        return jsonify(error=constant.FAIL)
 
 
 @main.route('/unfollow_topic/<topic_id>')
@@ -226,16 +238,15 @@ def follow_topic(topic_id):
 def unfollow_topic(topic_id):
     """取消关注某个话题"""
     topic = Topic.query.filter_by(id=topic_id).first()
-    if topic is None:
-        flash(constant.INVALID_TOPIC)
-        return redirect(url_for('main.topics'))
+    if topic is None or not current_user.is_following_topic(topic):
+        return jsonify(error=constant.FAIL)
 
-    if not current_user.is_following_topic(topic):
-        return redirect(url_for('main.topic'))
     # 取消关注
-    current_user.unfollow_topic(topic)
-
-    return redirect(url_for('main.topic_detail', id=topic_id))
+    try:
+        current_user.unfollow_topic(topic)
+        return jsonify(error="")
+    except Exception as e:
+        return jsonify(error=constant.FAIL)
 
 
 @main.route('/follow_question/<question_id>')
