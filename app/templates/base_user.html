@@ -10,8 +10,7 @@
     function mout_img(obj) {
         $(".UserAvatarEditor .Mask").addClass("Mask-hidden");
     }
-</script>
-<script type="text/javascript">
+
     function openFile() {
         document.getElementById("file").click();
 //             document.getElementById("submit").click();
@@ -23,6 +22,71 @@
         }
 
     }
+
+    //    关注,取消关注某人
+    function follow_user(user_name, id, position) {
+        id = id.toString();
+        $.ajax({
+            url: '/follow/' + user_name,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content =  "<button id=\"" + id + "\" onclick=\"unfollow_user(" + "'" + user_name.toString() + "'" + "," + "'" + id + "'" +"," + "'" + position + "'" + ")\" class=\"Button FollowButton Button--primary Button--grey\" style=\"width: 108px;height: 34px;\" type=\"button\"> 取消关注 </button>"
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+                if(position == "follow_list"){
+
+                }
+                if(position == "follow_list_user"){
+
+                     $("#NumberBoard-name_following").text((parseInt($("#NumberBoard-name_following").text()) + 1));
+                }
+                else{
+                     $("#NumberBoard-name_follower").text((parseInt($("#NumberBoard-name_follower").text()) + 1));
+                }
+
+
+            }
+        })
+
+    }
+
+     function unfollow_user(user_name, id, position) {
+        id = id.toString();
+        $.ajax({
+            url: '/unfollow/' + user_name,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<button id=\"" + id + "\" onclick=\"follow_user(" + "'" + user_name.toString() + "'" + "," + "'" + id + "'"  +"," + "'" + position + "'" + ")\" class=\"Button FollowButton Button--primary Button--blue\" style=\"width: 108px;height: 34px;\" type=\"button\"> " +
+                    "<svg viewBox=\"0 0 12 12\" class=\"Icon FollowButton-icon Icon--plus\" width=\"12\" height=\"16\" aria-hidden=\"true\" style=\"height: 16px; width: 12px;\"> <title></title> <g> " +
+                    "<path d=\"M6.994 4.994s-.008-3.593 0-4C6.97-.33 4.97-.33 4.996.994c-.025 1.275 0 4 0 4H1C-.334 5-.334 7 1 7c1.332 0 3.996-.006 3.996-.006v4c0 1.346 2.004 1.346 1.998 0-.006-1.347 0-4 0-4S9.658 7 10.997 7c1.338 0 1.338-2-.007-2.006H6.994z\"> " +
+                    "</path> </g> </svg>关注 </button>"
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+                if(position == "follow_list"){
+
+                }
+                if(position == "follow_list_user"){
+
+                     $("#NumberBoard-name_following").text((parseInt($("#NumberBoard-name_following").text()) - 1));
+                }
+                else{
+                     $("#NumberBoard-name_follower").text((parseInt($("#NumberBoard-name_follower").text()) - 1));
+                }
+            }
+        })
+
+    }
+
 </script>
 
 {% endblock %}
@@ -136,10 +200,8 @@
                                     <div class="MemberButtonGroup ProfileButtonGroup ProfileHeader-buttons">
                                         {% if user != current_user %}
                                         {% if current_user.is_anonymous or not current_user.is_following(user) %}
-                                        <a href="{{ url_for('main.follow', username=user.username) }}"
-                                           >
-                                            <button class="Button FollowButton Button--primary Button--blue"
-                                                    type="button">
+
+                                            <button id="follow_user" onclick="follow_user('{{user.username}}', id, 'follow_user')" class="Button FollowButton Button--primary Button--blue" style="width: 108px;height: 34px;" type="button">
                                                 <svg viewBox="0 0 12 12" class="Icon FollowButton-icon Icon--plus"
                                                      width="12"
                                                      height="16" aria-hidden="true" style="height: 16px; width: 12px;">
@@ -153,15 +215,12 @@
 
                                                 关注
                                             </button>
-                                        </a>
                                         {% else %}
-                                        <a href="{{ url_for('main.unfollow', username=user.username) }}"
-                                           >
-                                            <button class="Button FollowButton Button--primary Button--grey"
+                                            <button onclick="unfollow_user('{{user.username}}', id, 'follow_user')" id="follow_user" class="Button FollowButton Button--primary Button--grey" style="width: 108px;height: 34px;"
                                                     type="button">
                                                 取消关注
                                             </button>
-                                        </a>
+
 
                                         {% endif %}
                                         {% endif %}
@@ -198,13 +257,13 @@
                     <a class="Button NumberBoard-item Button--plain" type="button"
                        href="/people/{{user.username}}/following">
                         <div class="NumberBoard-name">关注了</div>
-                        <div class="NumberBoard-value">{{ user.followed.count() }}</div>
+                        <div class="NumberBoard-value" id="NumberBoard-name_following">{{ user.followed.count() }}</div>
                     </a>
                     <div class="NumberBoard-divider"></div>
                     <a class="Button NumberBoard-item Button--plain" type="button"
                        href="/people/{{user.username}}/followers">
-                        <div class="NumberBoard-name">关注者</div>
-                        <div class="NumberBoard-value">{{ user.followers.count() }}</div>
+                        <div class="NumberBoard-name" >关注者</div>
+                        <div class="NumberBoard-value" id="NumberBoard-name_follower">{{ user.followers.count() }}</div>
                     </a>
                 </div>
             </div>

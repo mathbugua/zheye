@@ -68,16 +68,17 @@ def follow(username):
     """关注某人"""
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash(constant.INVALID_USER)
-        return redirect(url_for('main.index'))
-
+        return jsonify(error=constant.INVALID_USER)
     if user == current_user:
-        flash(constant.CANNOT_CON_MYSELF)
-        return redirect(url_for('main.index'))
+        return jsonify(constant.CANNOT_CON_MYSELF)
     if current_user.is_following(user):
-        return redirect(url_for('main.people', username=username))
-    current_user.follow(user)
-    return redirect(url_for('main.people', username=username))
+        return jsonify(error=constant.ALREADY_CON)
+    try:
+        current_user.follow(user)
+    except Exception as e:
+        return jsonify(constant.FAIL)
+
+    return jsonify(error="")
 
 
 @main.route('/unfollow/<username>')
@@ -86,12 +87,15 @@ def unfollow(username):
     """取消关注"""
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash(constant.INVALID_USER)
-        return redirect(url_for('main.index'))
+        return jsonify(error=constant.INVALID_USER)
     if not current_user.is_following(user):
-        return redirect(url_for('main.people', username=username))
-    current_user.unfollow(user)
-    return redirect(url_for('main.people', username=username))
+        return jsonify(error=constant.NO_CON)
+    try:
+        current_user.unfollow(user)
+    except Exception as e:
+        return jsonify(constant.FAIL)
+
+    return jsonify(error="")
 
 
 @main.route('/people/<username>/followers')

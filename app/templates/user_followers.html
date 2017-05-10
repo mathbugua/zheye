@@ -3,6 +3,7 @@
 {% block head %}
 {{super()}}
 <link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
+
 {% endblock %}
 {% block person_data %}
 <div class="Card ProfileMain">
@@ -80,9 +81,12 @@
                         </div>
                         {% if current_user != follow.user %}
                         {% if current_user.is_anonymous or not current_user.is_following(follow.user) %}
-                        <a href="{{ url_for('main.follow', username=follow.user.username) }}"
-                           >
-                            <button class="Button FollowButton Button--primary Button--blue" type="button">
+                            {% if user == current_user %}
+                            <button id="follow_user_{{follow.user.id}}" onclick="follow_user('{{follow.user.username}}', id, 'follow_list_user')"
+                                {% else %}
+                                    <button id="follow_user_{{follow.user.id}}" onclick="follow_user('{{follow.user.username}}', id, 'follow_list')"
+                                            {% endif %}
+                                    class="Button FollowButton Button--primary Button--blue" style="width: 108px;height: 34px;" type="button">
                                 <svg viewBox="0 0 12 12" class="Icon FollowButton-icon Icon--plus" width="12"
                                      height="16" aria-hidden="true" style="height: 16px; width: 12px;">
                                     <title></title>
@@ -94,14 +98,16 @@
                                 </svg>
                                 关注
                             </button>
-                        </a>
                         {% else %}
-                        <a href="{{ url_for('main.unfollow', username=follow.user.username) }}"
-                           >
-                            <button class="Button FollowButton Button--primary Button--grey" type="button">
+                        {% if user == current_user %}
+                            <button id="follow_user_{{follow.user.id}}" onclick="unfollow_user('{{follow.user.username}}', id, 'follow_list_user')" class="Button FollowButton Button--primary Button--grey" style="width: 108px;height: 34px;" type="button">
                                 取消关注
                             </button>
-                        </a>
+                        {% else %}
+                        <button id="follow_user_{{follow.user.id}}" onclick="unfollow_user('{{follow.user.username}}', id, 'follow_list')" class="Button FollowButton Button--primary Button--grey" style="width: 108px;height: 34px;" type="button">
+                                取消关注
+                            </button>
+                        {% endif %}
                         {% endif %}
                         {% endif %}
 

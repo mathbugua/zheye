@@ -2,6 +2,46 @@
 {% block title %}关注[{{topic.topic_name}}]话题的人-者也{% endblock %}
 {% block head %}
 {{super()}}
+<script>
+    //    关注,取消关注某人
+    function topic_follow_user(user_name, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/follow/' + user_name,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a id=\"" + id + "\" href=\"#\" class=\"zg-btn zg-btn-unfollow\" onclick=\"topic_unfollow_user(" + "'" + user_name.toString() + "'" + "," + "'" + id + "'" + ")\">取消关注</a>"
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+
+            }
+        })
+
+    }
+    function topic_unfollow_user(user_name, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/unfollow/' + user_name,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a id=\"" + id + "\" href=\"#\" class=\"zg-btn zg-btn-follow\" onclick=\"topic_follow_user(" + "'" + user_name.toString() + "'" + "," + "'" + id + "'" + ")\">关注</a>"
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+            }
+        })
+
+    }
+</script>
 {% endblock %}
 {% block body %}
 <div class="topic-avatar" itemprop="image" itemscope="" itemtype="http://schema.org/ImageObject">
@@ -27,18 +67,19 @@
 
 <div>
     {% for topic_follow in topic.follow_topics.all() %}
-    <div class="zm-person-item" id="mi-1292813075">
+    <div class="zm-person-item">
         <div class="zg-right">
             {% if topic_follow.users == current_user %}
 
             {% else %}
             {% if not current_user.is_following(topic_follow.users) %}
-            <a href="javasctipt:;" name="focus" class="zg-btn zg-btn-follow" id="pp-6733f12c60e7e98ea7491f20de46f79e">关注</a>
+            <a href="#" class="zg-btn zg-btn-follow" id="zg-btn_{{topic_follow.users.id}}"
+               onclick="topic_follow_user('{{topic_follow.users.username}}', id)">关注</a>
             {% else %}
-            <a href="javasctipt:;" class="zg-btn zg-btn-unfollow" name="focus" id="pp-6733f12c60e7e98ea7491f20de46f79e">取消关注</a>
+            <a href="#" class="zg-btn zg-btn-unfollow" id="zg-btn_{{topic_follow.users.id}}"
+               onclick="topic_unfollow_user('{{topic_follow.users.username}}', id)">取消关注</a>
             {% endif %}
             {% endif %}
-
         </div>
 
         <a class="zm-list-avatar-medium" href="{{url_for('main.people', username=topic_follow.users.username)}}"><img
@@ -83,11 +124,13 @@
 
                         {% else %}
                         <a href="javascript:;"
-                           class="zg-mr10 zu-entry-focus-button zg-btn-white" id="topic_{{topic.id}}" onclick="unfollow_topic_detail('{{topic.id}}', id)">取消关注</a>
+                           class="zg-mr10 zu-entry-focus-button zg-btn-white" id="topic_{{topic.id}}"
+                           onclick="unfollow_topic_detail('{{topic.id}}', id)">取消关注</a>
                         {% endif %}
                         <div class="zm-topic-side-followers-info">
 
-                            <a href="#" style="color: #259;"><strong id="topic_follow_count">{{topic.follow_topics.count()}}</strong></a> 人关注了该话题
+                            <a href="#" style="color: #259;"><strong id="topic_follow_count">{{topic.follow_topics.count()}}</strong></a>
+                            人关注了该话题
 
                         </div>
                     </div>
