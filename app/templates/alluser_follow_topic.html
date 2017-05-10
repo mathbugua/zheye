@@ -82,7 +82,7 @@
             {% endif %}
         </div>
 
-        <a class="zm-list-avatar-medium" href="{{url_for('main.people', username=topic_follow.users.username)}}"><img
+        <a class="zm-list-avatar-medium" href="{{url_for('main.people', username=topic_follow.users.name)}}"><img
                 class="avatar-img-50"
                 {% if topic_follow.users.avatar %}
                 src="data:;base64,{{ base64.b64encode(topic_follow.users.avatar)}}">
@@ -93,7 +93,7 @@
         <div class="zm-list-content-medium">
 
             <h5 class="zm-list-content-title">
-                <a href="{{url_for('main.people', username=topic_follow.users.username)}}" class="zg-link author-link">{{topic_follow.users.username}}</a>
+                <a href="{{url_for('main.people', username=topic_follow.users.username)}}" class="zg-link author-link">{{topic_follow.users.name}}</a>
             </h5>
             <div class="summary-wrapper summary-wrapper--medium">
                 <span class="badge-summary">{{topic_follow.users.short_intr or ""}}</span>

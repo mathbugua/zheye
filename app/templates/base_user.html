@@ -2,6 +2,7 @@
 
 {% block title %}{{user.username}}-者也{% endblock %}
 {% block head %}
+<link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
 {{super()}}
 <script>
     function mover_img(obj) {
@@ -148,8 +149,8 @@
                         <div class="ProfileHeader-content">
                             <div class="ProfileHeader-contentHead">
                                 <h1 class="ProfileHeader-title">
-                                    <span class="ProfileHeader-name">{{user.username}}</span>
-                                    <span class="RichText ProfileHeader-headline">{{user.short_intr}}</span>
+                                    <span class="ProfileHeader-name">{{user.name}}</span>
+                                    <span class="RichText ProfileHeader-headline">{{user.short_intr or ""}}</span>
                                 </h1>
                             </div>
                             <div class="ProfileHeader-contentBody">

@@ -11,7 +11,7 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.main.forms import EditProfileForm
-from app.models.models import User, Follow, TopicCategory, Topic, Question, Answer, Comments
+from app.models.models import User, Follow, TopicCategory, Topic, Question, Answer, Comments, Dynamic
 from . import main
 from app.helpers import constant
 
@@ -27,7 +27,8 @@ def index():
 def people(username):
     """个人资料界面"""
     user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html', user=user, base64=base64)
+    dynamics = Dynamic.search_dynamic(user.id)
+    return render_template('user.html', user=user, base64=base64, dynamics=dynamics)
 
 
 @main.route('/edit-profile', methods=['POST', 'GET'])
@@ -36,7 +37,7 @@ def edit_profile():
     """编辑个人资料"""
     form = EditProfileForm()
     if form.validate_on_submit():
-        current_user.username = form.username.data
+        current_user.name = form.name.data
         current_user.location = form.location.data
         current_user.sex = form.sex.data
         current_user.short_intr = form.short_intr.data
@@ -50,7 +51,7 @@ def edit_profile():
         flash(constant.PROFILE_UPDATE)
         return redirect(url_for('main.people', username=current_user.username))
 
-    form.username.data = current_user.username
+    form.name.data = current_user.name
     form.sex.data = current_user.sex or "man"
     form.short_intr.data = current_user.short_intr
     form.industry.data = current_user.industry
@@ -111,7 +112,8 @@ def followers(username):
         error_out=False)
     follows = [{'user': item.follower}
                for item in pagination.items]
-    return render_template('user_followers.html', user=user,
+    who = u'我' if user == current_user else u'他'
+    return render_template('user_followers.html', user=user, who=who,
                            endpoint='.followers', pagination=pagination,
                            follows=follows, base64=base64)
 
@@ -129,7 +131,8 @@ def following(username):
         error_out=False)
     follows = [{'user': item.followed}
                for item in pagination.items]
-    return render_template('user_followers.html', user=user,
+    who = u'我' if user == current_user else u'他'
+    return render_template('user_following.html', user=user, who=who,
                            endpoint='.following', pagination=pagination,
                            follows=follows, base64=base64)
 
@@ -165,6 +168,14 @@ def answers(username):
 
     return render_template('user_answers.html', user=user, base64=base64,
                            endpoint='.answers', pagination=pagination, items=pagination.items)
+
+
+@main.route('/people/<username>/activities')
+def activities(username):
+    """个人动态界面"""
+    user = User.query.filter_by(username=username).first_or_404()
+    dynamics = Dynamic.search_dynamic(user.id)
+    return render_template('user.html', user=user, base64=base64, dynamics=dynamics)
 
 
 @main.route('/people/images', methods=['POST'])
@@ -265,6 +276,8 @@ def follow_topic(topic_id):
     # 关注话题
     try:
         current_user.follow_topic(topic)
+        current_user.add_dynamic(current_user.id, topic.id,
+                                 "topic")  # 增加关注话题动态记录
         return jsonify(error="")
     except Exception as e:
         return jsonify(error=constant.FAIL)
@@ -297,6 +310,8 @@ def follow_question(question_id):
     # 关注问题
     try:
         current_user.follow_question(question)
+        current_user.add_dynamic(current_user.id, question.id,
+                                 "question")  # 增加关注问题动态记录
         return jsonify(error="")
     except Exception as e:
         return jsonify(error=constant.FAIL)
@@ -354,6 +369,7 @@ def submit_comment():
 @main.route('/topic/<int:id>')
 @login_required
 def topic_detail(id):
+    print Dynamic.query.all()
     """话题详细页面"""
     topic = Topic.query.filter_by(id=id).first()
     if topic:
@@ -383,6 +399,7 @@ def question_follow_all():
 def question_detail(id):
     question = Question.query.filter_by(id=id).first()
     if question:
+        question.ping()    # 增加问题的浏览次数
         return render_template("question_detail.html", question=question, base64=base64)
 
     flash(constant.INVALID_TOPIC)
@@ -422,3 +439,9 @@ def topic_followers(id):
     topic = Topic.query.get_or_404(id)
     return render_template('alluser_follow_topic.html', base64=base64, topic=topic)
 
+
+@main.route('/question/<int:id>/followers')
+def question_followers(id):
+    """显示某个话题的所有关注者"""
+    question = Question.query.get_or_404(id)
+    return render_template('alluser_follow_question.html', base64=base64, question=question)

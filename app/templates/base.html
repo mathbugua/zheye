@@ -333,7 +333,7 @@
         {% if current_user.is_authenticated %}
         <div onmouseover="mOver(this)" onmouseout="mOut(this)" class="top-nav-profile">
             <a href="{{ url_for('main.people', username = current_user.username) }}" class="zu-top-nav-userinfo ">
-                <span class="name">{{current_user.username}}</span>
+                <span class="name">{{current_user.name}}</span>
                 <img class="Avatar"
                      {% if current_user.avatar %}
                      src="data:;base64,{{ base64.b64encode(current_user.avatar)}}">
@@ -347,14 +347,14 @@
                         <i class="zg-icon zg-icon-dd-home"></i>我的主页
                     </a>
                 </li>
-                <li>
-                    <a href="/inbox">
-                        <i class="zg-icon zg-icon-dd-pm"></i>私信
-                        <span id="zh-top-nav-pm-count" class="zu-top-nav-pm-count zg-noti-number"
-                              style="visibility:hidden" data-count="0">
-                        </span>
-                    </a>
-                </li>
+                <!--<li>-->
+                    <!--<a href="/inbox">-->
+                        <!--<i class="zg-icon zg-icon-dd-pm"></i>私信-->
+                        <!--<span id="zh-top-nav-pm-count" class="zu-top-nav-pm-count zg-noti-number"-->
+                              <!--style="visibility:hidden" data-count="0">-->
+                        <!--</span>-->
+                    <!--</a>-->
+                <!--</li>-->
                 <li>
                     <a href="{{url_for('auth.settings')}}">
                         <i class="zg-icon zg-icon-dd-settings"></i>设置
@@ -390,7 +390,8 @@
         <div id="zg-top-nav" class="zu-top-nav">
             <ul class="zu-top-nav-ul zg-clear">
 
-                <li class="zu-top-nav-li current" id="zh-top-nav-home">
+                {% block navi_color %}
+                <li class="zu-top-nav-li" id="zh-top-nav-home">
                     <a class="zu-top-nav-link" href="/" id="zh-top-link-home" data-za-c="view_home"
                        data-za-a="visit_home" data-za-l="top_navigation_home">首页</a>
                 </li>
@@ -408,7 +409,7 @@
                     <a class="zu-top-nav-link" href="javascript:;" id="zh-top-nav-count-wrap" role="button"><span
                             class="mobi-arrow"></span>消息</a>
                 </li>
-
+                {% endblock %}
 
             </ul>
             <div class="zu-top-nav-live zu-noti7-popup zg-r5px no-hovercard" id="zh-top-nav-live-new" role="popup"

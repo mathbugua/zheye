@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 {% block title %}话题动态-者也{% endblock %}
+{% block navi_color %}
+                <li class="zu-top-nav-li" id="zh-top-nav-home">
+                    <a class="zu-top-nav-link" href="/" id="zh-top-link-home" data-za-c="view_home"
+                       data-za-a="visit_home" data-za-l="top_navigation_home">首页</a>
+                </li>
 
+
+                <li class="top-nav-topic-selector zu-top-nav-li current" id="zh-top-nav-topic">
+                    <a class="zu-top-nav-link" href="{{url_for('main.topic')}}" id="top-nav-dd-topic">话题</a>
+                </li>
+
+                <li class="zu-top-nav-li " id="zh-top-nav-explore">
+                    <a class="zu-top-nav-link" href="/#">发现</a>
+                </li>
+
+                <li class="top-nav-noti zu-top-nav-li ">
+                    <a class="zu-top-nav-link" href="javascript:;" id="zh-top-nav-count-wrap" role="button"><span
+                            class="mobi-arrow"></span>消息</a>
+                </li>
+{% endblock %}
 {% block head %}
 {{super()}}
 <link rel="stylesheet" href="{{url_for('static', filename='style/style.css')}}">

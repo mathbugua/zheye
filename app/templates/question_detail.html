@@ -76,16 +76,20 @@
                 <div class="QuestionHeader-follow-status">
                     <div class="QuestionFollowStatus">
                         <div class="NumberBoard QuestionFollowStatus-counts">
-                            <button class="Button NumberBoard-item Button--plain" type="button" style="box-shadow:0;">
+                            <a href="/question/{{question.id}}/followers">
+                            <button class="NumberBoard-item Button--plain" type="button" style="box-shadow:0;text-align: center;">
                                 <div class="NumberBoard-name">关注者</div>
                                 <div id="NumberBoard-value" class="NumberBoard-value">
+
                                     {{question.follow_questions.count()}}
+
                                 </div>
                             </button>
+                                 </a>
                             <div class="NumberBoard-divider"></div>
                             <div class="NumberBoard-item">
                                 <div class="NumberBoard-name">被浏览</div>
-                                <div class="NumberBoard-value">6387</div>
+                                <div class="NumberBoard-value">{{question.views}}</div>
                             </div>
                         </div><!-- react-empty: 88 --></div>
                 </div>
@@ -164,7 +168,7 @@
                                                     <div class="AuthorInfo-head"><span class="UserLink AuthorInfo-name"><div
                                                             class="Popover"><div id="Popover-39170-24086-toggle">
                                                         <a class="UserLink-link"
-                                                           href="{{url_for('main.people', username=answer.users.username)}}">{{answer.users.username}}</a></div>
+                                                           href="{{url_for('main.people', username=answer.users.username)}}">{{answer.users.name}}</a></div>
                                                         <!-- react-empty: 675 --></div></span></div>
                                                     <div class="AuthorInfo-detail">
                                                         <div class="RichText AuthorInfo-badge">
@@ -246,7 +250,7 @@
                                                                 alt="{{comment.comment_user.username}}"></a></div>
                                                             <!-- react-empty: 2768 --></div></span><span
                                                                 class="UserLink"><a class="UserLink-link"
-                                                                                    href="{{url_for('main.people', username=comment.comment_user.username)}}">{{comment.comment_user.username}}</a></span><span
+                                                                                    href="{{url_for('main.people', username=comment.comment_user.username)}}">{{comment.comment_user.name}}</a></span><span
                                                                 class="CommentItem-time">{{comment.content_time}}</span></div>
                                                         <div class="RichText CommentItem-content" style="white-space: initial;">
                                                             {{comment.content_body}}
@@ -298,7 +302,7 @@
                             </span>
                             <div class="AuthorInfo-content">
                                 <div class="AuthorInfo-head"><span class="UserLink AuthorInfo-name">
-                                    {{current_user.username}}</span></div>
+                                    {{current_user.name}}</span></div>
                                 <div class="AuthorInfo-detail">
                                     <div class="AuthorInfo-badge"><span class="RichText AnswerAdd-bio">{{current_user.short_intr or ""}}</span>
                                     </div>

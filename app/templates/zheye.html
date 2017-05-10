@@ -7,6 +7,26 @@
 <script data-main="{{url_for('static', filename='js/main')}}"
         src="{{url_for('static', filename='js/require.js')}}"></script>
 {% endblock %}
+{% block navi_color %}
+<li class="zu-top-nav-li current" id="zh-top-nav-home">
+    <a class="zu-top-nav-link" href="/" id="zh-top-link-home" data-za-c="view_home"
+       data-za-a="visit_home" data-za-l="top_navigation_home">首页</a>
+</li>
+
+
+<li class="top-nav-topic-selector zu-top-nav-li " id="zh-top-nav-topic">
+    <a class="zu-top-nav-link" href="{{url_for('main.topic')}}" id="top-nav-dd-topic">话题</a>
+</li>
+
+<li class="zu-top-nav-li " id="zh-top-nav-explore">
+    <a class="zu-top-nav-link" href="/#">发现</a>
+</li>
+
+<li class="top-nav-noti zu-top-nav-li ">
+    <a class="zu-top-nav-link" href="javascript:;" id="zh-top-nav-count-wrap" role="button"><span
+            class="mobi-arrow"></span>消息</a>
+</li>
+{% endblock %}
 
 {% block body %}
 <div class="HomeEntry">
@@ -20,7 +40,7 @@
     </div>
     <div class="HomeEntry-box">
         <span class="HomeEntry-boxArrow"></span>
-        <ul class="HomeEntry-list" >
+        <ul class="HomeEntry-list">
             <li class="HomeEntry-item" data-toggle="modal" data-target="#myModal">
                 <a href="#" class="HomeEntry-ask js-HomeEntry-ask">
                     <i class="sprite-home-question-off"></i>
@@ -28,7 +48,8 @@
                 </a>
             </li>
             <li class="HomeEntry-item">
-                <a href="{{url_for('main.answer_question')}}" target="_blank" class="HomeEntry-answer js-HomeEntry-answer">
+                <a href="{{url_for('main.answer_question')}}" target="_blank"
+                   class="HomeEntry-answer js-HomeEntry-answer">
                     <i class="sprite-home-answer-off"></i>
                     回答
                 </a>
@@ -88,29 +109,30 @@
                             <!-- <meta itemprop="answer-id" content="59825897">
                             <meta itemprop="answer-url-token" content="163697991"> -->
 
-                                    <!--<div class="zm-item-vote">-->
-                                        <!--<a class="zm-item-vote-count js-expand js-vote-count" href="javascript:;"-->
-                                           <!--data-bind-votecount="">6</a>-->
-                                    <!--</div>-->
+                            <!--<div class="zm-item-vote">-->
+                            <!--<a class="zm-item-vote-count js-expand js-vote-count" href="javascript:;"-->
+                            <!--data-bind-votecount="">6</a>-->
+                            <!--</div>-->
 
-                                    <!--<div class="zm-votebar" data-za-module="VoteBar">-->
-                                        <!--<button class="up" aria-pressed="false" title="赞同">-->
-                                            <!--<i class="icon vote-arrow"></i>-->
-                                            <!--<span class="count">6</span>-->
-                                            <!--<span class="label sr-only">赞同</span>-->
-                                        <!--</button>-->
-                                        <!--<button class="down" aria-pressed="false" title="反对，不会显示你的姓名">-->
-                                            <!--<i class="icon vote-arrow"></i>-->
-                                            <!--<span class="label sr-only">反对，不会显示你的姓名</span>-->
-                                        <!--</button>-->
-                                    <!--</div>-->
+                            <!--<div class="zm-votebar" data-za-module="VoteBar">-->
+                            <!--<button class="up" aria-pressed="false" title="赞同">-->
+                            <!--<i class="icon vote-arrow"></i>-->
+                            <!--<span class="count">6</span>-->
+                            <!--<span class="label sr-only">赞同</span>-->
+                            <!--</button>-->
+                            <!--<button class="down" aria-pressed="false" title="反对，不会显示你的姓名">-->
+                            <!--<i class="icon vote-arrow"></i>-->
+                            <!--<span class="label sr-only">反对，不会显示你的姓名</span>-->
+                            <!--</button>-->
+                            <!--</div>-->
 
 
                             <div class="zm-item-answer-author-info">
 
                             <span class="summary-wrapper">
                             <span class="author-link-line">
-                                <a class="author-link" data-hovercard="p$t$tang-ge-71-52" target="_blank" href="/people/tang-ge-71-52">陈龙</a>
+                                <a class="author-link" data-hovercard="p$t$tang-ge-71-52" target="_blank"
+                                   href="/people/tang-ge-71-52">陈龙</a>
                             </span>
                             <span title="神奇的八卦IT人" class="bio">神奇的八卦IT人</span>
                             </span>
@@ -119,8 +141,8 @@
                             <!--<div class="zm-item-vote-info" data-votecount="6" data-za-module="VoteInfo">-->
 
 
-                                <!--<span class="voters text"><a href="#" class="more text"><span-->
-                                        <!--class="js-voteCount">6</span>&nbsp;人赞同</a></span>-->
+                            <!--<span class="voters text"><a href="#" class="more text"><span-->
+                            <!--class="js-voteCount">6</span>&nbsp;人赞同</a></span>-->
 
 
                             <!--</div>-->
@@ -148,7 +170,7 @@
                                                     but ... I think I've made my point.
                                                     冬季的时候，这个地方离电暖器很近、最暖和，但是又不会近到让你感觉热、流汗；夏天的时候，这里又可以吹由那两扇窗户吹进来的徐徐微风；
                                                     坐这的角度可以让我同时看电视又同时和他人聊天而不受影响，恰好不会太远也不会产生视觉上的错觉。</p>
-                                                 <p>In the winter that seat is close enough to the radiator to remain
+                                                <p>In the winter that seat is close enough to the radiator to remain
                                                     warm and yet not so close as to cause perspiration. In the summer
                                                     it's directly in the path of a cross breeze created by opening
                                                     windows there, and there.
@@ -158,7 +180,7 @@
                                                     but ... I think I've made my point.
                                                     冬季的时候，这个地方离电暖器很近、最暖和，但是又不会近到让你感觉热、流汗；夏天的时候，这里又可以吹由那两扇窗户吹进来的徐徐微风；
                                                     坐这的角度可以让我同时看电视又同时和他人聊天而不受影响，恰好不会太远也不会产生视觉上的错觉。</p>
-                                                 <p>In the winter that seat is close enough to the radiator to remain
+                                                <p>In the winter that seat is close enough to the radiator to remain
                                                     warm and yet not so close as to cause perspiration. In the summer
                                                     it's directly in the path of a cross breeze created by opening
                                                     windows there, and there.
@@ -168,7 +190,7 @@
                                                     but ... I think I've made my point.
                                                     冬季的时候，这个地方离电暖器很近、最暖和，但是又不会近到让你感觉热、流汗；夏天的时候，这里又可以吹由那两扇窗户吹进来的徐徐微风；
                                                     坐这的角度可以让我同时看电视又同时和他人聊天而不受影响，恰好不会太远也不会产生视觉上的错觉。</p>
-                                                 <p>In the winter that seat is close enough to the radiator to remain
+                                                <p>In the winter that seat is close enough to the radiator to remain
                                                     warm and yet not so close as to cause perspiration. In the summer
                                                     it's directly in the path of a cross breeze created by opening
                                                     windows there, and there.

@@ -5,7 +5,7 @@ from wtforms.validators import Length, Required
 
 
 class EditProfileForm(Form):
-    username = StringField(u'用户名', validators=[Required(), Length(0, 64)])
+    name = StringField(u'姓名', validators=[Required(), Length(0, 64)])
     sex = RadioField(u'性别', choices=[('man', u'男'), ('woman', u'女')], default='man')
     location = StringField(u'居住地', validators=[Length(0, 64)])
     short_intr = StringField(u'一句话介绍', validators=[Length(0, 30)])

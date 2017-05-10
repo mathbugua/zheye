@@ -1,25 +1,90 @@
 {% extends "base_user.html" %}
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
+{% endblock %}
 {% block person_data %}
 <div class="Card ProfileMain">
     <div class="ProfileMain-header">
         <ul role="tablist" class="Tabs ProfileMain-tabs">
             <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-activities">
-                <a class="Tabs-link is-active" href="/people/chen_long/activities" style="color: #0f88eb;">动态</a>
+                <a class="Tabs-link" href="/people/{{user.username}}/activities" style="color: #0f88eb;">动态</a>
             </li>
             <li role="tab" class="Tabs-item" aria-controls="Profile-answers">
-                <a class="Tabs-link" href="#">
-                    <!-- react-text: 124 -->回答<!-- /react-text --><span class="Tabs-meta">1</span>
+                <a class="Tabs-link" href="/people/{{user.username}}/answers">
+                    <!-- react-text: 124 -->回答<!-- /react-text --><span
+                        class="Tabs-meta"> {{user.answers.count()}}</span>
                 </a>
             </li>
-            <li role="tab" class="Tabs-item" aria-controls="Profile-asks">
-                <a class="Tabs-link" href="#">
-                    <!-- react-text: 132 -->提问<!-- /react-text --><span class="Tabs-meta">1</span>
+            <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-asks">
+                <a class="Tabs-link" href="/people/{{user.username}}/asks">
+                    <!-- react-text: 132 -->提问<!-- /react-text --><span
+                        class="Tabs-meta"> {{user.questions.count()}}</span>
                 </a>
             </li>
             <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-following">
                 <a class="Tabs-link" href="/people/{{user.username}}/following">关注</a>
             </li>
         </ul>
+    </div>
+    <div class="List ProfileActivities">
+        <div class="List-header">
+            <h4 class="List-headerText"><span>我的动态</span></h4>
+            <div class="List-headerOptions"></div>
+        </div>
+        <div>
+            {% for dynamic in dynamics %}
+            {% if dynamic[0] == "question" %}
+            <div class="List-item">
+                <div class="List-itemMeta">
+                    <div class="ActivityItem-meta"><span class="ActivityItem-metaTitle"><!-- react-text: 465 -->
+                        <!-- /react-text --><!-- react-text: 466 -->关注了问题<!-- /react-text --></span><span>{{dynamic[2]}}</span>
+                    </div>
+                </div>
+                <div class="ContentItem" data-za-module="QuestionItem">
+                    <h4 class="ContentItem-title">
+                        <div class="QuestionItem-title"><a href="{{url_for('main.question_detail', id=dynamic[1].id)}}" target="_blank">{{dynamic[1].question_name}}？</a></div>
+                    </h4><!-- react-empty: 472 --></div>
+            </div>
+            {% else %}
+            <div class="List-item">
+                <div class="List-itemMeta">
+                    <div class="ActivityItem-meta"><span class="ActivityItem-metaTitle"><!-- react-text: 480 -->
+                        <!-- /react-text --><!-- react-text: 481 -->关注了话题<!-- /react-text --></span><span>{{dynamic[2]}}</span>
+                    </div>
+                </div>
+                <div class="ContentItem" data-za-module="TopicItem">
+                    <div class="ContentItem-main">
+                        <div class="ContentItem-image"><a class="TopicLink" href="/topic/19551563" target="_blank">
+                            <div class="Popover">
+                                {% if dynamic[1].topic_avatar %}
+                                <div id="Popover-87320-54637-toggle" aria-haspopup="true" aria-expanded="false"
+                                     aria-owns="Popover-87320-54637-content"><img
+                                        class="Avatar Avatar--large TopicLink-avatar" width="60" height="60"
+                                        src="data:;base64,{{ base64.b64encode(dynamic[1].topic_avatar)}}"
+                                         alt=""></div>
+                                {% endif %}
+                                <!-- react-empty: 490 --></div>
+                        </a></div>
+                        <div class="ContentItem-head">
+                            <h4 class="ContentItem-title"><a class="TopicLink" href="{{url_for('main.topic_detail', id=dynamic[1].id)}}" target="_blank">
+                                <div class="Popover">
+                                    <div id="Popover-87321-44006-toggle" aria-haspopup="true" aria-expanded="false"
+                                         aria-owns="Popover-87321-44006-content">{{dynamic[1].topic_name}}
+                                    </div><!-- react-empty: 496 --></div>
+                            </a></h4>
+                            <div class="ContentItem-meta">
+                                <div class="TopicItem-meta">
+                                   {{dynamic[1].topic_desc}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -61,7 +61,7 @@ class Comments(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     answer_id = db.Column(db.Integer, db.ForeignKey("answer.id"))
-    content_body = db.Column(db.String(200), nullable=False)
+    content_body = db.Column(db.String(2000), nullable=False)
     content_time = db.Column(db.DateTime(), default=datetime.utcnow)
     comment_type = db.Column(db.String(64), default='comment')
     reply_to = db.Column(db.Integer, db.ForeignKey("users.id"))
@@ -106,6 +106,7 @@ class User(db.Model, UserMixin):
     school = db.Column(db.String(64))
     discipline = db.Column(db.String(64))
     username = db.Column(db.String(30), nullable=False)
+    name = db.Column(db.String(30), nullable=False)   # 姓名字段
     password_hash = db.Column(db.String(128))
     avatar = db.Column(db.LargeBinary(length=2048))
     confirmed = db.Column(db.Boolean, default=True)
@@ -298,6 +299,66 @@ class User(db.Model, UserMixin):
         return self.answers.filter_by(
             user_id=self.id, question_id=question_id).first() is not None
 
+    def add_dynamic(self, user_id, t_q_id, type):
+        """添加个人动态记录"""
+        dynamic = Dynamic(
+            user_id=user_id,
+            t_q_id=t_q_id,
+            type=type
+        )
+        db.session.add(dynamic)
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+
+
+class Dynamic(db.Model):
+    """用户个人动态,存放用户关注的话题,问题记录"""
+    __tablename__ = "dynamic"
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
+    t_q_id = db.Column(db.Integer)   # 存放话题或问题id
+    dynamic_time = db.Column(db.DateTime(), default=datetime.utcnow)
+    type = db.Column(db.String(20))  # type = "question" or "topic"
+
+    @staticmethod
+    def search_dynamic(user_id):
+        """查询个人动态以备显示"""
+        dynamic_note_list = list()
+        dynamic = Dynamic.query.filter_by(user_id=user_id).order_by(Dynamic.dynamic_time.desc()).all()
+        for item in dynamic:
+            stored = []
+            if item.type == "question":
+                question = Question.query.filter_by(id=item.t_q_id).first()
+                if question:
+                    stored.append("question")
+                    stored.append(question)
+                    stored.append(item.dynamic_time)
+                    dynamic_note_list.append(stored)
+            else:
+                topic = Topic.query.filter_by(id=item.t_q_id).first()
+                if topic:
+                    stored.append("topic")
+                    stored.append(topic)
+                    stored.append(item.dynamic_time)
+                    dynamic_note_list.append(stored)
+        return dynamic_note_list    # 返回一个嵌套列表[["type", 对象, "time"]]
+
+
+class FriendUpdates(db.Model):
+    """
+    记录关注的人的动态,以供在首页进行展示:
+    type: "关注用户", "关注话题", "关注问题", "回答了问题"
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    follower_id = db.Column(db.Integer)  # 关注者
+    followed_id = db.Column(db.Integer)  # 被关注者,即记录的发生者
+    target = db.Column(db.Integer)   # 操作的目标, 值为"用户id" or "话题id" or "问题id" or "回答id"
+    type = db.Column(db.String(20))  # type = "follow_user" or "follow_topic" or "follow_ques" or "answer"
+    update_time = db.Column(db.DateTime(), default=datetime.utcnow)
+    show = db.Column(db.Boolean, default=False)   # 是否已经被展示,默认为否
+
 
 class TopicCategory(db.Model):
     """话题类别"""
@@ -311,8 +372,10 @@ class TopicCategory(db.Model):
     def insert_category():
         for i in range(15):
             cate_name = "topic" + str(i)
+            cete_desc = "cete_test" + str(i)
             topic_cate = TopicCategory(
-                category_name=cate_name
+                category_name=cate_name,
+                category_desc=cete_desc
             )
             db.session.add(topic_cate)
         db.session.commit()
@@ -323,6 +386,7 @@ class Topic(db.Model):
     __tablename__ = "topic"
     id = db.Column(db.Integer, primary_key=True)
     topic_name = db.Column(db.String(30), nullable=False)
+    topic_avatar = db.Column(db.LargeBinary(length=2048))
     topic_desc = db.Column(db.String(50))
     category_id = db.Column(db.Integer, db.ForeignKey("topiccate.id"))
     follow_topics = db.relationship("FollowTopic", backref="topic",
@@ -359,33 +423,39 @@ class Topic(db.Model):
     def insert_topic():
         topic1 = Topic(
             topic_name=u"单机",
-            category_id=1
+            category_id=1,
+            topic_desc=u"测试话题描述1"
         )
         db.session.add(topic1)
         topic2 = Topic(
             topic_name=u"网游",
-            category_id=1
+            category_id=1,
+            topic_desc=u"测试话题描述2"
         )
         db.session.add(topic2)
         topic3 = Topic(
-                    topic_name=u"多人游戏",
-                    category_id=1
+            topic_name=u"多人游戏",
+            category_id=1,
+            topic_desc=u"测试话题描述3"
                 )
         db.session.add(topic3)
 
         topic4 = Topic(
             topic_name=u"饮食",
-            category_id=2
+            category_id=2,
+            topic_desc=u"测试话题描述4"
         )
         db.session.add(topic4)
         topic5 = Topic(
             topic_name=u"美食",
-            category_id=2
+            category_id=2,
+            topic_desc=u"测试话题描述5"
         )
         db.session.add(topic5)
         topic6 = Topic(
             topic_name=u"烹饪",
-            category_id=2
+            category_id=2,
+            topic_desc=u"测试话题描述6"
         )
         db.session.add(topic6)
         db.session.commit()
@@ -410,6 +480,7 @@ class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_name = db.Column(db.String(30), nullable=False)
     question_desc = db.Column(db.String(500))
+    views = db.Column(db.Integer, default=0)  # 问题被浏览次数,默认为0次.
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     question_time = db.Column(db.DateTime(), default=datetime.utcnow)
     question_topic = db.relationship("QuestionTopic", backref="question")
@@ -422,6 +493,15 @@ class Question(db.Model):
                                        lazy='dynamic',
                                        cascade='all, delete-orphan'
                                        )
+
+    def ping(self):
+        """问题被浏览的次数"""
+        self.views += 1
+        db.session.add(self)
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
 
     @staticmethod
     def add_question(question_name, question_desc, topic, current_user_id):
@@ -454,7 +534,7 @@ class Question(db.Model):
                 db.session.commit()
                 return False
 
-        return question               # 提交成功返回问题
+        return question     # 提交成功返回问题
 
 
 class QuestionTopic(db.Model):
@@ -473,7 +553,7 @@ class Answer(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"))
     question_id = db.Column(db.Integer, db.ForeignKey("question.id"))
     timestamp = db.Column(db.DateTime(), default=datetime.utcnow)
-    answer_body = db.Column(db.String(1000), nullable=False)
+    answer_body = db.Column(db.String(2000), nullable=False)
     comments = db.relationship("Comments", backref="answer",
                                lazy='dynamic',
                                cascade='all, delete-orphan'

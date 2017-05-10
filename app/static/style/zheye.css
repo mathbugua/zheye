@@ -1360,7 +1360,7 @@ textarea.zg-form-text-input, .zg-form-text-input > textarea {
 .icon, .tr-icon, .tr-inline-icon, .goog-option-selected .goog-menuitem-checkbox, .zu-edit-button-icon, .zu-top-live-icon, .zh-global-backtotop, .zh-hovercard-arrow, .modal-dialog-title-close, .icon-external, .zg-icon, .zm-profile-icon, .zm-profile-header-icon, .icon-info, .icon-green-check, .icon-big-arrow-left, .icon-big-arrow-right, .icon-weibo, .icon-qzone, .icon-weibo-corner, .icon-big-white-sina, .icon-big-white-qq, .icon-big-white-mail, .icon-delete, .icon-edit {
     width: 16px;
     height: 16px;
-    /*background-image: url(/static/images/sprites-1.9.2.4c54885a.png);*/
+    background-image: url(/static/images/sprites-1.9.2.4c54885a.png);
     background-repeat: no-repeat;
     display: inline-block;
     vertical-align: middle
@@ -1701,7 +1701,7 @@ i[class^=z-icon-], i[class*=" z-icon-"] {
     *margin-right: .3em;
     line-height: 10px;
     vertical-align: 0;
-    /*background-image: url(/static/images/sprites-1.9.2.4c54885a.png);*/
+    background-image: url(/static/images/sprites-1.9.2.4c54885a.png);
     background-repeat: no-repeat;
     margin-right: 5px
 }
@@ -2363,7 +2363,7 @@ html.no-touchevents .tab-navs .tab-nav > a:hover {
 }
 
 .sprite-global, [class*=sprite-global-] {
-    /*background-image: url(/static/images/sprites.auto.2bb79a7e.png);*/
+    background-image: url(/static/images/sprites.auto.2bb79a7e.png);
     background-repeat: no-repeat
 }
 
@@ -6336,7 +6336,7 @@ html.no-touchevents .feed-source a:hover {
     text-indent: -9999px;
     width: 20px;
     height: 20px;
-    /*background-image: url(/static/images/sprites-1.9.2.4c54885a.png);*/
+    background-image: url(/static/images/sprites-1.9.2.4c54885a.png);
     background-repeat: no-repeat;
     background-position: -261px -62px
 }
@@ -10487,7 +10487,7 @@ a > .invisible {
     float: left;
     width: 61px;
     height: 100%;
-    /*background-image: url(/static/images/new_logo.ede2316d.png);*/
+    background-image: url(/static/images/new_logo.ede2316d.png);
     background-repeat: no-repeat;
     background-position: 0 8px;
     text-indent: -9999px;

@@ -1,0 +1,12 @@
+{% extends "user_follow_base.html" %}
+{% block follow %}
+<div class="List-header">
+    <h5 class="List-headerText">
+        <div class="SubTabs"><a class="SubTabs-item" style="color: #337ab7;">
+            <!-- react-text: 1363 -->{{who}}<!-- /react-text --><!-- react-text: 1364 -->关注的人<!-- /react-text --></a>
+            <a class="SubTabs-item" href="/people/{{user.username}}/followers"><!-- react-text: 1366 -->关注<!-- /react-text --><!-- react-text: 1367 -->{{who}}<!-- /react-text --><!-- react-text: 1368 -->的人<!-- /react-text --></a>
+        </div>
+    </h5>
+    <div class="List-headerOptions"></div>
+</div>
+{% endblock %}

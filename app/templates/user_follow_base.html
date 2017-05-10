@@ -1,0 +1,127 @@
+{% extends "base_user.html" %}
+{% import "_macros.html" as macros %}
+{% block head %}
+{{super()}}
+<link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
+
+{% endblock %}
+{% block person_data %}
+<div class="Card ProfileMain">
+    <div class="ProfileMain-header">
+        <ul role="tablist" class="Tabs ProfileMain-tabs">
+            <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-activities">
+                <a class="Tabs-link" href="/people/{{user.username}}/activities">动态</a>
+            </li>
+            <li role="tab" class="Tabs-item" aria-controls="Profile-answers">
+                <a class="Tabs-link" href="/people/{{user.username}}/answers">
+                    <!-- react-text: 124 -->回答<!-- /react-text --><span class="Tabs-meta"> {{user.answers.count()}}</span>
+                </a>
+            </li>
+            <li role="tab" class="Tabs-item" aria-controls="Profile-asks">
+                <a class="Tabs-link" href="/people/{{user.username}}/asks">
+                    <!-- react-text: 132 -->提问<!-- /react-text --><span class="Tabs-meta"> {{user.questions.count()}}</span>
+                </a>
+            </li>
+            <li role="tab" class="Tabs-item Tabs-item--noMeta" aria-controls="Profile-following">
+                <a class="Tabs-link" href="/people/{{user.username}}/following" style="color: #0f88eb;">关注</a>
+            </li>
+        </ul>
+
+
+    </div>
+
+    <div class="List" id="Profile-following">
+        {% block follow %}{% endblock %}
+        <div>
+            {% for follow in follows %}
+            <div class="List-item">
+                <div class="ContentItem" data-za-module="UserItem"
+                     data-za-module-info="{&quot;card&quot;:{&quot;content&quot;:{&quot;type&quot;:&quot;User&quot;,&quot;member_hash_id&quot;:&quot;720c6ef165a77d39a9452c8977729518&quot;,&quot;follower_num&quot;:137251}}}">
+                    <div class="ContentItem-main">
+                        <div class="ContentItem-image">
+                            <span class="UserLink UserItem-avatar">
+                                <div class="Popover">
+                                    <div id="Popover-30259-33431-toggle" aria-haspopup="true" aria-expanded="false"
+                                         aria-owns="Popover-30259-33431-content">
+                                    <a class="UserLink-link" target="_blank"
+                                       href="{{url_for('main.people', username=follow.user.username)}}">
+                                    <img class="Avatar Avatar--large UserLink-avatar" width="60" height="60"
+                                         {% if follow.user.avatar %}
+                                         src="data:;base64,{{ base64.b64encode(follow.user.avatar)}}">
+                                            {% else %}
+                                            src="{{url_for('static', filename='images/default.jpg')}}">
+                                            {% endif %}
+                                    </a>
+                                    </div>
+                                </div>
+                            </span>
+                        </div>
+                        <div class="ContentItem-head">
+                            <h2 class="ContentItem-title">
+                                <div class="UserItem-title">
+                                <span class="UserLink UserItem-name">
+                                    <div class="Popover">
+                                        <div id="Popover-30260-39178-toggle" aria-haspopup="true" aria-expanded="false"
+                                             aria-owns="Popover-30260-39178-content">
+                                            <a class="UserLink-link" target="_blank"
+                                               href="{{ url_for('main.people', username = follow.user.username) }}">{{ follow.user.username }}</a>
+                                        </div><!-- react-empty: 181 --></div>
+                                   </span><!-- react-empty: 186 -->
+                                </div>
+                            </h2>
+                            <div class="ContentItem-meta">
+                                <div>
+                                    <div>{{follow.user.short_intr or ""}}</div>
+                                    <div class="ContentItem-status">
+                                        <span class="ContentItem-statusItem">0 回答</span>
+                                        <span class="ContentItem-statusItem">0 文章</span><span
+                                            class="ContentItem-statusItem">{{follow.user.followers.count()}} 关注者</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if current_user != follow.user %}
+                        {% if current_user.is_anonymous or not current_user.is_following(follow.user) %}
+                            {% if user == current_user %}
+                            <button id="follow_user_{{follow.user.id}}" onclick="follow_user('{{follow.user.username}}', id, 'follow_list_user')"
+                                {% else %}
+                                    <button id="follow_user_{{follow.user.id}}" onclick="follow_user('{{follow.user.username}}', id, 'follow_list')"
+                                            {% endif %}
+                                    class="Button FollowButton Button--primary Button--blue" style="width: 108px;height: 34px;" type="button">
+                                <svg viewBox="0 0 12 12" class="Icon FollowButton-icon Icon--plus" width="12"
+                                     height="16" aria-hidden="true" style="height: 16px; width: 12px;">
+                                    <title></title>
+                                    <g>
+                                        <path d="M6.994 4.994s-.008-3.593 0-4C6.97-.33 4.97-.33 4.996.994c-.025 1.275 0 4 0 4H1C-.334 5-.334 7 1 7c1.332 0 3.996-.006 3.996-.006v4c0 1.346 2.004 1.346 1.998 0-.006-1.347 0-4 0-4S9.658 7 10.997 7c1.338 0 1.338-2-.007-2.006H6.994z">
+
+                                        </path>
+                                    </g>
+                                </svg>
+                                关注
+                            </button>
+                        {% else %}
+                        {% if user == current_user %}
+                            <button id="follow_user_{{follow.user.id}}" onclick="unfollow_user('{{follow.user.username}}', id, 'follow_list_user')" class="Button FollowButton Button--primary Button--grey" style="width: 108px;height: 34px;" type="button">
+                                取消关注
+                            </button>
+                        {% else %}
+                        <button id="follow_user_{{follow.user.id}}" onclick="unfollow_user('{{follow.user.username}}', id, 'follow_list')" class="Button FollowButton Button--primary Button--grey" style="width: 108px;height: 34px;" type="button">
+                                取消关注
+                            </button>
+                        {% endif %}
+                        {% endif %}
+                        {% endif %}
+
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="pagination">
+        {{ macros.pagination_widget(pagination, endpoint, username = user.username) }}
+    </div>
+</div>
+{% endblock %}

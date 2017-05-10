@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}关注[{{question.question_name}}]问题的人-者也{% endblock %}
+{% block head %}
+{{super()}}
+<script>
+    //    关注,取消关注某人
+    function question_follow_user(user_name, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/follow/' + user_name,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a id=\"" + id + "\" href=\"#\" class=\"zg-btn zg-btn-unfollow\" onclick=\"question_unfollow_user(" + "'" + user_name.toString() + "'" + "," + "'" + id + "'" + ")\">取消关注</a>"
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+
+            }
+        })
+
+    }
+    function question_unfollow_user(user_name, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/unfollow/' + user_name,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a id=\"" + id + "\" href=\"#\" class=\"zg-btn zg-btn-follow\" onclick=\"question_follow_user(" + "'" + user_name.toString() + "'" + "," + "'" + id + "'" + ")\">关注</a>"
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+            }
+        })
+
+    }
+</script>
+{% endblock %}
+{% block body %}
+
+<div class="topic-info">
+    <div class="" id="zh-topic-title">
+        <h4 class="zm-editable-content" data-disabled="1"><a href="{{url_for('main.question_detail', id=question.id)}}">{{question.question_name}}?</a></h4>
+    </div>
+    <div class="zm-topic-topbar">
+
+
+    </div>
+</div>
+
+<div>
+    {% for topic_follow in question.follow_questions %}
+    <div class="zm-person-item">
+        <div class="zg-right">
+            {% if topic_follow.users == current_user %}
+
+            {% else %}
+            {% if not current_user.is_following(topic_follow.users) %}
+            <a href="#" class="zg-btn zg-btn-follow" id="zg-btn_{{topic_follow.users.id}}"
+               onclick="question_follow_user('{{topic_follow.users.username}}', id)">关注</a>
+            {% else %}
+            <a href="#" class="zg-btn zg-btn-unfollow" id="zg-btn_{{topic_follow.users.id}}"
+               onclick="question_unfollow_user('{{topic_follow.users.username}}', id)">取消关注</a>
+            {% endif %}
+            {% endif %}
+        </div>
+
+        <a class="zm-list-avatar-medium" href="{{url_for('main.people', username=topic_follow.users.username)}}"><img
+                class="avatar-img-50"
+                {% if topic_follow.users.avatar %}
+                src="data:;base64,{{ base64.b64encode(topic_follow.users.avatar)}}">
+            {% else %}
+            src="{{url_for('static', filename='images/default.jpg')}}">
+            {% endif %}</a>
+
+        <div class="zm-list-content-medium">
+
+            <h5 class="zm-list-content-title">
+                <a href="{{url_for('main.people', username=topic_follow.users.username)}}" class="zg-link author-link">{{topic_follow.users.name}}</a>
+            </h5>
+            <div class="summary-wrapper summary-wrapper--medium">
+                <span class="badge-summary">{{topic_follow.users.short_intr or ""}}</span>
+            </div>
+            <div class="zg-gray-normal">
+                <a href="/people/{{topic_follow.users.username}}/answers" class="zg-link-gray-normal">回答了
+                    {{topic_follow.users.answers.count()}} 个问题</a>
+            </div>
+
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

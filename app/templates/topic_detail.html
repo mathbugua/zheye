@@ -22,7 +22,7 @@
         <div class="topic-name zm-editable-status-normal" id="zh-topic-title">
             <h4 class="zm-editable-content" data-disabled="1">{{topic.topic_name}}</h4>
         </div>
-        <div class="zm-topic-topbar">
+        <div class="zm-topic-topbar" style="margin-top: 45px;">
             <div class="zm-topic-topbar-nav clearfix">
             </div>
         </div>
@@ -34,11 +34,11 @@
                 <div class="feed-item feed-item-hook">
                     <div class="feed-main">
                         <div class="feed-content">
-                            <h5><a class="question_link"
+                            <h4><a class="question_link" style="color: #337ab7;"
                                    href="{{url_for('main.question_detail', id=question_answer[0].id)}}" target="_blank">
                                 {{question_answer[0].question_name}}?
                                 <!--{{max}}?-->
-                            </a></h5>
+                            </a></h4>
                             {% if question_answer[1] %}
                             <div class="expandable entry-body">
                                 <div class="zm-item-answer-author-info">
