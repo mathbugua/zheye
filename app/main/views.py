@@ -11,7 +11,7 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.main.forms import EditProfileForm
-from app.models.models import User, Follow, TopicCategory, Topic, Question, Answer, Comments, Dynamic
+from app.models.models import User, Follow, TopicCategory, Topic, Question, Answer, Comments, Dynamic, FriendUpdates
 from . import main
 from app.helpers import constant
 
@@ -20,7 +20,8 @@ from app.helpers import constant
 @login_required
 def index():
     topic_all = Topic.query.filter_by().all()
-    return render_template("zheye.html", user=current_user, base64=base64, topic_all=topic_all)
+    return render_template("zheye.html", user=current_user, base64=base64,
+                           topic_all=topic_all, index_show=current_user.current_user_index())
 
 
 @main.route('/people/<username>')
@@ -79,6 +80,7 @@ def follow(username):
     except Exception as e:
         return jsonify(constant.FAIL)
 
+    current_user.notify_follower(user.id, "follow_user")
     return jsonify(error="")
 
 
@@ -276,11 +278,13 @@ def follow_topic(topic_id):
     # 关注话题
     try:
         current_user.follow_topic(topic)
-        current_user.add_dynamic(current_user.id, topic.id,
-                                 "topic")  # 增加关注话题动态记录
-        return jsonify(error="")
     except Exception as e:
         return jsonify(error=constant.FAIL)
+
+    current_user.add_dynamic(current_user.id, topic.id,
+                             "topic")  # 增加关注话题动态记录
+    current_user.notify_follower(topic.id, "follow_topic")
+    return jsonify(error="")
 
 
 @main.route('/unfollow_topic/<topic_id>')
@@ -310,11 +314,13 @@ def follow_question(question_id):
     # 关注问题
     try:
         current_user.follow_question(question)
-        current_user.add_dynamic(current_user.id, question.id,
-                                 "question")  # 增加关注问题动态记录
-        return jsonify(error="")
     except Exception as e:
         return jsonify(error=constant.FAIL)
+
+    current_user.add_dynamic(current_user.id, question.id,
+                             "question")  # 增加关注问题动态记录
+    current_user.notify_follower(question.id, "follow_ques")
+    return jsonify(error="")
 
 
 @main.route('/unfollow_question/<question_id>')
@@ -348,6 +354,7 @@ def submit_question():
         return jsonify(error=constant.FAIL)
 
     current_user.follow_question(result)   # 提问者默认关注提出的问题
+    current_user.notify_follower(result.id, "ask")
     return jsonify(result=result.id, error="")
 
 
@@ -417,6 +424,8 @@ def answer_submit():
     flag = Answer.answer_question(current_user.id, question_id, answer_body)
     if not flag:
         flash(constant.FAIL)
+    else:
+        current_user.notify_follower(flag.id, "answer")
     return redirect(url_for('main.question_detail', id=question_id))
 
 

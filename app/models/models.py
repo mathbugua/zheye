@@ -9,6 +9,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from app import db, login_manager
+from .base_model import BaseOperateModel
 
 
 class Permission:
@@ -20,7 +21,7 @@ class Permission:
     ADMINISTER = 0x08
 
 
-class Role(db.Model):
+class Role(db.Model, BaseOperateModel):
     """角色"""
     __tablename__ = "roles"
     id = db.Column(db.Integer, primary_key=True)
@@ -55,7 +56,7 @@ class Role(db.Model):
         return "<Role %r>" % self.name
 
 
-class Comments(db.Model):
+class Comments(db.Model, BaseOperateModel):
     """评论回答"""
     __tablename__ = "comments"
     id = db.Column(db.Integer, primary_key=True)
@@ -83,7 +84,7 @@ class Comments(db.Model):
             return False
 
 
-class Follow(db.Model):
+class Follow(db.Model, BaseOperateModel):
     __tablename__ = 'follows'
     # 关注者
     follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
@@ -93,7 +94,7 @@ class Follow(db.Model):
                             primary_key=True)
 
 
-class User(db.Model, UserMixin):
+class User(db.Model, BaseOperateModel, UserMixin):
     """用户信息"""
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -312,8 +313,51 @@ class User(db.Model, UserMixin):
         except Exception as e:
             db.session.rollback()
 
+    def notify_follower(self, target_id, operate_type):
+        """把当前用户的动态通知给他的关注者"""
+        for user in self.followers.all():  # 遍历当前用户的所有关注者
+            self.notify_message(user.follower.id, self.id,
+                                target_id, operate_type)
 
-class Dynamic(db.Model):
+    def notify_message(self, follower_id, followed_id,
+                       target_id, operate_type):
+        """记录添加到数据库"""
+        update = FriendUpdates(
+            follower_id=follower_id,
+            followed_id=followed_id,
+            target=target_id,
+            type=operate_type
+        )
+        db.session.add(update)
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+
+    def current_user_index(self):
+        """
+        当前用户的首页数据展示;
+            - 关注的用户的动态
+            - 关注的话题的下问题的展示
+        """
+        index_show = list()    # 存储首页显示的数据
+        # 存储关注的话题下的问题及优秀回答
+        for topic in self.follow_topics.all():
+            questions_excellans = topic.topic.questions_excellans()
+            # 添加内容的类型
+            [questions_excellan.append("current_user_follow") for questions_excellan in questions_excellans]
+            if questions_excellans:
+                index_show.extend(questions_excellans)
+
+        # 存储关注的用户的动态
+        search_notes = FriendUpdates.search_notes(self.id)
+        if search_notes:
+            index_show.extend(search_notes)
+
+        return sorted(index_show)
+
+
+class Dynamic(db.Model, BaseOperateModel):
     """用户个人动态,存放用户关注的话题,问题记录"""
     __tablename__ = "dynamic"
     id = db.Column(db.Integer, primary_key=True)
@@ -346,21 +390,46 @@ class Dynamic(db.Model):
         return dynamic_note_list    # 返回一个嵌套列表[["type", 对象, "time"]]
 
 
-class FriendUpdates(db.Model):
+class FriendUpdates(db.Model, BaseOperateModel):
     """
     记录关注的人的动态,以供在首页进行展示:
-    type: "关注用户", "关注话题", "关注问题", "回答了问题"
+    type: "关注用户", "关注话题", "关注问题", "回答了问题","提问"
     """
     id = db.Column(db.Integer, primary_key=True)
     follower_id = db.Column(db.Integer)  # 关注者
     followed_id = db.Column(db.Integer)  # 被关注者,即记录的发生者
     target = db.Column(db.Integer)   # 操作的目标, 值为"用户id" or "话题id" or "问题id" or "回答id"
-    type = db.Column(db.String(20))  # type = "follow_user" or "follow_topic" or "follow_ques" or "answer"
+    type = db.Column(db.String(20))  # type = "follow_user" or "follow_topic" or "follow_ques" or "answer" or "ask"
     update_time = db.Column(db.DateTime(), default=datetime.utcnow)
     show = db.Column(db.Boolean, default=False)   # 是否已经被展示,默认为否
 
+    @staticmethod
+    def search_notes(id):
+        follow_user_activity = list()
+        updates = FriendUpdates.query.filter_by(follower_id=id).all()
+        for update in updates:
+            activity = list()
+            activity.append(User.query.filter_by(id=update.followed_id).first())
+            result = None
+            if update.type == "follow_user":
+                result = User.query.filter_by(id=update.target).first()
+            if update.type == "follow_topic":
+                result = Topic.query.filter_by(id=update.target).first()
+            if update.type == "follow_ques" or update.type == "ask":
+                result = Question.query.filter_by(id=update.target).first()
+            if update.type == "answer":
+                result = Answer.query.filter_by(id=update.target).first()
 
-class TopicCategory(db.Model):
+            if not result:
+                continue
+            activity.append(result)
+            activity.append(update.update_time)
+            activity.append(update.type)
+            follow_user_activity.append(activity)
+        return follow_user_activity
+
+
+class TopicCategory(db.Model, BaseOperateModel):
     """话题类别"""
     __tablename__ = "topiccate"
     id = db.Column(db.Integer, primary_key=True)
@@ -381,7 +450,7 @@ class TopicCategory(db.Model):
         db.session.commit()
 
 
-class Topic(db.Model):
+class Topic(db.Model, BaseOperateModel):
     """话题"""
     __tablename__ = "topic"
     id = db.Column(db.Integer, primary_key=True)
@@ -397,7 +466,7 @@ class Topic(db.Model):
 
     def questions_excellans(self):
         """
-        列举话题本身下的所有话题，
+        列举话题本身下的所有问题，
          以及最优回答，即评论最多的。
         """
         questions_excellans = list()  # 存放所有问题以及最优回答对象
@@ -416,6 +485,7 @@ class Topic(db.Model):
             else:
                 question_answer.append(question.question)
                 question_answer.append(None)
+            question_answer.append(self)
             questions_excellans.append(question_answer)  # 添加进总集和并返回
         return questions_excellans
 
@@ -461,7 +531,7 @@ class Topic(db.Model):
         db.session.commit()
 
 
-class FollowTopic(db.Model):
+class FollowTopic(db.Model, BaseOperateModel):
     """
     关注话题：
     多对多的关系
@@ -474,7 +544,7 @@ class FollowTopic(db.Model):
     desc = db.Column(db.String(30))
 
 
-class Question(db.Model):
+class Question(db.Model, BaseOperateModel):
     """问题"""
     __tablename__ = "question"
     id = db.Column(db.Integer, primary_key=True)
@@ -505,7 +575,7 @@ class Question(db.Model):
 
     @staticmethod
     def add_question(question_name, question_desc, topic, current_user_id):
-        """添加一个话题"""
+        """添加一个问题"""
         question = Question(
             question_name=question_name,
             question_desc=question_desc,
@@ -537,7 +607,7 @@ class Question(db.Model):
         return question     # 提交成功返回问题
 
 
-class QuestionTopic(db.Model):
+class QuestionTopic(db.Model, BaseOperateModel):
     """问题与话题之间是多对多的关系"""
     __tablename__ = "question_topic"
     question_id = db.Column(db.Integer, db.ForeignKey("question.id"),
@@ -546,7 +616,7 @@ class QuestionTopic(db.Model):
                          primary_key=True)
 
 
-class Answer(db.Model):
+class Answer(db.Model, BaseOperateModel):
     """用户回答问题是多对多的关系"""
     __tablename__ = "answer"
     id = db.Column(db.Integer, primary_key=True)
@@ -570,13 +640,13 @@ class Answer(db.Model):
         try:
             db.session.commit()
         except Exception as e:
-            print e
             db.session.rollback()
             return False
-        return True
+        return Answer.query.filter_by(user_id=user_id,
+                                      question_id=question_id).first()
 
 
-class FollowQuestion(db.Model):
+class FollowQuestion(db.Model, BaseOperateModel):
     __tablename__ = "follow_question"
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                         primary_key=True)

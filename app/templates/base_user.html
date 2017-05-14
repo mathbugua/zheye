@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{user.username}}-者也{% endblock %}
+{% block title %}{{user.name}}-者也{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
 {{super()}}

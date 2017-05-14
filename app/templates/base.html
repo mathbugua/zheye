@@ -331,8 +331,8 @@
         <a href="/" class="zu-top-link-logo" id="zh-top-link-logo" data-za-c="view_home" data-za-a="visit_home"
            data-za-l="top_navigation_zhihu_logo">知乎</a>
         {% if current_user.is_authenticated %}
-        <div onmouseover="mOver(this)" onmouseout="mOut(this)" class="top-nav-profile">
-            <a href="{{ url_for('main.people', username = current_user.username) }}" class="zu-top-nav-userinfo ">
+        <div class="top-nav-profile" onmouseover="mOver(this)" onmouseout="mOut(this)">
+            <a href="{{ url_for('main.people', username = current_user.username) }}" class="zu-top-nav-userinfo">
                 <span class="name">{{current_user.name}}</span>
                 <img class="Avatar"
                      {% if current_user.avatar %}
@@ -341,7 +341,7 @@
                 src="{{url_for('static', filename='images/default.jpg')}}">
                 {% endif %}
             </a>
-            <ul id="top-nav-profile-dropdown" class="top-nav-dropdown" aria-labelledby=":0" aria-hidden="true">
+            <ul id="top-nav-profile-dropdown" class="top-nav-dropdown" >
                 <li>
                     <a href="{{ url_for('main.people', username = current_user.username) }}">
                         <i class="zg-icon zg-icon-dd-home"></i>我的主页
