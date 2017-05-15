@@ -1,6 +1,7 @@
 # coding=utf-8
 
 """定义数据库的models"""
+import calendar
 import hashlib
 
 from datetime import datetime
@@ -424,6 +425,7 @@ class FriendUpdates(db.Model, BaseOperateModel):
                 continue
             activity.append(result)
             activity.append(update.update_time)
+            activity.append(calendar.timegm(update.update_time.utctimetuple()))
             activity.append(update.type)
             follow_user_activity.append(activity)
         return follow_user_activity

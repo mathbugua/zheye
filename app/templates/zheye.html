@@ -7,6 +7,81 @@
 <link rel="stylesheet" href="{{url_for('static', filename='style/main.app.css')}}">
 <script data-main="{{url_for('static', filename='js/main')}}"
         src="{{url_for('static', filename='js/require.js')}}"></script>
+<script>
+    //    评论的隐藏与显示
+    function show_comments_answer(id, answer_id, user_id){
+        var content =  '<button class="ContentItem-action Button--plain" type="button" id="' + id + '" onclick="hide_comments_answer(\'' + id +'\'' + ',' +'\''+answer_id+ '\'' + ',' +'\''+user_id+ '\')">' +
+                '<svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"' +
+                'class="Icon Icon--comment Icon--left" width="12" height="16"' +
+                'aria-hidden="true" style="height: 16px; width: 12px;"> <title></title> ' +
+                '<g> <path d="M7.24 16.313c-.272-.047-.553.026-.77.2-1.106.813-2.406 1.324-3.77 1.482-.16.017-.313-.06-.394-.197-.082-.136-.077-.308.012-.44.528-.656.906-1.42 1.11-2.237.04-.222-.046-.45-.226-.588C1.212 13.052.027 10.73 0 8.25 0 3.7 4.03 0 9 0s9 3.7 9 8.25-4.373 9.108-10.76 8.063z"></path> ' +
+                '</g> </svg>收起评论 </button>';
+
+            var control_id = "#" + id;
+            $(control_id).replaceWith(content);
+            var control_answer_id = "#Comments-container_" + answer_id + "_" + user_id;
+            $(control_answer_id).show(1000);
+
+    };
+
+    function hide_comments_answer(id, answer_id, user_id) {
+        var content =  '<button class="ContentItem-action Button--plain" type="button" id="' + id + '" onclick="show_comments_answer(\'' + id +'\'' + ',' +'\''+answer_id+ '\'' + ',' +'\''+user_id+ '\')">' +
+                '<svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"' +
+                'class="Icon Icon--comment Icon--left" width="12" height="16"' +
+                'aria-hidden="true" style="height: 16px; width: 12px;"> <title></title> ' +
+                '<g> <path d="M7.24 16.313c-.272-.047-.553.026-.77.2-1.106.813-2.406 1.324-3.77 1.482-.16.017-.313-.06-.394-.197-.082-.136-.077-.308.012-.44.528-.656.906-1.42 1.11-2.237.04-.222-.046-.45-.226-.588C1.212 13.052.027 10.73 0 8.25 0 3.7 4.03 0 9 0s9 3.7 9 8.25-4.373 9.108-10.76 8.063z"></path> ' +
+                '</g> </svg>添加评论 </button>';
+
+             var control_id = "#" + id;
+            $(control_id).replaceWith(content);
+            var control_answer_id = "#Comments-container_" + answer_id + "_" + user_id;
+            $(control_answer_id).hide();
+    };
+
+//    提交评论
+    function submit_comment_answer(answer_id, user_id) {
+        var form_name = "comment_form_" + answer_id + "_" + user_id;
+        var comment_name = "comment_answer_" + answer_id + "_" + user_id;
+        var form = document.forms[form_name];
+            var comment = form[comment_name].value;
+            if(comment ==null || comment == ""){
+                alert("评论不能为空");
+                return;
+            }
+            $.ajax({
+                url: "/submit_comment",
+                async: true,
+                type: "POST",
+                data:{"answer_id": answer_id, "comment_body":comment},
+                success : function (data, status){
+                    if(data.error != ""){
+                        alert(data.error);
+                        return
+                    }
+                    var content = '<div class="CommentItem"> ' +
+                        '<div> ' +
+                        '<div class="CommentItem-meta"><span ' +
+                        'class="UserLink CommentItem-avatar">' +
+                        '<div class="Popover">' +
+                        '</div></span><span class="UserLink">' +
+                        '<a class="UserLink-link" href="/people/' + data.username +'">'+ data.username +'</a></span>' +
+                        '<span class="CommentItem-time">刚刚</span></div>' +
+                        '<div class="RichText CommentItem-content" style="white-space: initial;">'
+                        + data.comment +'</div>' +
+                        '<div class="CommentItem-footer ">' +
+                        '</div><!-- react-empty: 2795 --></div></div>';
+
+                    var comeents_list_all = "#comeents_list_all_" + answer_id + "_" + user_id;
+                    $(comeents_list_all).append(content);
+//                    提交成功，清空提交框
+
+                    var comment_answer = "#comment_answer_" + answer_id + "_" + user_id;
+                    $(comment_answer).val("");
+                }
+            })
+
+    }
+    </script>
 {% endblock %}
 {% block navi_color %}
 <li class="zu-top-nav-li current" id="zh-top-nav-home">
@@ -80,10 +155,15 @@
         <div class="feed-item folding feed-item-hook">
             <div class="feed-item-inner">
                 <div class="avatar">
-                    <a title="Python 程序员" data-hovercard="t$t$19744308" class="zm-item-link-avatar"
-                       href="/topic/19744308" target="_blank">
-                        <img src="https://pic1.zhimg.com/e82bab09c_m.jpg" alt="Python 程序员" class="side-topic-avatar">
-                    </a>
+                    <a href="{{url_for('main.topic_detail', id=activity[2].id)}}" target="_blank">
+                        <img
+                                {% if activity[2].topic_avatar %}
+                                                                    src="data:;base64,{{ base64.b64encode(activity[2].topic_avatar)}}"
+                                                                    {% else %}
+                                                                    src="{{url_for('static', filename='images/default.jpg')}}"
+                                                                    {% endif %}
+                                alt="" class="side-topic-avatar">
+                    </a >
                 </div>
                 <div class="feed-main">
                     <div class="feed-source">
@@ -245,9 +325,14 @@
         <div class="feed-item folding feed-item-hook">
             <div class="feed-item-inner">
                 <div class="avatar">
-                    <a title="Python 程序员" data-hovercard="t$t$19744308" class="zm-item-link-avatar"
-                       href="/topic/19744308" target="_blank">
-                        <img src="https://pic1.zhimg.com/e82bab09c_m.jpg" alt="Python 程序员" class="side-topic-avatar">
+                    <a href="{{url_for('main.people', username=activity[0].username)}}" target="_blank">
+                        <img {% if activity[0].avatar %}
+                     src="data:;base64,{{ base64.b64encode(activity[0].avatar)}}"
+                {% else %}
+                src="{{url_for('static', filename='images/default.jpg')}}"
+                {% endif %}
+
+                             alt="" class="side-topic-avatar">
                     </a>
                 </div>
                 <div class="feed-main">
@@ -301,13 +386,13 @@
                             <div class="zm-item-meta answer-actions clearfix js-contentActions">
                                 <div class="zm-meta-panel">
 
-                                    {% if not current_user.is_following_question(activity[0]) %}
-                                    <a id="follow_quesrion_{{activity[1].question.id}}_{{activity[1].users.id}}" href="#"
+                                    {% if not current_user.is_following_question(activity[1].question) %}
+                                    <a id="follow_quesrion_{{activity[1].question.id}}_{{activity[1].users.id}}_{{activity[3]}}" href="#"
                                        onclick="follow_question('{{activity[1].question.id}}', id)"
                                        class="follow-link zg-follow meta-item"><i class="z-icon-follow"></i>关注问题</a>
                                     {% else %}
-                                    <a id="follow_quesrion_{{activity[1].question.id}}_{{activity[1].users.id}}" href="#"
-                                       onclick="unfollow_question('activity[1].question.id}}', id)"
+                                    <a id="follow_quesrion_{{activity[1].question.id}}_{{activity[1].users.id}}_{{activity[3]}}" href="#"
+                                       onclick="unfollow_question('{{activity[1].question.id}}', id)"
                                        class="follow-link zg-unfollow meta-item"><i
                                             class="z-icon-follow"></i>取消关注</a>
                                     {% endif %}
@@ -315,7 +400,7 @@
                                     {% if activity[1] %}
                                     <button class="ContentItem-action Button--plain" type="button"
                                             id="comments-button-show_{{activity[1].id}}_{{activity[0].id}}"
-                                            onclick="show_comments(id, '{{activity[1].id}}')">
+                                            onclick="show_comments_answer(id, '{{activity[1].id}}', '{{activity[0].id}}')">
                                         <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"
                                              class="Icon Icon--comment Icon--left" width="12" height="16"
                                              aria-hidden="true" style="height: 16px; width: 12px;">
@@ -394,7 +479,7 @@
                                                                   style="min-height: 30px;"></textarea>
                                                     </div>
                                                 </div>
-                                                <button onclick="submit_comment('{{activity[1].id}}')"
+                                                <button onclick="submit_comment_answer('{{activity[1].id}}', '{{activity[0].id}}')"
                                                         class="Button CommentEditor-singleButton Button--primary Button--blue"
                                                         type="button">评论
                                                 </button>
@@ -409,6 +494,168 @@
                 </div>
             </div>
         </div>
+
+        {% elif activity[-1] == "ask" %}
+         <div class="feed-item folding feed-item-hook">
+             <div class="feed-item-inner">
+                 <div class="avatar">
+                    <a href="{{url_for('main.people', username=activity[0].username)}}" target="_blank">
+                        <img {% if activity[0].avatar %}
+                     src="data:;base64,{{ base64.b64encode(activity[0].avatar)}}"
+                {% else %}
+                src="{{url_for('static', filename='images/default.jpg')}}"
+                {% endif %}
+
+                             alt="" class="side-topic-avatar">
+                    </a>
+                </div>
+                 <div class="feed-main">
+                     <div class="feed-source" data-za-module="FeedSource">
+                        <a href="{{url_for('main.people', username=activity[0].username)}}" target="_blank"
+                           class="zg-link author-link">{{activity[0].name}}</a> 提出了问题
+
+                        <span class="zg-bull">•</span>
+                        <span class="time" data-timestamp="1494777898000">{{activity[2]}}</span>
+
+                    </div>
+                     <div class="feed-content" data-za-module="AnswerItem">
+                          <h5 class="feed-title"><a class="question_link"
+                                                  href="{{url_for('main.question_detail', id=activity[1].id)}}"
+                                                  target="_blank">
+                            {{activity[1].question_name}}？
+                        </a></h5>
+
+                         <div class="feed-meta">
+                            <div class="zm-item-meta answer-actions clearfix js-contentActions">
+                                <div class="zm-meta-panel">
+                                     {% if not current_user.is_following_question(activity[1]) %}
+                                    <a id="follow_quesrion_{{activity[1].id}}_{{activity[0].id}}_{{activity[3]}}" href="#"
+                                       onclick="follow_question('{{activity[1].id}}', id)"
+                                       class="follow-link zg-follow meta-item"><i class="z-icon-follow"></i>关注问题</a>
+                                    {% else %}
+                                    <a id="follow_quesrion_{{activity[1].id}}_{{activity[0].id}}_{{activity[3]}}" href="#"
+                                       onclick="unfollow_question('{{activity[1].id}}', id)"
+                                       class="follow-link zg-unfollow meta-item"><i
+                                            class="z-icon-follow"></i>取消关注</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                         </div>
+                     </div>
+
+                 </div>
+
+
+             </div>
+         </div>
+
+        {% elif activity[-1] == "follow_ques" %}
+        <div class="feed-item folding feed-item-hook">
+             <div class="feed-item-inner">
+                 <div class="avatar">
+                    <a href="{{url_for('main.people', username=activity[0].username)}}" target="_blank">
+                        <img {% if activity[0].avatar %}
+                     src="data:;base64,{{ base64.b64encode(activity[0].avatar)}}"
+                {% else %}
+                src="{{url_for('static', filename='images/default.jpg')}}"
+                {% endif %}
+
+                             alt="" class="side-topic-avatar">
+                    </a>
+                </div>
+                 <div class="feed-main">
+                     <div class="feed-source" data-za-module="FeedSource">
+                        <a href="{{url_for('main.people', username=activity[0].username)}}" target="_blank"
+                           class="zg-link author-link">{{activity[0].name}}</a> 关注了问题
+
+                        <span class="zg-bull">•</span>
+                        <span class="time" data-timestamp="1494777898000">{{activity[2]}}</span>
+
+                    </div>
+                     <div class="feed-content" data-za-module="AnswerItem">
+                          <h5 class="feed-title"><a class="question_link"
+                                                  href="{{url_for('main.question_detail', id=activity[1].id)}}"
+                                                  target="_blank">
+                            {{activity[1].question_name}}？
+                        </a></h5>
+
+                         <div class="feed-meta">
+                            <div class="zm-item-meta answer-actions clearfix js-contentActions">
+                                <div class="zm-meta-panel">
+                                     {% if not current_user.is_following_question(activity[1]) %}
+                                    <a id="follow_quesrion_{{activity[1].id}}_{{activity[0].id}}_{{activity[3]}}" href="#"
+                                       onclick="follow_question('{{activity[1].id}}', id)"
+                                       class="follow-link zg-follow meta-item"><i class="z-icon-follow"></i>关注问题</a>
+                                    {% else %}
+                                    <a id="follow_quesrion_{{activity[1].id}}_{{activity[0].id}}_{{activity[3]}}" href="#"
+                                       onclick="unfollow_question('{{activity[1].id}}', id)"
+                                       class="follow-link zg-unfollow meta-item"><i
+                                            class="z-icon-follow"></i>取消关注</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                         </div>
+                     </div>
+
+                 </div>
+
+
+             </div>
+         </div>
+
+        {% elif activity[-1] == "follow_topic" %}
+          <div class="feed-item folding feed-item-hook">
+             <div class="feed-item-inner">
+                 <div class="avatar">
+                    <a href="{{url_for('main.people', username=activity[0].username)}}" target="_blank">
+                        <img {% if activity[0].avatar %}
+                     src="data:;base64,{{ base64.b64encode(activity[0].avatar)}}"
+                {% else %}
+                src="{{url_for('static', filename='images/default.jpg')}}"
+                {% endif %}
+
+                             alt="" class="side-topic-avatar">
+                    </a>
+                </div>
+                 <div class="feed-main">
+                     <div class="feed-source" data-za-module="FeedSource">
+                        <a href="{{url_for('main.people', username=activity[0].username)}}" target="_blank"
+                           class="zg-link author-link">{{activity[0].name}}</a> 关注了话题
+
+                        <span class="zg-bull">•</span>
+                        <span class="time" data-timestamp="1494777898000">{{activity[2]}}</span>
+
+                    </div>
+                     <div class="feed-content" data-za-module="AnswerItem">
+                          <h5 class="feed-title"><a class="question_link"
+                                                  href="{{url_for('main.topic_detail', id=activity[1].id)}}"
+                                                  target="_blank">
+                            {{activity[1].topic_name}}
+                        </a></h5>
+
+                         <div class="feed-meta">
+                            <div class="zm-item-meta answer-actions clearfix js-contentActions">
+                                <div class="zm-meta-panel">
+                                     {% if not current_user.is_following_topic(activity[1]) %}
+                                    <a id="follow_topic_{{activity[1].id}}_{{activity[0].id}}_{{activity[3]}}" href="#"
+                                       onclick="follow_topic('{{activity[1].id}}', id)"
+                                       class="follow-link zg-follow meta-item"><i class="z-icon-follow"></i>关注话题</a>
+                                    {% else %}
+                                    <a id="follow_quesrion_{{activity[1].id}}_{{activity[0].id}}_{{activity[3]}}" href="#"
+                                       onclick="unfollow_topic('{{activity[1].id}}', id)"
+                                       class="follow-link zg-unfollow meta-item"><i
+                                            class="z-icon-follow"></i>取消关注</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                         </div>
+                     </div>
+
+                 </div>
+
+
+             </div>
+         </div>
 
         {% endif %}
 
@@ -433,62 +680,40 @@
                 <ul class="zm-side-nav" id="zg-sidebar-nav">
 
                     <li class="zm-side-nav-li">
-                        <a class="zm-side-nav-link" href="/collections" data-za-c="collection"
-                           data-za-l="sidebar_collections" data-za-a="visit_collections">
-                            <i class="zg-icon zg-icon-sidenav-fav"></i>
-                            我的收藏
-
-                        </a>
-                    </li>
-
-                    <li class="zm-side-nav-li">
                         <a class="zm-side-nav-link" href="{{url_for('main.question_follow_all')}}">
                             <i class="zg-icon zg-icon-sidenav-follow"></i>
                             我关注的问题
                         </a>
                     </li>
-                    <li class="zm-side-nav-li">
-                        <a class="zm-side-nav-link" href="/question/invited">
-                            <i class="zg-icon zg-icon-sidenav-invite"></i>
-                            邀请我回答的问题
 
-                        </a>
-                    </li>
-                    <li class="zm-side-nav-li">
-                        <a class="zm-side-nav-link z-icon-container " href="/balance">
-                            <i class="zg-icon icon icon-purse"></i>
-                            我的余额
-                        </a>
-                    </li>
-                </ul>
             </div>
-            <div class="zm-side-nav-group">
-                <ul class="zm-side-nav">
+            <!--<div class="zm-side-nav-group">-->
+                <!--<ul class="zm-side-nav">-->
 
 
-                    <li class="zm-side-nav-li rq3-publiceditlink" id="rq3-sidenav-link">
-                        <a class="zm-side-nav-link" href="/watch">
-                            <i class="zg-icon zg-icon-sidenav-publicedit"></i>
-                            公共编辑动态
-                            <span class="zg-num hidden">0</span>
-                        </a>
-                    </li>
+                    <!--<li class="zm-side-nav-li rq3-publiceditlink" id="rq3-sidenav-link">-->
+                        <!--<a class="zm-side-nav-link" href="/watch">-->
+                            <!--<i class="zg-icon zg-icon-sidenav-publicedit"></i>-->
+                            <!--公共编辑动态-->
+                            <!--<span class="zg-num hidden">0</span>-->
+                        <!--</a>-->
+                    <!--</li>-->
 
-                    <li class="zm-side-nav-li">
-                        <a class="zm-side-nav-link z-ico-container" href="/community">
-                            <i class="z-ico-community"></i>
-                            社区服务中心
-                        </a>
-                    </li>
+                    <!--<li class="zm-side-nav-li">-->
+                        <!--<a class="zm-side-nav-link z-ico-container" href="/community">-->
+                            <!--<i class="z-ico-community"></i>-->
+                            <!--社区服务中心-->
+                        <!--</a>-->
+                    <!--</li>-->
 
-                    <li class="zm-side-nav-li">
-                        <a class="zm-side-nav-link z-ico-container" href="/copyright">
-                            <i class="zg-icon icon icon-copyright"></i>
-                            版权服务中心
-                        </a>
-                    </li>
-                </ul>
-            </div>
+                    <!--<li class="zm-side-nav-li">-->
+                        <!--<a class="zm-side-nav-link z-ico-container" href="/copyright">-->
+                            <!--<i class="zg-icon icon icon-copyright"></i>-->
+                            <!--版权服务中心-->
+                        <!--</a>-->
+                    <!--</li>-->
+                <!--</ul>-->
+            <!--</div>-->
         </div>
     </div>
 </div>

@@ -246,7 +246,7 @@
                     alert(data.error);
                     return;
                 }
-                var content = "<a href=\"javascript:;\" id=\"" + id + "\"  onclick=\"follow_topic_detail(" + "'" + topic_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"zg-btn-green zu-entry-focus-button zg-mr10\" >关注问题</a>";
+                var content = "<a href=\"javascript:;\" id=\"" + id + "\"  onclick=\"follow_topic_detail(" + "'" + topic_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"zg-btn-green zu-entry-focus-button zg-mr10\" >关注话题</a>";
 
                 var ID = "#" + id;
                 $(ID).replaceWith(content);
@@ -256,6 +256,46 @@
 
     }
 
+     <!--关注、取消关注话题-->
+    function follow_topic(topic_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/follow_topic/' + topic_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+
+                var content = "<a href=\"#\" id=\"" + id + "\"  onclick=\"unfollow_topic(" + "'" + topic_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"follow meta-item zg-unfollow\"><i class=\"z-icon-follow\"></i>取消关注</a>";
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+            }
+        })
+
+    }
+
+    function unfollow_topic(topic_id, id) {
+        id = id.toString();
+        $.ajax({
+            url: '/unfollow_topic/' + topic_id,
+            async: true,
+            type: "GET",
+            success: function (data, status) {
+                if (data.error != "") {
+                    alert(data.error);
+                    return;
+                }
+                var content = "<a href=\"#\" id=\"" + id + "\"  onclick=\"follow_topic(" + "'" + topic_id.toString() + "'" + "," + "'" + id + "'" + ")\" class=\"follow meta-item zg-follow\"><i class=\"z-icon-follow\"></i>关注话题</a>";
+
+                var ID = "#" + id;
+                $(ID).replaceWith(content);
+            }
+        })
+
+    }
 </script>
 </head>
 
@@ -401,8 +441,8 @@
                     <a class="zu-top-nav-link" href="{{url_for('main.topic')}}" id="top-nav-dd-topic">话题</a>
                 </li>
 
-                <li class="zu-top-nav-li " id="zh-top-nav-explore">
-                    <a class="zu-top-nav-link" href="/#">发现</a>
+                <li class="zu-top-nav-li" id="zh-top-nav-explore">
+                    <a class="zu-top-nav-link" href="#">发现</a>
                 </li>
 
                 <li class="top-nav-noti zu-top-nav-li ">
