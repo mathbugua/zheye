@@ -1,0 +1,34 @@
+{% extends "auth/admin_base.html" %}
+{% import "_macros.html" as macros %}
+{% block title %}管理话题类别{% endblock %}
+{% block head %}
+{{super()}}
+<script>
+    function confirm_del(){
+        var r = confirm("确认删除?");
+        if (r == true){
+            return true;
+        }
+        else{
+            return false
+        }
+    }
+    </script>
+{% endblock %}
+{% block page_content %}
+<table class="table table-hover followers">
+    <thead><tr><th>类别</th><th>描述</th><th>操作</th></tr></thead>
+    {% for cate in items %}
+    <tr>
+        <td>
+            {{cate.category_name}}
+        </td>
+        <td>{{cate.category_desc}}</td>
+        <td><a href="{{url_for('auth.delete_category', cate_id=cate.id)}}"><button type="button" class="btn btn-warning" onclick="return confirm_del()">删除</button></a></td>
+    </tr>
+    {% endfor %}
+</table>
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, endpoint) }}
+</div>
+{% endblock %}

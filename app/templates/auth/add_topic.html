@@ -1,0 +1,31 @@
+{% extends "auth/admin_base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}添加话题{% endblock %}
+
+{% block page_content %}
+<div class="page-header">
+    <h3>添加话题</h3>
+</div>
+<div class="col-md-4">
+    <form method="post" class="form" role="form" enctype="multipart/form-data">
+        <div style="display:none;"><input id="csrf_token" name="csrf_token" type="hidden"
+                                          value="1483870933.62##e0fa65a06cdca9ea1ef051f71158d18edfc7dc8b"></div>
+        <div class="form-group "><label class="control-label">话题名称</label>
+            {{ form.topic_name(class="form-control", required="True") }}
+        </div>
+        <div class="form-group "><label class="control-label">话题描述</label>
+            {{ form.topic_desc(class="form-control") }}
+        </div>
+        <div class="form-group "><label class="control-label">话题</label>
+            {{ form.topic_cate(class="form-control") }}
+        </div>
+        <label class="control-label">头像</label>
+            <input type="file" name="file" required="True">
+
+        {{ form.submit(class="btn btn-default") }}
+
+
+    </form>
+</div>
+{% endblock %}

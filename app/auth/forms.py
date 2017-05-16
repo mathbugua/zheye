@@ -1,9 +1,9 @@
 # coding=utf-8
 from flask_wtf import Form
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField, SelectField
 from wtforms.validators import Required, Length, Email, Regexp, EqualTo, ValidationError
 
-from app.models.models import User
+from app.models.models import User, TopicCategory
 
 
 class LoginForm(Form):
@@ -54,3 +54,20 @@ class ChangeEmailForm(Form):
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
             raise ValidationError('Email already registered.')
+
+
+class InsertCategory(Form):
+    category_name = StringField(u'类别名称', validators=[Required(), Length(0, 30)])
+    category_desc = StringField(u'描述', validators=[Length(0, 50)])
+    submit = SubmitField(u'保存')
+
+
+class InsertTopic(Form):
+    topic_name = StringField(u'话题名称', validators=[Required(), Length(1, 30)])
+    topic_desc = StringField(u'话题描述', validators=[Length(0, 50)])
+    topic_cate = SelectField(u'话题类别', coerce=int, validators=[Required()])
+    submit = SubmitField(u'保存')
+
+    def __init__(self, *args, **kwargs):
+        super(InsertTopic, self).__init__(*args, **kwargs)
+        self.topic_cate.choices = [(cate.id, cate.category_name) for cate in TopicCategory.query.all()]

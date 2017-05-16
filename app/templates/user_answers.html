@@ -98,6 +98,7 @@
                                     {% endif %}
                                 </button>
 
+                                {% if current_user == user %}
                                 <div class="Popover ContentItem-action" onclick="delete_answer('{{item.id}}')">
                                     <button class="Button--plain" type="button" id="Popover-97103-4112-toggle"
                                             aria-haspopup="true" aria-expanded="false"
@@ -110,6 +111,7 @@
                                             </g>
                                         </svg><!-- react-text: 744 -->删除<!-- /react-text --></button>
                                     <!-- react-empty: 745 --></div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>

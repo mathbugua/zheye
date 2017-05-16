@@ -111,7 +111,7 @@ class User(db.Model, BaseOperateModel, UserMixin):
     name = db.Column(db.String(30), nullable=False)   # 姓名字段
     password_hash = db.Column(db.String(128))
     avatar = db.Column(db.LargeBinary(length=2048))
-    confirmed = db.Column(db.Boolean, default=True)
+    confirmed = db.Column(db.Boolean, default=False)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"))
 
     # followed代表followed_id字段为自身的所有实例。
@@ -164,11 +164,11 @@ class User(db.Model, BaseOperateModel, UserMixin):
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
-        # if self.role is None:
-        #     if self.email == current_app.config['FLASKY_ADMIN']:
-        #         self.role = Role.query.filter_by(permissions=0xff).first()
-        #     if self.role is None:
-        #         self.role = Role.query.filter_by(default=True).first()
+        if self.role is None:
+            if self.email == current_app.config['FLASKY_ADMIN']:
+                self.role = Role.query.filter_by(permissions=0xff).first()
+            if self.role is None:
+                self.role = Role.query.filter_by(default=True).first()
 
     @property
     def password(self):
@@ -236,6 +236,13 @@ class User(db.Model, BaseOperateModel, UserMixin):
         except:
             return False
         return True
+
+    def can(self, permissions):
+        return self.role is not None and \
+            (self.role.permissions & permissions) == permissions
+
+    def is_administrator(self):
+        return self.can(Permission.ADMINISTER)
 
     # 关注人
     def follow(self, user):
@@ -440,16 +447,31 @@ class TopicCategory(db.Model, BaseOperateModel):
     topics = db.relationship("Topic", backref="category")
 
     @staticmethod
-    def insert_category():
-        for i in range(15):
-            cate_name = "topic" + str(i)
-            cete_desc = "cete_test" + str(i)
-            topic_cate = TopicCategory(
-                category_name=cate_name,
-                category_desc=cete_desc
-            )
-            db.session.add(topic_cate)
-        db.session.commit()
+    def insert_category(name, desc):
+        topic_cate = TopicCategory(
+            category_name=name,
+            category_desc=desc
+        )
+        db.session.add(topic_cate)
+        try:
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            return False
+
+    @staticmethod
+    def delete_category(cate_id):
+        cate = TopicCategory.query.filter_by(id=cate_id).first()
+        if not cate:
+            return False
+        db.session.delete(cate)
+        try:
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            return False
 
 
 class Topic(db.Model, BaseOperateModel):
@@ -492,45 +514,34 @@ class Topic(db.Model, BaseOperateModel):
         return questions_excellans
 
     @staticmethod
-    def insert_topic():
-        topic1 = Topic(
-            topic_name=u"单机",
-            category_id=1,
-            topic_desc=u"测试话题描述1"
-        )
-        db.session.add(topic1)
-        topic2 = Topic(
-            topic_name=u"网游",
-            category_id=1,
-            topic_desc=u"测试话题描述2"
-        )
-        db.session.add(topic2)
-        topic3 = Topic(
-            topic_name=u"多人游戏",
-            category_id=1,
-            topic_desc=u"测试话题描述3"
-                )
-        db.session.add(topic3)
+    def insert_topic(name, desc, avatar, cate):
+        topic = Topic(
+            topic_name=name,
+            topic_desc=desc,
+            topic_avatar=avatar,
+            category_id=cate
 
-        topic4 = Topic(
-            topic_name=u"饮食",
-            category_id=2,
-            topic_desc=u"测试话题描述4"
         )
-        db.session.add(topic4)
-        topic5 = Topic(
-            topic_name=u"美食",
-            category_id=2,
-            topic_desc=u"测试话题描述5"
-        )
-        db.session.add(topic5)
-        topic6 = Topic(
-            topic_name=u"烹饪",
-            category_id=2,
-            topic_desc=u"测试话题描述6"
-        )
-        db.session.add(topic6)
-        db.session.commit()
+        db.session.add(topic)
+        try:
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            return False
+
+    @staticmethod
+    def delete_topic(topic_id):
+        topic = Topic.query.filter_by(id=topic_id).first()
+        if not topic:
+            return False
+        db.session.delete(topic)
+        try:
+            db.session.commit()
+            return True
+        except Exception as e:
+            db.session.rollback()
+            return False
 
 
 class FollowTopic(db.Model, BaseOperateModel):

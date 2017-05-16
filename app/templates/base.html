@@ -530,12 +530,9 @@
         <div class="zu-main-content-inner">
             <div class="container">
                 {% for message in get_flashed_messages() %}
-                <div class="alert alert-warning">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
                     <script>
                         alert("{{ message }}")
                     </script>
-                </div>
                 {% endfor %}
 
             </div>

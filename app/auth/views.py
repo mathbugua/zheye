@@ -1,15 +1,17 @@
 # coding=utf-8
 import base64
 
+from flask import current_app
 from flask_login import login_user, login_required, logout_user, current_user
 from flask import render_template, redirect, url_for, request, flash
 
 from app import db
 from app.auth import auth
-from app.auth.forms import LoginForm, RegistrationForm, ChangepasswordForm, ChangeEmailForm
+from app.auth.forms import LoginForm, RegistrationForm, ChangepasswordForm, ChangeEmailForm, InsertCategory, InsertTopic
 from app.helpers.email import send_email
-from app.models.models import User
+from app.models.models import User, TopicCategory, Topic
 from app.helpers import constant
+from app.helpers.decorators import admin_required, permission_required
 
 
 @auth.before_app_request
@@ -142,3 +144,103 @@ def password():
             flash(constant.WRONG_PWD)
 
     return render_template("password_settings.html", user=current_user, form=form, base64=base64)
+
+
+@auth.route('/admin', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def admin_index():
+    """管理员界面"""
+    return render_template('auth/admin_index.html')
+
+
+@auth.route('/add/category', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_category():
+    """添加话题类别"""
+    form = InsertCategory()
+    if form.validate_on_submit():
+        if not TopicCategory.query.filter_by(category_name=form.category_name.data).first():
+            is_success = TopicCategory.insert_category(form.category_name.data, form.category_desc.data)
+            if not is_success:
+                flash(constant.FAIL)
+        else:
+            flash(constant.ALREADY_EXIST)
+        return redirect(url_for('auth.manage_category'))
+
+    return render_template('auth/add_category.html', form=form)
+
+
+@auth.route('/manage/category', methods=['GET'])
+@login_required
+@admin_required
+def manage_category():
+    page = request.args.get('page', 1, type=int)
+    pagination = TopicCategory.query.paginate(
+        page, per_page=current_app.config['ADMIN_MANAGE'],
+        error_out=False)
+
+    return render_template("auth/manage_category.html", endpoint='auth.manage_category', pagination=pagination, items=pagination.items
+                           )
+
+
+@auth.route('/delete/category', methods=['GET'])
+@login_required
+@admin_required
+def delete_category():
+    cate_id = request.args.get("cate_id", None)
+    if not cate_id:
+        return redirect(url_for('auth.manage_category'))
+    is_success = TopicCategory.delete_category(cate_id)
+    if not is_success:
+        flash(constant.FAIL)
+    else:
+        flash(constant.UPDATE_SUCC)
+    return redirect(url_for('auth.manage_category'))
+
+
+@auth.route('/add/topic', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_topic():
+    form = InsertTopic()
+    if request.method == 'POST':
+        if not Topic.query.filter_by(topic_name=form.topic_name.data).first():
+            is_success = Topic.insert_topic(form.topic_name.data, form.topic_desc.data,
+                                            request.files['file'].read(), form.topic_cate.data)
+            if not is_success:
+                flash(constant.FAIL)
+        else:
+            flash(constant.ALREADY_EXIST)
+        return redirect(url_for('auth.manage_topic'))
+
+    return render_template('auth/add_topic.html', form=form)
+
+
+@auth.route('/manage/topic', methods=['GET'])
+@login_required
+@admin_required
+def manage_topic():
+    page = request.args.get('page', 1, type=int)
+    pagination = Topic.query.paginate(
+        page, per_page=current_app.config['ADMIN_MANAGE'],
+        error_out=False)
+
+    return render_template("auth/manage_topic.html", endpoint='auth.manage_topic', pagination=pagination, items=pagination.items
+                           )
+
+
+@auth.route('/delete/topic', methods=['GET'])
+@login_required
+@admin_required
+def delete_topic():
+    topic_id = request.args.get("topic_id", None)
+    if not topic_id:
+        return redirect(url_for('auth.manage_topic'))
+    is_success = Topic.delete_topic(topic_id)
+    if not is_success:
+        flash(constant.FAIL)
+    else:
+        flash(constant.UPDATE_SUCC)
+    return redirect(url_for('auth.manage_topic'))

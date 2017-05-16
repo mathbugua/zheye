@@ -18,4 +18,5 @@ UPDATE_SUCC = u"更新成功"
 QUESTION_ERROR = u"问题或问题描述过长"
 COMMENT_ERROR = u"评论过长"
 FAIL = u"操作失败"
-NOFOUND=u'未找到'
+NOFOUND = u'未找到'
+ALREADY_EXIST = u'已经存在'

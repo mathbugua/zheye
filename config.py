@@ -21,6 +21,7 @@ class Config:
     FLASKY_MAIL_SENDER = 'Flasky Admin <cl20141205@163.com>'
     FLASKY_ADMIN = 'cl20141205@163.com'
     FLASKY_FOLLOWERS_PER_PAGE = 2
+    ADMIN_MANAGE = 10
 
     UPLOAD_FOLDER = os.path.join(basedir)
     @staticmethod
