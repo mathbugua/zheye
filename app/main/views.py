@@ -376,7 +376,6 @@ def submit_comment():
 @main.route('/topic/<int:id>')
 @login_required
 def topic_detail(id):
-    print Dynamic.query.all()
     """话题详细页面"""
     topic = Topic.query.filter_by(id=id).first()
     if topic:

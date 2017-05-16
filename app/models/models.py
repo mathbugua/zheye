@@ -10,7 +10,7 @@ from flask_login import UserMixin, AnonymousUserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from app import db, login_manager
-from .base_model import BaseOperateModel
+from .OperateModel import operate_model
 
 
 class Permission:
@@ -22,7 +22,7 @@ class Permission:
     ADMINISTER = 0x08
 
 
-class Role(db.Model, BaseOperateModel):
+class Role(db.Model):
     """角色"""
     __tablename__ = "roles"
     id = db.Column(db.Integer, primary_key=True)
@@ -50,14 +50,13 @@ class Role(db.Model, BaseOperateModel):
                 role = Role(name=r)
             role.permissions = roles[r][0]
             role.default = roles[r][1]
-            db.session.add(role)
-        db.session.commit()
+            operate_model.db_add(role)  # 提交到数据库
 
     def __repr__(self):
         return "<Role %r>" % self.name
 
 
-class Comments(db.Model, BaseOperateModel):
+class Comments(db.Model):
     """评论回答"""
     __tablename__ = "comments"
     id = db.Column(db.Integer, primary_key=True)
@@ -76,16 +75,10 @@ class Comments(db.Model, BaseOperateModel):
             answer_id=answer_id,
             content_body=comment_body
         )
-        db.session.add(comment)
-        try:
-            db.session.commit()
-            return True
-        except:
-            db.session.rollback()
-            return False
+        return operate_model.db_add(comment)
 
 
-class Follow(db.Model, BaseOperateModel):
+class Follow(db.Model):
     __tablename__ = 'follows'
     # 关注者
     follower_id = db.Column(db.Integer, db.ForeignKey('users.id'),
@@ -95,7 +88,7 @@ class Follow(db.Model, BaseOperateModel):
                             primary_key=True)
 
 
-class User(db.Model, BaseOperateModel, UserMixin):
+class User(db.Model, UserMixin):
     """用户信息"""
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -196,19 +189,12 @@ class User(db.Model, BaseOperateModel, UserMixin):
         if data.get('confirm') != self.id:
             return False
         self.confirmed = True
-        db.session.add(self)
-        db.session.commit()
-        return True
+        return operate_model.db_add(self)
 
     def change_password(self, newpassword):
         """修改密码"""
-        try:
-            self.password = newpassword
-            db.session.add(self)
-            db.session.commit()
-        except:
-            return False
-        return True
+        self.password = newpassword
+        return operate_model.db_add(self)
 
     def generate_email_change_token(self, new_email, expiration=3600):
         """生成邮箱秘钥"""
@@ -230,12 +216,7 @@ class User(db.Model, BaseOperateModel, UserMixin):
         if self.query.filter_by(email=new_email).first() is not None:
             return False
         self.email = new_email
-        try:
-            db.session.add(self)
-            db.session.commit()
-        except:
-            return False
-        return True
+        return operate_model.db_add(self)
 
     def can(self, permissions):
         return self.role is not None and \
@@ -295,13 +276,8 @@ class User(db.Model, BaseOperateModel, UserMixin):
 
     def change_avatar(self, images):
         """改变头像"""
-        try:
-            self.avatar = images
-            db.session.add(self)
-            db.session.commit()
-        except:
-            return False
-        return True
+        self.avatar = images
+        return operate_model.db_add(self)
 
     def is_answer_question(self, question_id):
         """是否回答了某个问题"""
@@ -315,11 +291,7 @@ class User(db.Model, BaseOperateModel, UserMixin):
             t_q_id=t_q_id,
             type=type
         )
-        db.session.add(dynamic)
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
+        return operate_model.db_add(dynamic)
 
     def notify_follower(self, target_id, operate_type):
         """把当前用户的动态通知给他的关注者"""
@@ -336,11 +308,7 @@ class User(db.Model, BaseOperateModel, UserMixin):
             target=target_id,
             type=operate_type
         )
-        db.session.add(update)
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
+        return operate_model.db_add(update)
 
     def current_user_index(self):
         """
@@ -365,7 +333,7 @@ class User(db.Model, BaseOperateModel, UserMixin):
         return sorted(index_show)
 
 
-class Dynamic(db.Model, BaseOperateModel):
+class Dynamic(db.Model):
     """用户个人动态,存放用户关注的话题,问题记录"""
     __tablename__ = "dynamic"
     id = db.Column(db.Integer, primary_key=True)
@@ -398,7 +366,7 @@ class Dynamic(db.Model, BaseOperateModel):
         return dynamic_note_list    # 返回一个嵌套列表[["type", 对象, "time"]]
 
 
-class FriendUpdates(db.Model, BaseOperateModel):
+class FriendUpdates(db.Model):
     """
     记录关注的人的动态,以供在首页进行展示:
     type: "关注用户", "关注话题", "关注问题", "回答了问题","提问"
@@ -438,7 +406,7 @@ class FriendUpdates(db.Model, BaseOperateModel):
         return follow_user_activity
 
 
-class TopicCategory(db.Model, BaseOperateModel):
+class TopicCategory(db.Model):
     """话题类别"""
     __tablename__ = "topiccate"
     id = db.Column(db.Integer, primary_key=True)
@@ -452,29 +420,17 @@ class TopicCategory(db.Model, BaseOperateModel):
             category_name=name,
             category_desc=desc
         )
-        db.session.add(topic_cate)
-        try:
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            return False
+        return operate_model.db_add(topic_cate)
 
     @staticmethod
     def delete_category(cate_id):
         cate = TopicCategory.query.filter_by(id=cate_id).first()
         if not cate:
             return False
-        db.session.delete(cate)
-        try:
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            return False
+        return operate_model.db_delete(cate)
 
 
-class Topic(db.Model, BaseOperateModel):
+class Topic(db.Model):
     """话题"""
     __tablename__ = "topic"
     id = db.Column(db.Integer, primary_key=True)
@@ -522,29 +478,17 @@ class Topic(db.Model, BaseOperateModel):
             category_id=cate
 
         )
-        db.session.add(topic)
-        try:
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            return False
+        return operate_model.db_add(topic)
 
     @staticmethod
     def delete_topic(topic_id):
         topic = Topic.query.filter_by(id=topic_id).first()
         if not topic:
             return False
-        db.session.delete(topic)
-        try:
-            db.session.commit()
-            return True
-        except Exception as e:
-            db.session.rollback()
-            return False
+        return operate_model.db_delete(topic)
 
 
-class FollowTopic(db.Model, BaseOperateModel):
+class FollowTopic(db.Model):
     """
     关注话题：
     多对多的关系
@@ -557,7 +501,7 @@ class FollowTopic(db.Model, BaseOperateModel):
     desc = db.Column(db.String(30))
 
 
-class Question(db.Model, BaseOperateModel):
+class Question(db.Model):
     """问题"""
     __tablename__ = "question"
     id = db.Column(db.Integer, primary_key=True)
@@ -580,11 +524,7 @@ class Question(db.Model, BaseOperateModel):
     def ping(self):
         """问题被浏览的次数"""
         self.views += 1
-        db.session.add(self)
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
+        return operate_model.db_add(self)
 
     @staticmethod
     def add_question(question_name, question_desc, topic, current_user_id):
@@ -594,12 +534,9 @@ class Question(db.Model, BaseOperateModel):
             question_desc=question_desc,
             author_id=current_user_id
         )
-        db.session.add(question)
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            return False
+        result = operate_model.db_add(question)
+        if not result:
+            return result
 
         question = Question.query.filter_by(question_name=question_name).first()
         if question:
@@ -607,20 +544,15 @@ class Question(db.Model, BaseOperateModel):
                 question_id=question.id,
                 topic_id=topic
             )
-            db.session.add(question_topic)
-            try:
-                db.session.commit()
-            except Exception as e:
-                db.session.rollback()
-                # 提交失败，删除问题
-                db.session.delete(question)
-                db.session.commit()
+            result = operate_model.db_add(question_topic)
+            if not result:
+                operate_model.db_delete(question)
                 return False
 
-        return question     # 提交成功返回问题
+            return question
 
 
-class QuestionTopic(db.Model, BaseOperateModel):
+class QuestionTopic(db.Model):
     """问题与话题之间是多对多的关系"""
     __tablename__ = "question_topic"
     question_id = db.Column(db.Integer, db.ForeignKey("question.id"),
@@ -629,7 +561,7 @@ class QuestionTopic(db.Model, BaseOperateModel):
                          primary_key=True)
 
 
-class Answer(db.Model, BaseOperateModel):
+class Answer(db.Model):
     """用户回答问题是多对多的关系"""
     __tablename__ = "answer"
     id = db.Column(db.Integer, primary_key=True)
@@ -649,17 +581,11 @@ class Answer(db.Model, BaseOperateModel):
             question_id=question_id,
             answer_body=answer_body
         )
-        db.session.add(answer)
-        try:
-            db.session.commit()
-        except Exception as e:
-            db.session.rollback()
-            return False
-        return Answer.query.filter_by(user_id=user_id,
-                                      question_id=question_id).first()
+        result = operate_model.db_add(answer)
+        return Answer.query.filter_by(user_id=user_id, question_id=question_id).first() if result else result
 
 
-class FollowQuestion(db.Model, BaseOperateModel):
+class FollowQuestion(db.Model):
     __tablename__ = "follow_question"
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"),
                         primary_key=True)
