@@ -17,8 +17,8 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = 'cl20141205@163.com'
     MAIL_PASSWORD = ''
-    FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
-    FLASKY_MAIL_SENDER = 'Flasky Admin <cl20141205@163.com>'
+    FLASKY_MAIL_SUBJECT_PREFIX = '[zheye]'
+    FLASKY_MAIL_SENDER = 'Zheye Admin <cl20141205@163.com>'
     FLASKY_ADMIN = 'cl20141205@163.com'
     FLASKY_FOLLOWERS_PER_PAGE = 2
     ADMIN_MANAGE = 10

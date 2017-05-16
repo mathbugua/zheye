@@ -8,10 +8,11 @@ from flask import render_template, redirect, url_for, request, flash
 from app import db
 from app.auth import auth
 from app.auth.forms import LoginForm, RegistrationForm, ChangepasswordForm, ChangeEmailForm, InsertCategory, InsertTopic
-from app.helpers.email import send_email
+from app.lib.mail.email import send_email
+from app.lib.pagination import base_pagination
 from app.models.models import User, TopicCategory, Topic
-from app.helpers import constant
-from app.helpers.decorators import admin_required, permission_required
+from app.lib import constant
+from app.auth.permission import admin_required, permission_required
 
 
 @auth.before_app_request
@@ -177,12 +178,10 @@ def add_category():
 @admin_required
 def manage_category():
     page = request.args.get('page', 1, type=int)
-    pagination = TopicCategory.query.paginate(
-        page, per_page=current_app.config['ADMIN_MANAGE'],
-        error_out=False)
+    pagination = base_pagination(TopicCategory.query, page, 'ADMIN_MANAGE')
 
-    return render_template("auth/manage_category.html", endpoint='auth.manage_category', pagination=pagination, items=pagination.items
-                           )
+    return render_template("auth/manage_category.html", endpoint='auth.manage_category',
+                           pagination=pagination, items=pagination.items)
 
 
 @auth.route('/delete/category', methods=['GET'])
@@ -223,12 +222,10 @@ def add_topic():
 @admin_required
 def manage_topic():
     page = request.args.get('page', 1, type=int)
-    pagination = Topic.query.paginate(
-        page, per_page=current_app.config['ADMIN_MANAGE'],
-        error_out=False)
+    pagination = base_pagination(Topic.query, page, 'ADMIN_MANAGE')
 
-    return render_template("auth/manage_topic.html", endpoint='auth.manage_topic', pagination=pagination, items=pagination.items
-                           )
+    return render_template("auth/manage_topic.html", endpoint='auth.manage_topic',
+                           pagination=pagination, items=pagination.items)
 
 
 @auth.route('/delete/topic', methods=['GET'])

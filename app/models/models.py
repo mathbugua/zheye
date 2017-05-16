@@ -381,6 +381,7 @@ class FriendUpdates(db.Model):
 
     @staticmethod
     def search_notes(id):
+        """查询与某用户相关的记录"""
         follow_user_activity = list()
         updates = FriendUpdates.query.filter_by(follower_id=id).all()
         for update in updates:

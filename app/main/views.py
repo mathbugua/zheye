@@ -11,9 +11,10 @@ from flask_login import login_required, current_user
 
 from app import db
 from app.main.forms import EditProfileForm
-from app.models.models import User, Follow, TopicCategory, Topic, Question, Answer, Comments, Dynamic, FriendUpdates
+from app.models.models import User, TopicCategory, Topic, Question, Answer, Comments, Dynamic
 from . import main
-from app.helpers import constant
+from app.lib import constant
+from app.lib.pagination import base_pagination
 
 
 @main.route("/")
@@ -104,14 +105,11 @@ def unfollow(username):
 @main.route('/people/<username>/followers')
 def followers(username):
     """显示username的关注者"""
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash(constant.INVALID_USER)
-        return redirect(url_for('.index'))
+    user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
-    pagination = user.followers.paginate(
-        page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
-        error_out=False)
+
+    # 获取分页对象
+    pagination = base_pagination(user.followers, page, 'FLASKY_FOLLOWERS_PER_PAGE')
     follows = [{'user': item.follower}
                for item in pagination.items]
     who = u'我' if user == current_user else u'他'
@@ -123,14 +121,9 @@ def followers(username):
 @main.route('/people/<username>/following')
 def following(username):
     """分页显示username关注了谁"""
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash(constant.INVALID_USER)
-        return redirect(url_for('.index'))
+    user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
-    pagination = user.followed.paginate(
-        page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
-        error_out=False)
+    pagination = base_pagination(user.followed, page, 'FLASKY_FOLLOWERS_PER_PAGE')
     follows = [{'user': item.followed}
                for item in pagination.items]
     who = u'我' if user == current_user else u'他'
@@ -142,14 +135,9 @@ def following(username):
 @main.route('/people/<username>/asks')
 def asks(username):
     """分页显示username提了哪些问题"""
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash(constant.INVALID_USER)
-        return redirect(url_for('.index'))
+    user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
-    pagination = user.questions.paginate(
-        page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
-        error_out=False)
+    pagination = base_pagination(user.questions, page, 'FLASKY_FOLLOWERS_PER_PAGE')
 
     return render_template('user_asks.html', user=user, base64=base64,
                            endpoint='.asks', pagination=pagination, items=pagination.items
@@ -159,14 +147,9 @@ def asks(username):
 @main.route('/people/<username>/answers')
 def answers(username):
     """分页显示username回答了哪些问题"""
-    user = User.query.filter_by(username=username).first()
-    if user is None:
-        flash(constant.INVALID_USER)
-        return redirect(url_for('.index'))
+    user = User.query.filter_by(username=username).first_or_404()
     page = request.args.get('page', 1, type=int)
-    pagination = user.answers.paginate(
-        page, per_page=current_app.config['FLASKY_FOLLOWERS_PER_PAGE'],
-        error_out=False)
+    pagination = base_pagination(user.answers, page, 'FLASKY_FOLLOWERS_PER_PAGE')
 
     return render_template('user_answers.html', user=user, base64=base64,
                            endpoint='.answers', pagination=pagination, items=pagination.items)
