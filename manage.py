@@ -20,8 +20,9 @@ def runserver():
 
 
 def create_db():
-    db.create_all()
-    Role.insert_roles()   # 创建角色
+    with app.app_context():
+        db.create_all()
+        Role.insert_roles()   # 创建角色
 
 if __name__ == '__main__':
     options.parse_command_line()
