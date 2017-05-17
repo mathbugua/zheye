@@ -58,13 +58,13 @@ class ChangeEmailForm(Form):
 
 class InsertCategory(Form):
     category_name = StringField(u'类别名称', validators=[Required(), Length(0, 30)])
-    category_desc = StringField(u'描述', validators=[Length(0, 50)])
+    category_desc = StringField(u'描述', validators=[Length(0, 300)])
     submit = SubmitField(u'保存')
 
 
 class InsertTopic(Form):
     topic_name = StringField(u'话题名称', validators=[Required(), Length(1, 30)])
-    topic_desc = StringField(u'话题描述', validators=[Length(0, 50)])
+    topic_desc = StringField(u'话题描述', validators=[Length(0, 300)])
     topic_cate = SelectField(u'话题类别', coerce=int, validators=[Required()])
     submit = SubmitField(u'保存')
 

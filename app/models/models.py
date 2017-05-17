@@ -412,7 +412,7 @@ class TopicCategory(db.Model):
     __tablename__ = "topiccate"
     id = db.Column(db.Integer, primary_key=True)
     category_name = db.Column(db.String(30), nullable=False)
-    category_desc = db.Column(db.String(50))
+    category_desc = db.Column(db.String(300))
     topics = db.relationship("Topic", backref="category")
 
     @staticmethod
@@ -437,7 +437,7 @@ class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     topic_name = db.Column(db.String(30), nullable=False)
     topic_avatar = db.Column(db.LargeBinary(length=2048))
-    topic_desc = db.Column(db.String(50))
+    topic_desc = db.Column(db.String(300))
     category_id = db.Column(db.Integer, db.ForeignKey("topiccate.id"))
     follow_topics = db.relationship("FollowTopic", backref="topic",
                                     lazy='dynamic',
@@ -506,7 +506,7 @@ class Question(db.Model):
     """问题"""
     __tablename__ = "question"
     id = db.Column(db.Integer, primary_key=True)
-    question_name = db.Column(db.String(30), nullable=False)
+    question_name = db.Column(db.String(60), nullable=False)
     question_desc = db.Column(db.String(500))
     views = db.Column(db.Integer, default=0)  # 问题被浏览次数,默认为0次.
     author_id = db.Column(db.Integer, db.ForeignKey("users.id"))

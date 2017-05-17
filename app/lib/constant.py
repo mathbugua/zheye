@@ -20,3 +20,4 @@ COMMENT_ERROR = u"评论过长"
 FAIL = u"操作失败"
 NOFOUND = u'未找到'
 ALREADY_EXIST = u'已经存在'
+NOT_VALID_CHOICE = u'话题不是有效的选择'

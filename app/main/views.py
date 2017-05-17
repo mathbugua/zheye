@@ -328,7 +328,10 @@ def submit_question():
     question = request.form.get("question")
     question_desc = request.form.get("question_desc")
     topic = request.form.get("topic")
-    if len(question) > 30 or len(question_desc) > 500:
+
+    if topic == None or topic == "":
+        return jsonify(error=constant.NOT_VALID_CHOICE)
+    if len(question) > 60 or len(question_desc) > 500:
         return jsonify(error=constant.QUESTION_ERROR)
 
     # 添加问题
