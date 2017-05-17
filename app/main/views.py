@@ -363,12 +363,10 @@ def submit_comment():
 @login_required
 def topic_detail(id):
     """话题详细页面"""
-    topic = Topic.query.filter_by(id=id).first()
-    if topic:
-        return render_template("topic_detail.html", topic=topic, count=topic.follow_topics.count(),
-                               base64=base64, questions_excellans=topic.questions_excellans())
+    topic = Topic.query.get_or_404(id)
 
-    return redirect(url_for("main.index"))
+    return render_template("topic_detail.html", topic=topic, count=topic.follow_topics.count(),
+                               base64=base64, questions_excellans=topic.questions_excellans())
 
 
 @main.route('/question')
@@ -389,13 +387,10 @@ def question_follow_all():
 @main.route('/question/<int:id>')
 @login_required
 def question_detail(id):
-    question = Question.query.filter_by(id=id).first()
-    if question:
-        question.ping()    # 增加问题的浏览次数
-        return render_template("question_detail.html", question=question, base64=base64)
+    question = Question.query.get_or_404(id)
 
-    flash(constant.INVALID_TOPIC)
-    return redirect(url_for('main.index'))
+    question.ping()    # 增加问题的浏览次数
+    return render_template("question_detail.html", question=question, base64=base64)
 
 
 @main.route('/answer_submit', methods=['POST'])

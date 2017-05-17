@@ -50,7 +50,7 @@
 
 {% if topic_selete %}
 <div class="topic-title clearfix js-topic-title" style="display: block;">
-    <a href="/topic/19550228" target="_blank" class="zg-left js-topic-title-avatar">
+    <a href="{{url_for('main.topic_detail', id=topic_selete.id)}}" target="_blank" class="zg-left js-topic-title-avatar">
         <img class="Avatar Avatar--m js-topic-avatar" style="width: 40px;height: 40px;"
 
              {% if topic_selete.topic_avatar %}

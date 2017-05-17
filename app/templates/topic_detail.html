@@ -12,8 +12,13 @@
 <div>
     <div class="topic-avatar" itemprop="image" itemscope="" itemtype="http://schema.org/ImageObject">
         <div>
-            <a class="zm-entry-head-avatar-link" href="/topic/19550994" id="zh-avartar-edit-form">
-                <img alt="游戏" src="{{url_for('static', filename='images/default.jpg')}}"
+            <a class="zm-entry-head-avatar-link" href="{{url_for('main.topic_detail', id=topic.id)}}" id="zh-avartar-edit-form">
+                <img
+                      {% if topic.topic_avatar %}
+             src="data:;base64,{{ base64.b64encode(topic.topic_avatar)}}"
+             {% else %}
+             src="{{url_for('static', filename='images/default.jpg')}}"
+             {% endif %}
                      style="width: 50px;height: 50px"></a>
         </div>
     </div>
