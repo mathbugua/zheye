@@ -17,10 +17,10 @@
 
 
     <script>
-        function mOver(obj) {
+        function mOver() {
             $(".top-nav-profile ul").addClass("top-nav-dropdowntop-nav-dropdown-other");
         }
-        function mOut(obj) {
+        function mOut() {
             $(".top-nav-profile ul").removeClass("top-nav-dropdowntop-nav-dropdown-other");
         }
     </script>
@@ -371,8 +371,8 @@
         <a href="/" class="zu-top-link-logo" id="zh-top-link-logo" data-za-c="view_home" data-za-a="visit_home"
            data-za-l="top_navigation_zhihu_logo">知乎</a>
         {% if current_user.is_authenticated %}
-        <div class="top-nav-profile" onmouseover="mOver(this)" onmouseout="mOut(this)">
-            <a href="{{ url_for('main.people', username = current_user.username) }}" class="zu-top-nav-userinfo">
+        <div class="top-nav-profile" onmouseover="mOver();" onmouseout="mOut();">
+            <a href="{{ url_for('main.people', username = current_user.username) }}" class="zu-top-nav-userinfo" style="display: inline-block">
                 <span class="name">{{current_user.name}}</span>
                 <img class="Avatar"
                      {% if current_user.avatar %}
