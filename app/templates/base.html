@@ -406,7 +406,11 @@
                     </a>
                 </li>
             </ul>
+
         </div>
+        {% if current_user.is_administrator() %}
+        <a href="{{url_for('auth.admin_index')}}"><button class="zu-top-add-question">后台管理</button></a>
+        {% endif %}
         {% else %}
         <div class="top-nav-profile-login">
             <button class="Button " type="button"><a href="{{url_for('auth.login_register')}}">登录</a></button>

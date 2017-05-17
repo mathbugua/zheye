@@ -7,10 +7,11 @@ from flask import render_template, redirect, url_for, request, flash
 
 from app import db
 from app.auth import auth
-from app.auth.forms import LoginForm, RegistrationForm, ChangepasswordForm, ChangeEmailForm, InsertCategory, InsertTopic
+from app.auth.forms import LoginForm, RegistrationForm, ChangepasswordForm, ChangeEmailForm, InsertCategory, InsertTopic, \
+    EditProfileAdminForm
 from app.lib.mail.email import send_email
 from app.lib.pagination import base_pagination
-from app.models.models import User, TopicCategory, Topic
+from app.models.models import User, TopicCategory, Topic, Role
 from app.lib import constant
 from app.auth.permission import admin_required, permission_required
 
@@ -241,3 +242,35 @@ def delete_topic():
     else:
         flash(constant.UPDATE_SUCC)
     return redirect(url_for('auth.manage_topic'))
+
+
+@auth.route('/manage/users', methods=['GET'])
+@login_required
+@admin_required
+def manage_users():
+    users = User.query.filter(User.username != current_user.username).all()
+    return render_template("auth/manage_users.html", users=users)
+
+
+@auth.route('/setting_users/<int:id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def setting_users(id):
+    user = User.query.get_or_404(id)
+    form = EditProfileAdminForm(user=user)
+    if form.validate_on_submit():
+        user.email = form.email.data
+        user.username = form.username.data
+        user.confirmed = form.confirmed.data
+        user.role = Role.query.get(form.role.data)
+        user.name = form.name.data
+        db.session.add(user)
+        db.session.commit()
+        flash(constant.PROFILE_UPDATE)
+        return redirect(url_for('auth.setting_users', id=id))
+    form.email.data = user.email
+    form.username.data = user.username
+    form.confirmed.data = user.confirmed
+    form.role.data = user.role_id
+    form.name.data = user.name
+    return render_template('auth/admin_edit_profile.html', form=form)

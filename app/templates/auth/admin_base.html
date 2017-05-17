@@ -27,16 +27,14 @@
                 <li><a href="{{url_for('auth.manage_category')}}">管理话题类别</a></li>
                 <li><a href="{{url_for('auth.add_topic')}}">添加话题</a></li>
                 <li><a href="{{url_for('auth.manage_topic')}}">管理话题</a></li>
+                <li><a href="{{url_for('auth.manage_users')}}">管理用户</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Change Password</a></li>
-                        <li><a href="#">Change Email</a></li>
-                        <li><a href="#">Log Out</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Log In</a></li>
+                {% if current_user.is_authenticated %}
+                <li><a href="{{ url_for('auth.logout') }}">登出</a></li>
+                {% else %}
+                <li><a href="{{url_for('auth.login_register')}}">>登入</a></li>
+                {% endif %}
             </ul>
         </div>
     </div>
