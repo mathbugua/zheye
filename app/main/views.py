@@ -434,3 +434,12 @@ def question_followers(id):
     """显示某个话题的所有关注者"""
     question = Question.query.get_or_404(id)
     return render_template('alluser_follow_question.html', base64=base64, question=question)
+
+
+@main.route('/explore')
+@login_required
+def explore():
+    """发现"""
+    recommend_quwstions = Question.recommend()
+    return render_template("explore.html", base64=base64,
+                           questions_excellans=recommend_quwstions)

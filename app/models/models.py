@@ -2,8 +2,6 @@
 
 """定义数据库的models"""
 import calendar
-import hashlib
-
 from datetime import datetime
 from flask import current_app
 from flask_login import UserMixin, AnonymousUserMixin
@@ -526,6 +524,29 @@ class Question(db.Model):
         """问题被浏览的次数"""
         self.views += 1
         return operate_model.db_add(self)
+
+    @staticmethod
+    def recommend():
+        """编辑推荐优秀问题，标准为被浏览次数大于常量VIEW_MAX"""
+        recomm_question_list = list()
+        questions = Question.query.all()
+        for question in questions:
+            if question.views > current_app.config['VIEW_MAX']:
+                query = question.answers.filter_by().all()  # 查询问题下的所有回答
+                question_answer = [question]  # 存放目标问题及其下的优秀回答
+                if query:
+                    answer_excell = query[0]
+                    count = answer_excell.comments.count()
+                    for answer in query:
+                        if answer.comments.count() > count:
+                            answer_excell = answer
+                            count = answer_excell.comments.count()
+                    question_answer.append(answer_excell)
+                else:
+                    question_answer.append(None)
+
+                recomm_question_list.append(question_answer)  # 添加进总集和并返回
+        return recomm_question_list
 
     @staticmethod
     def add_question(question_name, question_desc, topic, current_user_id):

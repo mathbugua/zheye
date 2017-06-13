@@ -9,7 +9,7 @@ class Config:
     项目的配置文件类，配置可以都多种选择，```Config```为基类，
     配置公共部分
     """
-    SQLALCHEMY_COMMIT_ON_TEARDOWN = True   # 开启自动commit
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = True  # 开启自动commit
     SECRET_KEY = os.environ.get("SECRET_KEY") or "hard to guess string"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     MAIL_SERVER = 'smtp.163.com'
@@ -22,8 +22,9 @@ class Config:
     FLASKY_ADMIN = 'cl20141205@163.com'
     FLASKY_FOLLOWERS_PER_PAGE = 2
     ADMIN_MANAGE = 10
-
+    VIEW_MAX = 5  # 问题浏览次数常量
     UPLOAD_FOLDER = os.path.join(basedir)
+
     @staticmethod
     def init_app(app):
         pass
