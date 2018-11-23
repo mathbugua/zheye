@@ -1,10 +1,6 @@
 ## 项目介绍
 > 在线问答社区：者也
 
-## 测试账户
-- URL：http://119.29.248.16:5000/
-- username：chenlong_email@126.com　　　 password：123456
-
 ## 系统设计概述
 > 系统采用flask作为web开发框架，sqlalchemy实现数据库的操作。服务端推送消息采用twisted&websocket实现。tornado作为web服务器进行系统的部署。
 
